@@ -228,7 +228,7 @@ async function syncBlock(blockId, pageId = '') {
   }
 
   // CASE 5: Unchecked todo with text -> CREATE or UPDATE
-  const parsed = parseTask(rawText);
+  const parsed = await parseTask(rawText);
 
   if (existingTask) {
     // UPDATE existing task
