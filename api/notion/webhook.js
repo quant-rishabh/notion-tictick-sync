@@ -186,7 +186,14 @@ function parseTask(text) {
 
 // ==================== SYNC SINGLE BLOCK ====================
 
-async function syncBlock(blockId) {
+function getNotionLink(pageId, blockId) {
+  // Remove dashes from IDs for URL
+  const cleanPageId = pageId.replace(/-/g, '');
+  const cleanBlockId = blockId.replace(/-/g, '');
+  return `https://notion.so/${cleanPageId}#${cleanBlockId}`;
+}
+
+async function syncBlock(blockId, pageId = '') {
   console.log(`Syncing block: ${blockId}`);
 
   // 1. Get block from Notion
@@ -269,9 +276,15 @@ async function syncBlock(blockId) {
     // CREATE new task
     console.log(`   Creating: "${parsed.title}"`);
 
+    // Build content with Notion link for easy navigation
+    const notionLink = pageId ? getNotionLink(pageId, blockId) : '';
+    const content = notionLink 
+      ? `notion:${blockId}\n\n📎 Open in Notion:\n${notionLink}`
+      : `notion:${blockId}`;
+
     await createTask({
       title: parsed.title,
-      content: `notion:${blockId}`,
+      content: content,
       tags: parsed.tags || [],
       priority: parsed.priority || 0,
       dueDate: parsed.dueDate
@@ -337,7 +350,8 @@ export default async function handler(req, res) {
 
   if (eventType === 'page.content_updated') {
     const updatedBlocks = payload.data?.updated_blocks || [];
-    console.log(`Processing ${updatedBlocks.length} updated blocks`);
+    const parentPageId = payload.data?.parent?.id || payload.entity?.id || '';
+    console.log(`Processing ${updatedBlocks.length} updated blocks (page: ${parentPageId})`);
 
     const results = {
       processed: 0,
@@ -353,7 +367,7 @@ export default async function handler(req, res) {
       const blockId = blockInfo.id;
 
       try {
-        const result = await syncBlock(blockId);
+        const result = await syncBlock(blockId, parentPageId);
         results.processed++;
 
         switch (result.action) {
