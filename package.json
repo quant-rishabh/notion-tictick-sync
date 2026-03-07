@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
-    "chrono-node": "^2.9.0"
+    "chrono-node": "^2.9.0",
+    "rrule": "^2.8.1"
   }
 }
