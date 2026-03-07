@@ -284,11 +284,14 @@ async function syncBlock(blockId) {
 // ==================== MAIN WEBHOOK HANDLER ====================
 
 export default async function handler(req, res) {
-  // Handle verification challenge (Notion sends this when setting up webhook)
+  // Handle verification challenge from Notion
+  // Notion sends a verification_token in POST body that must be echoed back
+  
+  // GET request verification (query param)
   if (req.method === 'GET') {
     const challenge = req.query.challenge;
     if (challenge) {
-      console.log('Responding to webhook verification challenge');
+      console.log('Responding to GET webhook verification challenge');
       return res.status(200).send(challenge);
     }
     return res.status(200).json({ status: 'Notion webhook endpoint ready' });
@@ -296,6 +299,27 @@ export default async function handler(req, res) {
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // LOG EVERYTHING for debugging
+  const payload = req.body;
+  console.log('=== WEBHOOK RECEIVED ===');
+  console.log('Headers:', JSON.stringify(req.headers, null, 2));
+  console.log('Body:', JSON.stringify(payload, null, 2));
+  console.log('========================');
+  
+  // POST request verification (Notion sends verification_token in body)
+  // Check for ANY verification-related field
+  const token = payload.verification_token || payload.challenge || payload.token;
+  
+  if (payload.type === 'url_verification' || token) {
+    console.log('🔑 VERIFICATION TOKEN RECEIVED:', token);
+    // Return token in multiple formats to ensure compatibility
+    return res.status(200).json({ 
+      ok: true,
+      challenge: token,
+      verification_token: token 
+    });
   }
 
   // Validate environment
@@ -306,7 +330,6 @@ export default async function handler(req, res) {
     });
   }
 
-  const payload = req.body;
   console.log('Received webhook:', JSON.stringify(payload, null, 2));
 
   // Handle different event types
