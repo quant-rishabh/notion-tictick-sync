@@ -8,10 +8,13 @@
  * 1. CREATE: Block exists in Notion, not in TickTick -> Create task
  * 2. UPDATE: Block exists in Notion, exists in TickTick -> Update task
  * 3. DELETE: Block returns 404 from Notion -> Delete from TickTick
- * 4. CHECK: Block exists but checked:true -> COMPLETE in TickTick (not delete!)
+ * 4. CHECK (one-time): Block checked:true -> COMPLETE in TickTick
+ * 5. CHECK (recurring): Block checked:true -> DELETE from TickTick (stops forever)
  *
  * Uses TickTick Search API for O(1) lookup by block ID
  */
+
+import { parseTask } from '../../lib/parser.js';
 
 const NOTION_TOKEN = process.env.NOTION_TOKEN;
 const TICKTICK_BEARER_TOKEN = process.env.TICKTICK_BEARER_TOKEN;
@@ -21,6 +24,7 @@ const TICKTICK_USER_ID = process.env.TICKTICK_USER_ID;
 const NOTION_API_BASE = 'https://api.notion.com/v1';
 const TICKTICK_API_BASE = 'https://api.ticktick.com/open/v1';
 const NOTION_SYNC_TAG = 'notion-sync';
+const NOTION_RECURRING_TAG = 'notion-recurring';
 
 // ==================== API HELPERS ====================
 
@@ -107,20 +111,30 @@ async function findTickTickTaskByNotionId(notionBlockId) {
 
 async function createTask(taskData) {
   const tags = taskData.tags || [];
-  if (!tags.includes(NOTION_SYNC_TAG)) {
-    tags.push(NOTION_SYNC_TAG);
+  
+  // Use different tag for recurring vs one-time tasks
+  const syncTag = taskData.isRecurring ? NOTION_RECURRING_TAG : NOTION_SYNC_TAG;
+  if (!tags.includes(syncTag)) {
+    tags.push(syncTag);
   }
+
+  const body = {
+    title: taskData.title,
+    content: taskData.content || '',
+    projectId: `inbox${TICKTICK_USER_ID}`,
+    tags: tags,
+    priority: taskData.priority || 0,
+  };
+
+  // Add optional fields
+  if (taskData.dueDate) body.dueDate = taskData.dueDate;
+  if (taskData.startDate) body.startDate = taskData.startDate;
+  if (taskData.repeatFlag) body.repeatFlag = taskData.repeatFlag;
+  if (taskData.isAllDay !== undefined) body.isAllDay = taskData.isAllDay;
 
   return ticktickRequest('/task', {
     method: 'POST',
-    body: JSON.stringify({
-      title: taskData.title,
-      content: taskData.content || '',
-      projectId: `inbox${TICKTICK_USER_ID}`,
-      tags: tags,
-      priority: taskData.priority || 0,
-      ...(taskData.dueDate && { dueDate: taskData.dueDate })
-    })
+    body: JSON.stringify(body)
   });
 }
 
@@ -142,46 +156,6 @@ async function completeTask(taskId, projectId) {
   return ticktickRequest(`/project/${projectId}/task/${taskId}/complete`, {
     method: 'POST'
   });
-}
-
-// ==================== PARSER ====================
-
-function parseTask(text) {
-  let title = text;
-  const tags = [];
-  let priority = 0;
-  let dueDate = null;
-
-  // Extract tags (#tag)
-  const tagMatches = title.match(/#(\w+)/g);
-  if (tagMatches) {
-    tagMatches.forEach(tag => {
-      const tagName = tag.slice(1);
-      if (!['track', 'notrack'].includes(tagName)) {
-        tags.push(tagName);
-      }
-    });
-    title = title.replace(/#\w+/g, '').trim();
-  }
-
-  // Extract priority (!1, !2, !3)
-  const priorityMatch = title.match(/!([1-3])/);
-  if (priorityMatch) {
-    priority = parseInt(priorityMatch[1]);
-    title = title.replace(/![1-3]/g, '').trim();
-  }
-
-  // Extract date ($date)
-  const dateMatch = title.match(/\$(\d{4}-\d{2}-\d{2})/);
-  if (dateMatch) {
-    dueDate = dateMatch[1];
-    title = title.replace(/\$\d{4}-\d{2}-\d{2}/g, '').trim();
-  }
-
-  // Clean up extra spaces
-  title = title.replace(/\s+/g, ' ').trim();
-
-  return { title, tags, priority, dueDate };
 }
 
 // ==================== SYNC SINGLE BLOCK ====================
@@ -232,12 +206,23 @@ async function syncBlock(blockId, pageId = '') {
     return { action: 'skipped', reason: 'empty todo, no task' };
   }
 
-  // CASE 4: Checked todo - COMPLETE in TickTick (not delete!)
+  // CASE 4: Checked todo - Handle differently for recurring vs one-time
   if (isChecked) {
     if (existingTask) {
-      console.log(`   Task checked in Notion, completing in TickTick: "${rawText}"`);
-      await completeTask(existingTask.id, existingTask.projectId);
-      return { action: 'completed', reason: 'checked in notion' };
+      // Check if it's a recurring task (has notion-recurring tag)
+      const isRecurring = existingTask.tags && existingTask.tags.includes(NOTION_RECURRING_TAG);
+      
+      if (isRecurring) {
+        // RECURRING: Delete task entirely to stop all future instances
+        console.log(`   ♻️ Recurring task checked in Notion, DELETING from TickTick: "${rawText}"`);
+        await deleteTask(existingTask.id, existingTask.projectId);
+        return { action: 'deleted', reason: 'recurring task stopped via Notion' };
+      } else {
+        // ONE-TIME: Just complete it
+        console.log(`   ✅ Task checked in Notion, completing in TickTick: "${rawText}"`);
+        await completeTask(existingTask.id, existingTask.projectId);
+        return { action: 'completed', reason: 'checked in notion' };
+      }
     }
     return { action: 'skipped', reason: 'checked, no task' };
   }
@@ -274,11 +259,12 @@ async function syncBlock(blockId, pageId = '') {
     return { action: 'skipped', reason: 'no changes' };
   } else {
     // CREATE new task
-    console.log(`   Creating: "${parsed.title}"`);
+    const taskType = parsed.isRecurring ? '🔄 recurring' : '📝 one-time';
+    console.log(`   Creating ${taskType}: "${parsed.title}"`);
 
     // Build content with Notion link for easy navigation
     const notionLink = pageId ? getNotionLink(pageId, blockId) : '';
-    const content = notionLink 
+    const content = notionLink
       ? `notion:${blockId}\n\n📎 Open in Notion:\n${notionLink}`
       : `notion:${blockId}`;
 
@@ -287,10 +273,14 @@ async function syncBlock(blockId, pageId = '') {
       content: content,
       tags: parsed.tags || [],
       priority: parsed.priority || 0,
-      dueDate: parsed.dueDate
+      dueDate: parsed.dueDate,
+      startDate: parsed.startDate,
+      repeatFlag: parsed.repeatFlag,
+      isRecurring: parsed.isRecurring,
+      isAllDay: parsed.isAllDay
     });
 
-    return { action: 'created', title: parsed.title };
+    return { action: 'created', title: parsed.title, recurring: parsed.isRecurring };
   }
 }
 
