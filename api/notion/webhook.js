@@ -14,7 +14,7 @@
  * Uses TickTick Search API for O(1) lookup by block ID
  */
 
-import { parseTask } from '../../lib/parser.js';
+import { parseTask } from '../../lib/ai-parser.js';
 
 const NOTION_TOKEN = process.env.NOTION_TOKEN;
 const TICKTICK_BEARER_TOKEN = process.env.TICKTICK_BEARER_TOKEN;
