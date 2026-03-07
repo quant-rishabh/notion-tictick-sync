@@ -340,8 +340,10 @@ export default async function handler(req, res) {
 
   if (eventType === 'page.content_updated') {
     const updatedBlocks = payload.data?.updated_blocks || [];
-    const parentPageId = payload.data?.parent?.id || payload.entity?.id || '';
-    console.log(`Processing ${updatedBlocks.length} updated blocks (page: ${parentPageId})`);
+    // entity.id is the page where the task exists (correct!)
+    // data.parent.id is the PARENT of that page (wrong!)
+    const taskPageId = payload.entity?.id || payload.data?.parent?.id || '';
+    console.log(`Processing ${updatedBlocks.length} updated blocks (page: ${taskPageId})`);
 
     const results = {
       processed: 0,
@@ -357,7 +359,7 @@ export default async function handler(req, res) {
       const blockId = blockInfo.id;
 
       try {
-        const result = await syncBlock(blockId, parentPageId);
+        const result = await syncBlock(blockId, taskPageId);
         results.processed++;
 
         switch (result.action) {
