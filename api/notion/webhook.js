@@ -168,83 +168,131 @@ function getNotionLink(pageId, blockId) {
 }
 
 async function syncBlock(blockId, pageId = '') {
-  console.log(`Syncing block: ${blockId}`);
+  console.log(`\n========== SYNC BLOCK: ${blockId} ==========`);
 
   // 1. Get block from Notion
+  console.log(`[NOTION] Fetching block...`);
   const { data: block, status } = await getBlock(blockId);
+  console.log(`[NOTION] Response status: ${status}`);
 
   // 2. Fast lookup in TickTick
+  console.log(`[TICKTICK] Searching for existing task...`);
   const existingTask = await findTickTickTaskByNotionId(blockId);
-  console.log(`   TickTick task: ${existingTask ? existingTask.id : 'NOT FOUND'}`);
+  if (existingTask) {
+    console.log(`[TICKTICK] ✓ Found task: "${existingTask.title}" (ID: ${existingTask.id})`);
+    console.log(`[TICKTICK]   Tags: [${(existingTask.tags || []).join(', ')}]`);
+    console.log(`[TICKTICK]   Project: ${existingTask.projectId}`);
+  } else {
+    console.log(`[TICKTICK] ✗ No existing task found`);
+  }
 
   // CASE 1: Block deleted from Notion (404)
   if (status === 404 || block.object === 'error') {
+    console.log(`[NOTION] ⚠️ Block NOT FOUND (deleted or error)`);
     if (existingTask) {
-      console.log(`   Block deleted from Notion, removing from TickTick`);
-      await deleteTask(existingTask.id, existingTask.projectId);
+      console.log(`[DELETE] 🗑️ Deleting from TickTick because block deleted from Notion`);
+      console.log(`[DELETE]   Task: "${existingTask.title}"`);
+      console.log(`[DELETE]   TickTick ID: ${existingTask.id}`);
+      const deleteResult = await deleteTask(existingTask.id, existingTask.projectId);
+      console.log(`[DELETE]   Result: ${deleteResult ? 'SUCCESS' : 'DONE'}`);
       return { action: 'deleted', reason: 'notion block deleted' };
     }
+    console.log(`[SKIP] No task to delete`);
     return { action: 'skipped', reason: 'block not found, no task' };
   }
 
   // CASE 2: Not a todo block
   if (block.type !== 'to_do') {
-    console.log(`   Skipping non-todo block (${block.type})`);
+    console.log(`[NOTION] Block type: ${block.type} (not a todo)`);
+    if (existingTask) {
+      console.log(`[DELETE] 🗑️ Block changed from todo to ${block.type}, deleting task`);
+      console.log(`[DELETE]   Task: "${existingTask.title}"`);
+      const deleteResult = await deleteTask(existingTask.id, existingTask.projectId);
+      console.log(`[DELETE]   Result: ${deleteResult ? 'SUCCESS' : 'DONE'}`);
+      return { action: 'deleted', reason: 'block type changed' };
+    }
+    console.log(`[SKIP] Not a todo block`);
     return { action: 'skipped', reason: 'not a todo' };
   }
 
   const rawText = block.to_do.rich_text.map(r => r.plain_text).join('');
   const isChecked = block.to_do.checked;
+  console.log(`[NOTION] Todo text: "${rawText}"`);
+  console.log(`[NOTION] Checked: ${isChecked}`);
 
   // CASE 3: Empty todo - delete from TickTick if exists
   if (!rawText.trim()) {
+    console.log(`[NOTION] ⚠️ Todo text is EMPTY`);
     if (existingTask) {
-      console.log(`   Deleting empty task from TickTick`);
-      await deleteTask(existingTask.id, existingTask.projectId);
+      console.log(`[DELETE] 🗑️ Deleting empty task from TickTick`);
+      console.log(`[DELETE]   Task: "${existingTask.title}"`);
+      const deleteResult = await deleteTask(existingTask.id, existingTask.projectId);
+      console.log(`[DELETE]   Result: ${deleteResult ? 'SUCCESS' : 'DONE'}`);
       return { action: 'deleted', reason: 'empty todo' };
     }
+    console.log(`[SKIP] Empty todo, no task to delete`);
     return { action: 'skipped', reason: 'empty todo, no task' };
   }
 
   // CASE 4: Checked todo - Handle differently for recurring vs one-time
   if (isChecked) {
+    console.log(`[NOTION] ✓ Todo is CHECKED`);
     if (existingTask) {
       // Check if it's a recurring task (has notion-recurring tag)
       const isRecurring = existingTask.tags && existingTask.tags.includes(NOTION_RECURRING_TAG);
+      console.log(`[TICKTICK] Is recurring (has ${NOTION_RECURRING_TAG} tag): ${isRecurring}`);
       
       if (isRecurring) {
         // RECURRING: Delete task entirely to stop all future instances
-        console.log(`   ♻️ Recurring task checked in Notion, DELETING from TickTick: "${rawText}"`);
-        await deleteTask(existingTask.id, existingTask.projectId);
+        console.log(`[DELETE] 🔄🗑️ RECURRING task checked → DELETING to stop all future occurrences`);
+        console.log(`[DELETE]   Task: "${existingTask.title}"`);
+        const deleteResult = await deleteTask(existingTask.id, existingTask.projectId);
+        console.log(`[DELETE]   Result: ${deleteResult ? 'SUCCESS' : 'DONE'}`);
         return { action: 'deleted', reason: 'recurring task stopped via Notion' };
       } else {
         // ONE-TIME: Just complete it
-        console.log(`   ✅ Task checked in Notion, completing in TickTick: "${rawText}"`);
-        await completeTask(existingTask.id, existingTask.projectId);
+        console.log(`[COMPLETE] ✅ ONE-TIME task checked → Completing in TickTick`);
+        console.log(`[COMPLETE]   Task: "${existingTask.title}"`);
+        const completeResult = await completeTask(existingTask.id, existingTask.projectId);
+        console.log(`[COMPLETE]   Result: ${completeResult ? 'SUCCESS' : 'DONE'}`);
         return { action: 'completed', reason: 'checked in notion' };
       }
     }
+    console.log(`[SKIP] Checked todo but no task in TickTick`);
     return { action: 'skipped', reason: 'checked, no task' };
   }
 
   // CASE 5: Unchecked todo with text -> CREATE or UPDATE
+  console.log(`[AI] Parsing task with AI...`);
   const parsed = await parseTask(rawText);
+  console.log(`[AI] Parse result:`);
+  console.log(`[AI]   Title: "${parsed.title}"`);
+  console.log(`[AI]   Tags: [${(parsed.tags || []).join(', ')}]`);
+  console.log(`[AI]   Priority: ${parsed.priority}`);
+  console.log(`[AI]   Due Date: ${parsed.dueDate || 'none'}`);
+  console.log(`[AI]   Is Recurring: ${parsed.isRecurring}`);
+  console.log(`[AI]   Repeat Flag: ${parsed.repeatFlag || 'none'}`);
 
   if (existingTask) {
     // UPDATE existing task
     const existingUserTags = (existingTask.tags || [])
-      .filter(t => t !== NOTION_SYNC_TAG).sort().join(',');
+      .filter(t => t !== NOTION_SYNC_TAG && t !== NOTION_RECURRING_TAG).sort().join(',');
     const newUserTags = (parsed.tags || []).sort().join(',');
 
-    if (existingTask.title !== parsed.title || existingUserTags !== newUserTags) {
-      console.log(`   Updating: "${parsed.title}"`);
+    console.log(`[UPDATE] Checking for changes...`);
+    console.log(`[UPDATE]   Old title: "${existingTask.title}" → New: "${parsed.title}"`);
+    console.log(`[UPDATE]   Old tags: [${existingUserTags}] → New: [${newUserTags}]`);
 
+    if (existingTask.title !== parsed.title || existingUserTags !== newUserTags) {
+      console.log(`[UPDATE] 📝 Changes detected, updating task`);
+
+      const syncTag = parsed.isRecurring ? NOTION_RECURRING_TAG : NOTION_SYNC_TAG;
       const updatedTags = [...(parsed.tags || [])];
-      if (!updatedTags.includes(NOTION_SYNC_TAG)) {
-        updatedTags.push(NOTION_SYNC_TAG);
+      if (!updatedTags.includes(syncTag)) {
+        updatedTags.push(syncTag);
       }
 
-      await updateTask({
+      const updateResult = await updateTask({
         id: existingTask.id,
         projectId: existingTask.projectId,
         title: parsed.title,
@@ -252,15 +300,28 @@ async function syncBlock(blockId, pageId = '') {
         tags: updatedTags,
         priority: parsed.priority || 0
       });
+      console.log(`[UPDATE]   Result: ${updateResult ? 'SUCCESS' : 'DONE'}`);
 
       return { action: 'updated', title: parsed.title };
     }
 
+    console.log(`[SKIP] No changes detected`);
     return { action: 'skipped', reason: 'no changes' };
   } else {
     // CREATE new task
-    const taskType = parsed.isRecurring ? '🔄 recurring' : '📝 one-time';
-    console.log(`   Creating ${taskType}: "${parsed.title}"`);
+    const taskType = parsed.isRecurring ? '🔄 RECURRING' : '📝 ONE-TIME';
+    const syncTag = parsed.isRecurring ? NOTION_RECURRING_TAG : NOTION_SYNC_TAG;
+    console.log(`[CREATE] ➕ Creating NEW ${taskType} task`);
+    console.log(`[CREATE]   Title: "${parsed.title}"`);
+    console.log(`[CREATE]   Sync Tag: ${syncTag}`);
+    console.log(`[CREATE]   Tags: [${(parsed.tags || []).join(', ')}]`);
+    console.log(`[CREATE]   Priority: ${parsed.priority}`);
+    console.log(`[CREATE]   Due Date: ${parsed.dueDate || 'none'}`);
+    console.log(`[CREATE]   Start Date: ${parsed.startDate || 'none'}`);
+    console.log(`[CREATE]   Is All Day: ${parsed.isAllDay}`);
+    if (parsed.isRecurring) {
+      console.log(`[CREATE]   🔁 RRULE: ${parsed.repeatFlag}`);
+    }
 
     // Build content with Notion link for easy navigation
     const notionLink = pageId ? getNotionLink(pageId, blockId) : '';
@@ -268,7 +329,7 @@ async function syncBlock(blockId, pageId = '') {
       ? `notion:${blockId}\n\n📎 Open in Notion:\n${notionLink}`
       : `notion:${blockId}`;
 
-    await createTask({
+    const taskPayload = {
       title: parsed.title,
       content: content,
       tags: parsed.tags || [],
@@ -278,7 +339,19 @@ async function syncBlock(blockId, pageId = '') {
       repeatFlag: parsed.repeatFlag,
       isRecurring: parsed.isRecurring,
       isAllDay: parsed.isAllDay
-    });
+    };
+    
+    console.log(`[CREATE]   Full payload being sent to TickTick:`);
+    console.log(`[CREATE]   ${JSON.stringify(taskPayload, null, 2).split('\n').join('\n[CREATE]   ')}`);
+
+    const createResult = await createTask(taskPayload);
+    
+    if (createResult) {
+      console.log(`[CREATE]   ✓ SUCCESS - Task ID: ${createResult.id}`);
+      console.log(`[CREATE]   TickTick response: ${JSON.stringify(createResult, null, 2).split('\n').join('\n[CREATE]   ')}`);
+    } else {
+      console.log(`[CREATE]   ⚠️ No response from TickTick (might still be created)`);
+    }
 
     return { action: 'created', title: parsed.title, recurring: parsed.isRecurring };
   }
