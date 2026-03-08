@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Workflow</title>
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:-apple-system,sans-serif;background:#111;color:#eee;padding:8px;font-size:13px}
+        .nav{display:flex;justify-content:space-between;align-items:center;padding:6px 0 10px}
+        .nav a{color:#60a5fa;font-size:11px;text-decoration:none}
+        .menu{display:flex;flex-direction:column;gap:6px}
+        .menu-btn{display:flex;justify-content:space-between;padding:10px 12px;background:#222;border:none;border-radius:6px;color:#fff;font-size:12px;cursor:pointer}
+        .menu-btn:active{opacity:0.7}
+        .badge{background:#fff;color:#000;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:bold}
+        .card{background:#1a1a1a;border-radius:8px;padding:10px}
+        .card-header{display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px}
+        .close-btn{background:none;border:none;color:#666;font-size:16px;cursor:pointer}
+        .task{font-size:14px;font-weight:500;margin-bottom:4px}
+        .meta{font-size:10px;color:#666;margin-bottom:10px}
+        .actions{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+        .btn{padding:8px 14px;border:1px solid #444;border-radius:4px;font-size:12px;cursor:pointer;background:#fff;color:#222}
+        .btn:active{opacity:0.8}
+        .btn-h{border-color:#ea4335;color:#ea4335}
+        .btn-m{border-color:#fbbc04;color:#b45309}
+        .btn-l{border-color:#3b82f6;color:#3b82f6}
+        .btn-d{border-color:#666;color:#666}
+        .btn-s{border-color:#555;color:#888;background:#222}
+        .prog{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:10px;color:#555}
+        .prog-bar{flex:1;height:3px;background:#333;border-radius:2px}
+        .prog-fill{height:100%;background:#f59e0b;border-radius:2px}
+        .hidden{display:none!important}
+        #msg{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);padding:6px 14px;background:#333;border-radius:6px;font-size:11px;display:none}
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <b>⚡ Workflow</b>
+        <a href="index.html">← Back</a>
+    </div>
+
+    <!-- MENU -->
+    <div id="menu" class="menu">
+        <button class="menu-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706)" onclick="openPriority()">
+            <span>1. ⭐ Priority</span><span class="badge" id="bPri">-</span>
+        </button>
+        <button class="menu-btn" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed)" onclick="openFreq()">
+            <span>2. 🔄 Frequency</span><span class="badge" id="bFreq">-</span>
+        </button>
+        <button class="menu-btn" style="background:linear-gradient(135deg,#10b981,#059669)" onclick="openDur()">
+            <span>3. ⏱️ Duration</span><span class="badge" id="bDur">-</span>
+        </button>
+        <button class="menu-btn" style="background:linear-gradient(135deg,#f97316,#ea580c)" onclick="window.open('https://ticktick.com/webapp/#f/69a71f9ed36a0805fcbd5820/tasks','_blank')">
+            <span>4. 📅 Schedule</span><span class="badge">↗</span>
+        </button>
+        <button class="menu-btn" style="background:linear-gradient(135deg,#ec4899,#db2777)" onclick="window.open('https://ticktick.com/webapp/#f/69a71eb6d36a0805fcbd5627/tasks','_blank')">
+            <span>5. 🔄 Schedule Recurring</span><span class="badge">↗</span>
+        </button>
+    </div>
+
+    <!-- PRIORITY -->
+    <div id="priority" class="card hidden">
+        <div class="card-header">
+            <span>⭐ Priority <span id="pCount" style="color:#f59e0b">0</span></span>
+            <button class="close-btn" onclick="closeView()">×</button>
+        </div>
+        <div class="task" id="pTask">-</div>
+        <div class="meta" id="pMeta"></div>
+        <div class="actions" id="pActions">
+            <button class="btn btn-h" onclick="setPri(5)">High</button>
+            <button class="btn btn-m" onclick="setPri(3)">Med</button>
+            <button class="btn btn-l" onclick="setPri(1)">Low</button>
+            <button class="btn" onclick="setLater()">💤 Later</button>
+            <button class="btn btn-d" onclick="delTask()">Del</button>
+            <button class="btn btn-s" onclick="skipTask()">Skip</button>
+        </div>
+        <div class="actions hidden" id="pDone"><button class="btn" onclick="closeView()">✓ Close</button></div>
+        <div class="prog"><span id="pProg">0/0</span><div class="prog-bar"><div class="prog-fill" id="pBar"></div></div></div>
+    </div>
+
+    <!-- FREQUENCY -->
+    <div id="freq" class="card hidden">
+        <div class="card-header">
+            <span>🔄 Frequency <span id="fqCount" style="color:#8b5cf6">0</span></span>
+            <button class="close-btn" onclick="closeView()">×</button>
+        </div>
+        <div class="task" id="fqTask">-</div>
+        <div class="meta" id="fqMeta"></div>
+        <div class="actions" id="fqActions">
+            <button class="btn" onclick="setFreqTag('one-time')">1️⃣ One-time</button>
+            <button class="btn" onclick="setFreqTag('recurring')">🔄 Recurring</button>            <button class="btn btn-d" onclick="delFreq()">Del</button>            <button class="btn btn-s" onclick="skipFreq()">Skip</button>
+        </div>
+        <div class="actions hidden" id="fqDone"><button class="btn" onclick="closeView()">✓ Close</button></div>
+        <div class="prog"><span id="fqProg">0/0</span><div class="prog-bar"><div class="prog-fill" id="fqBar" style="background:#8b5cf6"></div></div></div>
+    </div>
+
+    <!-- DURATION -->
+    <div id="dur" class="card hidden">
+        <div class="card-header">
+            <span>⏱️ Duration <span id="drCount" style="color:#10b981">0</span></span>
+            <button class="close-btn" onclick="closeView()">×</button>
+        </div>
+        <div class="task" id="drTask">-</div>
+        <div class="meta" id="drMeta"></div>
+        <div class="actions" id="drActions">
+            <button class="btn" onclick="setDurTag('5-min')">5m</button>
+            <button class="btn" onclick="setDurTag('15-min')">15m</button>
+            <button class="btn" onclick="setDurTag('30-min')">30m</button>
+            <button class="btn" onclick="setDurTag('1-hour')">1h</button>
+            <button class="btn" onclick="setDurTag('2-hour')">2h</button>
+            <button class="btn btn-d" onclick="delDur()">Del</button>
+            <button class="btn btn-s" onclick="skipDur()">Skip</button>
+        </div>
+        <div class="actions hidden" id="drDone"><button class="btn" onclick="closeView()">✓ Close</button></div>
+        <div class="prog"><span id="drProg">0/0</span><div class="prog-bar"><div class="prog-fill" id="drBar" style="background:#10b981"></div></div></div>
+    </div>
+
+    <!-- SCHEDULE -->
+    <div id="sched" class="card hidden">
+        <div class="card-header">
+            <span>📅 Schedule <span id="scCount" style="color:#f97316">0</span></span>
+            <button class="close-btn" onclick="closeView()">×</button>
+        </div>
+        <div class="task" id="scTask">-</div>
+        <div class="meta" id="scMeta"></div>
+        <div class="actions" id="scActions">
+            <button class="btn" onclick="setSchedDate(0)">Today</button>
+            <button class="btn" onclick="setSchedDate(1)">Tomorrow</button>
+            <button class="btn" onclick="setSchedDate(7)">Next Week</button>
+            <button class="btn btn-d" onclick="delSched()">Del</button>
+            <button class="btn btn-s" onclick="skipSched()">Skip</button>
+        </div>
+        <div class="actions hidden" id="scDone"><button class="btn" onclick="closeView()">✓ Close</button></div>
+        <div class="prog"><span id="scProg">0/0</span><div class="prog-bar"><div class="prog-fill" id="scBar" style="background:#f97316"></div></div></div>
+    </div>
+
+    <div id="msg"></div>
+
+    <script>
+        let tasks=[],idx=0,currentView=null;
+        let fqTasks=[],fqIdx=0;
+        let drTasks=[],drIdx=0;
+        let scTasks=[],scIdx=0;
+
+        document.addEventListener('keydown',e=>{
+            if(currentView==='priority'){
+                if(e.key==='1')setPri(5);
+                else if(e.key==='2')setPri(3);
+                else if(e.key==='3')setPri(1);
+                else if(e.key==='4')setLater();
+                else if(e.key.toLowerCase()==='d')delTask();
+                else if(e.key.toLowerCase()==='s')skipTask();
+                else if(e.key==='Escape')closeView();
+            }else if(currentView==='freq'){
+                if(e.key==='1')setFreqTag('one-time');
+                else if(e.key==='2')setFreqTag('recurring');
+                else if(e.key.toLowerCase()==='d')delFreq();
+                else if(e.key.toLowerCase()==='s')skipFreq();
+                else if(e.key==='Escape')closeView();
+            }else if(currentView==='dur'){
+                if(e.key==='1')setDurTag('5-min');
+                else if(e.key==='2')setDurTag('15-min');
+                else if(e.key==='3')setDurTag('30-min');
+                else if(e.key==='4')setDurTag('1-hour');
+                else if(e.key==='5')setDurTag('2-hour');
+                else if(e.key.toLowerCase()==='d')delDur();
+                else if(e.key.toLowerCase()==='s')skipDur();
+                else if(e.key==='Escape')closeView();
+            }else if(currentView==='sched'){
+                if(e.key==='1')setSchedDate(0);
+                else if(e.key==='2')setSchedDate(1);
+                else if(e.key==='3')setSchedDate(7);
+                else if(e.key.toLowerCase()==='d')delSched();
+                else if(e.key.toLowerCase()==='s')skipSched();
+                else if(e.key==='Escape')closeView();
+            }
+        });
+
+        async function openPriority(){
+            const token=localStorage.getItem('ticktick_token');
+            if(!token){msg('No token');return}
+            
+            currentView='priority';
+            document.getElementById('menu').classList.add('hidden');
+            document.getElementById('priority').classList.remove('hidden');
+            document.getElementById('pTask').textContent='Loading...';
+            
+            try{
+                const res=await fetch('https://api.ticktick.com/open/v1/task/filter',{
+                    method:'POST',
+                    headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+                    body:JSON.stringify({priority:[0],status:[0]})
+                });
+                let allTasks=await res.json();
+                // Filter out tasks with 'delete' or 'later' tag
+                tasks=allTasks.filter(t=>{
+                    const tags=t.tags||[];
+                    return !tags.includes('delete')&&!tags.includes('later');
+                });
+                idx=0;
+                showTask();
+                msg('Loaded '+tasks.length);
+            }catch(e){
+                document.getElementById('pTask').textContent='Error loading';
+            }
+        }
+
+        async function openFreq(){
+            const token=localStorage.getItem('ticktick_token');
+            if(!token){msg('No token');return}
+            
+            currentView='freq';
+            document.getElementById('menu').classList.add('hidden');
+            document.getElementById('freq').classList.remove('hidden');
+            document.getElementById('fqTask').textContent='Loading...';
+            
+            try{
+                // Get high(5), med(3), low(1) priority tasks
+                const res=await fetch('https://api.ticktick.com/open/v1/task/filter',{
+                    method:'POST',
+                    headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+                    body:JSON.stringify({priority:[1,3,5],status:[0]})
+                });
+                let allTasks=await res.json();
+                // Filter: no one-time/recurring/notion-recurring tag, no delete/later tag
+                // For low priority (1): must have 'schedule' tag
+                fqTasks=allTasks.filter(t=>{
+                    const tags=t.tags||[];
+                    if(tags.includes('one-time')||tags.includes('recurring')||tags.includes('notion-recurring')||tags.includes('delete')||tags.includes('later'))return false;
+                    if(t.priority===1&&!tags.includes('schedule'))return false;
+                    return true;
+                });
+                fqIdx=0;
+                showFreqTask();
+                msg('Loaded '+fqTasks.length);
+            }catch(e){
+                document.getElementById('fqTask').textContent='Error loading';
+            }
+        }
+
+        function closeView(){
+            document.getElementById('priority').classList.add('hidden');
+            document.getElementById('freq').classList.add('hidden');
+            document.getElementById('dur').classList.add('hidden');
+            document.getElementById('sched').classList.add('hidden');
+            document.getElementById('menu').classList.remove('hidden');
+            currentView=null;
+        }
+
+        function showTask(){
+            const remain=tasks.length-idx;
+            document.getElementById('pCount').textContent=remain;
+            document.getElementById('bPri').textContent=remain;
+            
+            if(idx>=tasks.length){
+                document.getElementById('pTask').textContent='✅ All done!';
+                document.getElementById('pMeta').textContent='No tasks pending';
+                document.getElementById('pProg').textContent='0/0';
+                document.getElementById('pBar').style.width='100%';
+                document.getElementById('pActions').classList.add('hidden');
+                document.getElementById('pDone').classList.remove('hidden');
+                return;
+            }
+            document.getElementById('pActions').classList.remove('hidden');
+            document.getElementById('pDone').classList.add('hidden');
+            const t=tasks[idx];
+            document.getElementById('pTask').textContent=t.title||'-';
+            document.getElementById('pMeta').textContent=t.projectId||'';
+            document.getElementById('pProg').textContent=(idx+1)+'/'+tasks.length;
+            document.getElementById('pBar').style.width=((idx+1)/tasks.length*100)+'%';
+        }
+
+        function showFreqTask(){
+            const remain=fqTasks.length-fqIdx;
+            document.getElementById('fqCount').textContent=remain;
+            document.getElementById('bFreq').textContent=remain;
+            
+            if(fqIdx>=fqTasks.length){
+                document.getElementById('fqTask').textContent='✅ All done!';
+                document.getElementById('fqMeta').textContent='No tasks pending';
+                document.getElementById('fqProg').textContent='0/0';
+                document.getElementById('fqBar').style.width='100%';
+                document.getElementById('fqActions').classList.add('hidden');
+                document.getElementById('fqDone').classList.remove('hidden');
+                return;
+            }
+            document.getElementById('fqActions').classList.remove('hidden');
+            document.getElementById('fqDone').classList.add('hidden');
+            const t=fqTasks[fqIdx];
+            const pri=t.priority===5?'🔴':t.priority===3?'🟡':'🔵';
+            document.getElementById('fqTask').textContent=t.title||'-';
+            document.getElementById('fqMeta').textContent=pri+' '+(t.projectId||'');
+            document.getElementById('fqProg').textContent=(fqIdx+1)+'/'+fqTasks.length;
+            document.getElementById('fqBar').style.width=((fqIdx+1)/fqTasks.length*100)+'%';
+        }
+
+        async function setPri(p){
+            if(idx>=tasks.length)return;
+            const t=tasks[idx];
+            const token=localStorage.getItem('ticktick_token');
+            try{
+                await fetch(`https://api.ticktick.com/open/v1/task/${t.id}`,{
+                    method:'POST',
+                    headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+                    body:JSON.stringify({id:t.id,projectId:t.projectId,priority:p})
+                });
+                msg('Priority set');
+            }catch(e){msg('Error')}
+            idx++;showTask();
+        }
+
+        async function delTask(){
+            if(idx>=tasks.length)return;
+            const t=tasks[idx];
+            const token=localStorage.getItem('ticktick_token');
+            try{
+                // Add 'delete' tag via Open API task update
+                const newTags = [...(t.tags||[]), 'delete'];
+                await fetch(`https://api.ticktick.com/open/v1/task/${t.id}`,{
+                    method:'POST',
+                    headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+                    body:JSON.stringify({id:t.id,projectId:t.projectId,tags:newTags})
+                });
+                msg('Marked delete');
+            }catch(e){console.error(e);msg('Error')}
+            idx++;showTask();
+        }
+
+        async function setLater(){
+            if(idx>=tasks.length)return;
+            const t=tasks[idx];
+            const token=localStorage.getItem('ticktick_token');
+            try{
+                const newTags=[...(t.tags||[]),'later'];
+                await fetch(`https://api.ticktick.com/open/v1/task/${t.id}`,{
+                    method:'POST',
+                    headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+                    body:JSON.stringify({id:t.id,projectId:t.projectId,tags:newTags})
+                });
+                msg('💤 Later');
+            }catch(e){console.error(e);msg('Error')}
+            idx++;showTask();
+        }
+
+        function skipTask(){idx++;showTask();msg('Skipped')}
+
+        function skipFreq(){fqIdx++;showFreqTask();msg('Skipped')}
+
+        async function delFreq(){
+            if(fqIdx>=fqTasks.length)return;
+            const t=fqTasks[fqIdx];
+            const token=localStorage.getItem('ticktick_token');
+            try{
+                const newTags=[...(t.tags||[]),'delete'];
+                await fetch(`https://api.ticktick.com/open/v1/task/${t.id}`,{
+                    method:'POST',
+                    headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+                    body:JSON.stringify({id:t.id,projectId:t.projectId,tags:newTags})
+                });
+                msg('Marked delete');
+            }catch(e){console.error(e);msg('Error')}
+            fqIdx++;showFreqTask();
+        }
+
+        async function openDur(){
+            const token=localStorage.getItem('ticktick_token');
+            if(!token){msg('No token');return}
+
+            currentView='dur';
+            document.getElementById('menu').classList.add('hidden');
+            document.getElementById('dur').classList.remove('hidden');
+            document.getElementById('drTask').textContent='Loading...';
+
+            try{
+                // Get all priority tasks (high, med, low)
+                const res=await fetch('https://api.ticktick.com/open/v1/task/filter',{
+                    method:'POST',
+                    headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+                    body:JSON.stringify({priority:[1,3,5],status:[0]})
+                });
+                let allTasks=await res.json();
+                // Filter: no duration tags, no delete/later tag
+                const DUR_TAGS=['5-min','15-min','30-min','1-hour','2-hour'];
+                drTasks=allTasks.filter(t=>{
+                    const tags=t.tags||[];
+                    if(tags.includes('delete')||tags.includes('later'))return false;
+                    if(DUR_TAGS.some(d=>tags.includes(d)))return false;
+                    return true;
+                });
+                drIdx=0;
+                showDurTask();
+                msg('Loaded '+drTasks.length);
+            }catch(e){
+                document.getElementById('drTask').textContent='Error loading';
+            }
+        }
+
+        function showDurTask(){
+            const remain=drTasks.length-drIdx;
+            document.getElementById('drCount').textContent=remain;
+            document.getElementById('bDur').textContent=remain;
+
+            if(drIdx>=drTasks.length){
+                document.getElementById('drTask').textContent='✅ All done!';
+                document.getElementById('drMeta').textContent='No tasks pending';
+                document.getElementById('drProg').textContent='0/0';
+                document.getElementById('drBar').style.width='100%';
+                document.getElementById('drActions').classList.add('hidden');
+                document.getElementById('drDone').classList.remove('hidden');
+                return;
+            }
+            document.getElementById('drActions').classList.remove('hidden');
+            document.getElementById('drDone').classList.add('hidden');
+            const t=drTasks[drIdx];
+            const pri=t.priority===5?'🔴':t.priority===3?'🟡':'🔵';
+            document.getElementById('drTask').textContent=t.title||'-';
+            document.getElementById('drMeta').textContent=pri+' '+(t.projectId||'');
+            document.getElementById('drProg').textContent=(drIdx+1)+'/'+drTasks.length;
+            document.getElementById('drBar').style.width=((drIdx+1)/drTasks.length*100)+'%';
+        }
+
+        function skipDur(){drIdx++;showDurTask();msg('Skipped')}
+
+        async function delDur(){
+            if(drIdx>=drTasks.length)return;
+            const t=drTasks[drIdx];
+            const token=localStorage.getItem('ticktick_token');
+            try{
+                const newTags=[...(t.tags||[]),'delete'];
+                await fetch(`https://api.ticktick.com/open/v1/task/${t.id}`,{
+                    method:'POST',
+                    headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+                    body:JSON.stringify({id:t.id,projectId:t.projectId,tags:newTags})
+                });
+                msg('Marked delete');
+            }catch(e){console.error(e);msg('Error')}
+            drIdx++;showDurTask();
+        }
+
+        async function openSched(){
+            const token=localStorage.getItem('ticktick_token');
+            if(!token){msg('No token');return}
+
+            currentView='sched';
+            document.getElementById('menu').classList.add('hidden');
+            document.getElementById('sched').classList.remove('hidden');
+            document.getElementById('scTask').textContent='Loading...';
+
+            try{
+                // Get all priority tasks (high, med, low)
+                const res=await fetch('https://api.ticktick.com/open/v1/task/filter',{
+                    method:'POST',
+                    headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+                    body:JSON.stringify({priority:[1,3,5],status:[0]})
+                });
+                let allTasks=await res.json();
+                const today=new Date();
+                today.setHours(0,0,0,0);
+                // Filter: no date OR overdue, no delete/later tag
+                scTasks=allTasks.filter(t=>{
+                    const tags=t.tags||[];
+                    if(tags.includes('delete')||tags.includes('later'))return false;
+                    // No date
+                    if(!t.dueDate)return true;
+                    // Overdue (dueDate < today)
+                    const due=new Date(t.dueDate);
+                    due.setHours(0,0,0,0);
+                    return due<today;
+                });
+                scIdx=0;
+                showSchedTask();
+                msg('Loaded '+scTasks.length);
+            }catch(e){
+                document.getElementById('scTask').textContent='Error loading';
+            }
+        }
+
+        function showSchedTask(){
+            const remain=scTasks.length-scIdx;
+            document.getElementById('scCount').textContent=remain;
+            document.getElementById('bSched').textContent=remain;
+
+            if(scIdx>=scTasks.length){
+                document.getElementById('scTask').textContent='✅ All done!';
+                document.getElementById('scMeta').textContent='No tasks pending';
+                document.getElementById('scProg').textContent='0/0';
+                document.getElementById('scBar').style.width='100%';
+                document.getElementById('scActions').classList.add('hidden');
+                document.getElementById('scDone').classList.remove('hidden');
+                return;
+            }
+            document.getElementById('scActions').classList.remove('hidden');
+            document.getElementById('scDone').classList.add('hidden');
+            const t=scTasks[scIdx];
+            const pri=t.priority===5?'🔴':t.priority===3?'🟡':'🔵';
+            const dateInfo=t.dueDate?'⚠️ Overdue: '+new Date(t.dueDate).toLocaleDateString():'📅 No date';
+            document.getElementById('scTask').textContent=t.title||'-';
+            document.getElementById('scMeta').textContent=pri+' '+dateInfo;
+            document.getElementById('scProg').textContent=(scIdx+1)+'/'+scTasks.length;
+            document.getElementById('scBar').style.width=((scIdx+1)/scTasks.length*100)+'%';
+        }
+
+        function skipSched(){scIdx++;showSchedTask();msg('Skipped')}
+
+        async function delSched(){
+            if(scIdx>=scTasks.length)return;
+            const t=scTasks[scIdx];
+            const token=localStorage.getItem('ticktick_token');
+            try{
+                const newTags=[...(t.tags||[]),'delete'];
+                await fetch(`https://api.ticktick.com/open/v1/task/${t.id}`,{
+                    method:'POST',
+                    headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+                    body:JSON.stringify({id:t.id,projectId:t.projectId,tags:newTags})
+                });
+                msg('Marked delete');
+            }catch(e){console.error(e);msg('Error')}
+            scIdx++;showSchedTask();
+        }
+
+        async function setSchedDate(days){
+            if(scIdx>=scTasks.length)return;
+            const t=scTasks[scIdx];
+            const token=localStorage.getItem('ticktick_token');
+            try{
+                const d=new Date();
+                d.setDate(d.getDate()+days);
+                const dueDate=d.toISOString().split('T')[0]+'T00:00:00+0000';
+                await fetch(`https://api.ticktick.com/open/v1/task/${t.id}`,{
+                    method:'POST',
+                    headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+                    body:JSON.stringify({id:t.id,projectId:t.projectId,dueDate:dueDate})
+                });
+                const label=days===0?'Today':days===1?'Tomorrow':'Next Week';
+                msg('📅 '+label);
+            }catch(e){console.error(e);msg('Error')}
+            scIdx++;showSchedTask();
+        }
+
+        async function setDurTag(tag){
+            if(drIdx>=drTasks.length)return;
+            const t=drTasks[drIdx];
+            const token=localStorage.getItem('ticktick_token');
+            try{
+                const newTags=[...(t.tags||[]),tag];
+                await fetch(`https://api.ticktick.com/open/v1/task/${t.id}`,{
+                    method:'POST',
+                    headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+                    body:JSON.stringify({id:t.id,projectId:t.projectId,tags:newTags})
+                });
+                msg('⏱️ '+tag);
+            }catch(e){console.error(e);msg('Error')}
+            drIdx++;showDurTask();
+        }
+
+        async function setFreqTag(tag){
+            if(fqIdx>=fqTasks.length)return;
+            const t=fqTasks[fqIdx];
+            const token=localStorage.getItem('ticktick_token');
+            try{
+                const newTags=[...(t.tags||[]),tag];
+                await fetch(`https://api.ticktick.com/open/v1/task/${t.id}`,{
+                    method:'POST',
+                    headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+                    body:JSON.stringify({id:t.id,projectId:t.projectId,tags:newTags})
+                });
+                msg(tag==='one-time'?'1️⃣ One-time':'🔄 Recurring');
+            }catch(e){console.error(e);msg('Error')}
+            fqIdx++;showFreqTask();
+        }
+
+        function msg(t){
+            const el=document.getElementById('msg');
+            el.textContent=t;el.style.display='block';
+            setTimeout(()=>el.style.display='none',1200);
+        }
+    </script>
+</body>
+</html>
