@@ -31,6 +31,13 @@
         .prog-fill{height:100%;background:#f59e0b;border-radius:2px}
         .hidden{display:none!important}
         #msg{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);padding:6px 14px;background:#333;border-radius:6px;font-size:11px;display:none}
+        .settings{margin-top:10px;padding:10px;background:#1a1a1a;border-radius:8px}
+        .settings h3{font-size:12px;margin-bottom:8px;color:#888}
+        .settings input{width:100%;padding:8px;margin-bottom:6px;background:#222;border:1px solid #333;border-radius:4px;color:#fff;font-size:11px}
+        .settings input::placeholder{color:#555}
+        .settings-btn{width:100%;padding:8px;background:#10b981;border:none;border-radius:4px;color:#fff;font-size:12px;cursor:pointer}
+        .settings-btn:active{opacity:0.8}
+        .settings-toggle{font-size:11px;color:#666;cursor:pointer;margin-top:10px;text-align:center}
     </style>
 </head>
 <body>
@@ -56,6 +63,18 @@
         <button class="menu-btn" style="background:linear-gradient(135deg,#ec4899,#db2777)" onclick="window.open('https://ticktick.com/webapp/#f/69a71eb6d36a0805fcbd5627/tasks','_blank')">
             <span>5. 🔄 Schedule Recurring</span><span class="badge">↗</span>
         </button>
+    </div>
+
+    <!-- SETTINGS TOGGLE -->
+    <div class="settings-toggle" onclick="toggleSettings()">⚙️ Settings</div>
+
+    <!-- SETTINGS -->
+    <div id="settings" class="settings hidden">
+        <h3>🔑 TickTick Tokens</h3>
+        <input type="text" id="cfgToken" placeholder="Access Token (from OAuth)">
+        <input type="text" id="cfgCookieT" placeholder="Cookie t value">
+        <input type="text" id="cfgCsrf" placeholder="CSRF token (x-csrf-token)">
+        <button class="settings-btn" onclick="saveSettings()">💾 Save Settings</button>
     </div>
 
     <!-- PRIORITY -->
@@ -574,6 +593,36 @@
             el.textContent=t;el.style.display='block';
             setTimeout(()=>el.style.display='none',1200);
         }
+
+        function toggleSettings(){
+            document.getElementById('settings').classList.toggle('hidden');
+        }
+
+        function saveSettings(){
+            const token=document.getElementById('cfgToken').value.trim();
+            const cookieT=document.getElementById('cfgCookieT').value.trim();
+            const csrf=document.getElementById('cfgCsrf').value.trim();
+
+            if(token)localStorage.setItem('ticktick_token',token);
+            if(cookieT)localStorage.setItem('ticktick_cookie_t',cookieT);
+            if(csrf)localStorage.setItem('ticktick_csrf',csrf);
+
+            msg('✅ Settings saved!');
+            document.getElementById('settings').classList.add('hidden');
+        }
+
+        function loadSettings(){
+            const token=localStorage.getItem('ticktick_token')||'';
+            const cookieT=localStorage.getItem('ticktick_cookie_t')||'';
+            const csrf=localStorage.getItem('ticktick_csrf')||'';
+
+            document.getElementById('cfgToken').value=token;
+            document.getElementById('cfgCookieT').value=cookieT;
+            document.getElementById('cfgCsrf').value=csrf;
+        }
+
+        // Load settings on page load
+        loadSettings();
     </script>
 </body>
 </html>
