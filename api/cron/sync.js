@@ -93,32 +93,30 @@ async function removeNotionSyncTag(task) {
 async function findTasksWithDeleteTag() {
   const tasksToDelete = [];
 
-  // Method 1: Search API (cookie-based, fastest)
-  if (TICKTICK_COOKIE_TOKEN) {
+  // Method 1: Get all tasks from inbox via cookie API (most reliable)
+  if (TICKTICK_COOKIE_TOKEN && TICKTICK_USER_ID) {
     try {
-      const searchUrl = `https://api.ticktick.com/api/v2/search/all?keywords=${DELETE_TAG}`;
-      const response = await fetch(searchUrl, {
+      const inboxUrl = `https://api.ticktick.com/api/v2/project/inbox${TICKTICK_USER_ID}/tasks`;
+      const response = await fetch(inboxUrl, {
         headers: {
           'Cookie': `t=${TICKTICK_COOKIE_TOKEN}`
         }
       });
 
       if (response.ok) {
-        const data = await response.json();
-        if (data.tasks && data.tasks.length > 0) {
-          for (const task of data.tasks) {
-            if (task.tags && task.tags.includes(DELETE_TAG)) {
-              tasksToDelete.push(task);
-            }
+        const tasks = await response.json();
+        for (const task of tasks) {
+          if (task.tags && task.tags.includes(DELETE_TAG)) {
+            tasksToDelete.push(task);
           }
-          if (tasksToDelete.length > 0) {
-            console.log(`[DELETE] Found ${tasksToDelete.length} tasks with "${DELETE_TAG}" tag`);
-            return tasksToDelete;
-          }
+        }
+        if (tasksToDelete.length > 0) {
+          console.log(`[DELETE] Found ${tasksToDelete.length} tasks with "${DELETE_TAG}" tag`);
+          return tasksToDelete;
         }
       }
     } catch (e) {
-      console.log(`[DELETE] Search API failed, trying Open API`);
+      console.log(`[DELETE] Cookie API failed, trying Open API`);
     }
   }
 
