@@ -111,7 +111,7 @@ async function findTickTickTaskByNotionId(notionBlockId) {
 
 async function createTask(taskData) {
   const tags = taskData.tags || [];
-  
+
   // Use different tag for recurring vs one-time tasks
   const syncTag = taskData.isRecurring ? NOTION_RECURRING_TAG : NOTION_SYNC_TAG;
   if (!tags.includes(syncTag)) {
@@ -131,6 +131,7 @@ async function createTask(taskData) {
   if (taskData.startDate) body.startDate = taskData.startDate;
   if (taskData.repeatFlag) body.repeatFlag = taskData.repeatFlag;
   if (taskData.isAllDay !== undefined) body.isAllDay = taskData.isAllDay;
+  if (taskData.reminders && taskData.reminders.length > 0) body.reminders = taskData.reminders;
 
   return ticktickRequest('/task', {
     method: 'POST',
@@ -241,7 +242,7 @@ async function syncBlock(blockId, pageId = '') {
       // Check if it's a recurring task (has notion-recurring tag)
       const isRecurring = existingTask.tags && existingTask.tags.includes(NOTION_RECURRING_TAG);
       console.log(`[TICKTICK] Is recurring (has ${NOTION_RECURRING_TAG} tag): ${isRecurring}`);
-      
+
       if (isRecurring) {
         // RECURRING: Delete task entirely to stop all future instances
         console.log(`[DELETE] 🔄🗑️ RECURRING task checked → DELETING to stop all future occurrences`);
@@ -272,6 +273,7 @@ async function syncBlock(blockId, pageId = '') {
   console.log(`[AI]   Due Date: ${parsed.dueDate || 'none'}`);
   console.log(`[AI]   Is Recurring: ${parsed.isRecurring}`);
   console.log(`[AI]   Repeat Flag: ${parsed.repeatFlag || 'none'}`);
+  console.log(`[AI]   Reminders: [${(parsed.reminders || []).join(', ')}]`);
 
   if (existingTask) {
     // UPDATE existing task
@@ -322,6 +324,9 @@ async function syncBlock(blockId, pageId = '') {
     if (parsed.isRecurring) {
       console.log(`[CREATE]   🔁 RRULE: ${parsed.repeatFlag}`);
     }
+    if (parsed.reminders && parsed.reminders.length > 0) {
+      console.log(`[CREATE]   🔔 Reminders: [${parsed.reminders.join(', ')}]`);
+    }
 
     // Build content with Notion link for easy navigation
     const notionLink = pageId ? getNotionLink(pageId, blockId) : '';
@@ -338,14 +343,15 @@ async function syncBlock(blockId, pageId = '') {
       startDate: parsed.startDate,
       repeatFlag: parsed.repeatFlag,
       isRecurring: parsed.isRecurring,
-      isAllDay: parsed.isAllDay
+      isAllDay: parsed.isAllDay,
+      reminders: parsed.reminders || []
     };
-    
+
     console.log(`[CREATE]   Full payload being sent to TickTick:`);
     console.log(`[CREATE]   ${JSON.stringify(taskPayload, null, 2).split('\n').join('\n[CREATE]   ')}`);
 
     const createResult = await createTask(taskPayload);
-    
+
     if (createResult) {
       console.log(`[CREATE]   ✓ SUCCESS - Task ID: ${createResult.id}`);
       console.log(`[CREATE]   TickTick response: ${JSON.stringify(createResult, null, 2).split('\n').join('\n[CREATE]   ')}`);
@@ -362,7 +368,7 @@ async function syncBlock(blockId, pageId = '') {
 export default async function handler(req, res) {
   // Handle verification challenge from Notion
   // Notion sends a verification_token in POST body that must be echoed back
-  
+
   // GET request verification (query param)
   if (req.method === 'GET') {
     const challenge = req.query.challenge;
@@ -383,18 +389,18 @@ export default async function handler(req, res) {
   console.log('Headers:', JSON.stringify(req.headers, null, 2));
   console.log('Body:', JSON.stringify(payload, null, 2));
   console.log('========================');
-  
+
   // POST request verification (Notion sends verification_token in body)
   // Check for ANY verification-related field
   const token = payload.verification_token || payload.challenge || payload.token;
-  
+
   if (payload.type === 'url_verification' || token) {
     console.log('🔑 VERIFICATION TOKEN RECEIVED:', token);
     // Return token in multiple formats to ensure compatibility
-    return res.status(200).json({ 
+    return res.status(200).json({
       ok: true,
       challenge: token,
-      verification_token: token 
+      verification_token: token
     });
   }
 
@@ -449,7 +455,6 @@ export default async function handler(req, res) {
     }
 
     console.log(`Webhook processed: ${results.created} created, ${results.updated} updated, ${results.completed} completed, ${results.deleted} deleted, ${results.skipped} skipped`);
-
     return res.status(200).json({
       ok: true,
       event: eventType,
