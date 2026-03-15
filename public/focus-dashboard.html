@@ -12,12 +12,86 @@
         .nav-links{display:flex;gap:6px}
         .nav-link{padding:4px 10px;background:#252525;color:#888;border:1px solid #333;border-radius:4px;text-decoration:none;font-size:11px;cursor:pointer}
         .nav-link:hover{background:#333;color:#fff}
-        .container{max-width:1200px;margin:0 auto}
+        .nav-link.active{background:#6366f1;color:#fff;border-color:#6366f1}
+        .container{max-width:1400px;margin:0 auto}
         .stats{display:flex;gap:8px;margin-bottom:12px}
         .stat{flex:1;background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:10px;text-align:center}
         .stat-val{font-size:20px;font-weight:700;color:#fff}
         .stat-val.warn{color:#f59e0b}.stat-val.err{color:#ef4444}.stat-val.ok{color:#10b981}.stat-val.info{color:#6366f1}
         .stat-lbl{font-size:9px;color:#666;text-transform:uppercase;margin-top:2px}
+        
+        /* View Tabs */
+        .view-tabs{display:flex;gap:6px;margin-bottom:12px}
+        .view-tab{padding:6px 14px;background:#252525;color:#888;border:1px solid #333;border-radius:4px;font-size:11px;cursor:pointer;font-weight:500}
+        .view-tab:hover{background:#333;color:#fff}
+        .view-tab.active{background:#6366f1;color:#fff;border-color:#6366f1}
+        
+        /* Main Split Layout */
+        .main-layout{display:grid;grid-template-columns:280px 1fr;gap:12px;height:calc(100vh - 140px)}
+        
+        /* Left Sidebar - Project List */
+        .sidebar{display:flex;flex-direction:column;gap:8px;overflow-y:auto;padding-right:4px}
+        .project-card{background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:12px;cursor:pointer;transition:all 0.2s}
+        .project-card:hover{border-color:#555}
+        .project-card.selected{border-color:#6366f1;background:#1a1a2a}
+        .project-card.neglected{border-left:4px solid #ef4444}
+        .project-card.active{border-left:4px solid #10b981}
+        .project-card.moderate{border-left:4px solid #f59e0b}
+        .project-card.all-projects{border-left:4px solid #6366f1;background:#151520}
+        .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+        .card-title{font-size:12px;font-weight:600;color:#fff}
+        .card-status{font-size:9px;padding:3px 6px;border-radius:3px}
+        .card-status.neglected{background:#3d1515;color:#fca5a5}
+        .card-status.active{background:#153d1f;color:#6ee7b7}
+        .card-status.moderate{background:#3d3515;color:#fcd34d}
+        .card-stats-row{display:flex;gap:12px;font-size:10px}
+        .card-stat-item{display:flex;align-items:center;gap:4px}
+        .card-stat-item.red{color:#fca5a5}
+        .card-stat-item.yellow{color:#fcd34d}
+        .card-stat-item.green{color:#6ee7b7}
+        .card-stat-item.blue{color:#a5b4fc}
+        
+        /* Right Panel - Task Queue */
+        .task-panel{background:#1a1a1a;border:1px solid #333;border-radius:8px;display:flex;flex-direction:column;overflow:hidden}
+        .task-panel-header{padding:12px 16px;border-bottom:1px solid #333;display:flex;justify-content:space-between;align-items:center}
+        .task-panel-title{font-size:13px;font-weight:600;color:#fff}
+        .task-panel-tabs{display:flex;gap:4px}
+        .task-tab{padding:5px 12px;background:#252525;color:#888;border:1px solid #333;border-radius:4px;font-size:10px;cursor:pointer}
+        .task-tab:hover{background:#333;color:#fff}
+        .task-tab.active{background:#6366f1;color:#fff;border-color:#6366f1}
+        .task-panel-stats{padding:10px 16px;border-bottom:1px solid #333;display:flex;gap:12px;background:#151515}
+        .panel-stat{text-align:center;flex:1}
+        .panel-stat-val{font-size:16px;font-weight:700}
+        .panel-stat-lbl{font-size:9px;color:#666;margin-top:2px}
+        .task-panel-body{flex:1;overflow-y:auto;padding:12px 16px}
+        .task-panel-footer{padding:12px 16px;border-top:1px solid #333}
+        
+        /* Task Items */
+        .task-item{background:#151515;border-radius:6px;padding:10px 12px;margin-bottom:8px;border-left:3px solid #333}
+        .task-item.tier1{border-left-color:#ef4444}
+        .task-item.tier2{border-left-color:#f97316}
+        .task-item.tier3{border-left-color:#fbbf24}
+        .task-item.tier4{border-left-color:#10b981}
+        .task-item.tier5{border-left-color:#6b7280}
+        .task-header{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+        .task-num{color:#555;font-size:10px;font-weight:600;width:18px}
+        .task-title{flex:1;font-size:11px;color:#ddd;font-weight:500}
+        .task-score{background:#252525;color:#888;padding:2px 6px;border-radius:3px;font-size:9px}
+        .task-meta{display:flex;gap:8px;font-size:9px;color:#666;margin-left:18px;flex-wrap:wrap}
+        .task-badge{padding:1px 5px;border-radius:2px;font-size:9px}
+        .task-badge.overdue{background:#3d1515;color:#fca5a5}
+        .task-badge.today{background:#3d3515;color:#fcd34d}
+        .task-badge.tomorrow{background:#15353d;color:#7dd3fc}
+        .task-badge.thisweek{background:#1a2a1a;color:#86efac}
+        .task-badge.duration{background:#1a2a3a;color:#7dd3fc}
+        .task-badge.project{background:#2a2a2a;color:#a5a5a5}
+        .task-group{margin-bottom:16px}
+        .task-group-title{font-size:10px;color:#666;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid #252525;display:flex;justify-content:space-between}
+        
+        .start-btn{width:100%;padding:10px;background:#6366f1;border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:600;cursor:pointer}
+        .start-btn:hover{background:#5558dd}
+        
+        /* Original grid for All view */
         .grid{display:grid;grid-template-columns:1fr 320px;gap:12px}
         .panel{background:#1a1a1a;border:1px solid #333;border-radius:6px;overflow:hidden}
         .panel-hd{padding:8px 12px;border-bottom:1px solid #333;display:flex;justify-content:space-between;align-items:center}
@@ -55,12 +129,13 @@
         ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#1a1a1a}::-webkit-scrollbar-thumb{background:#333;border-radius:2px}
         .toast{position:fixed;bottom:12px;right:12px;background:#1a1a1a;border:1px solid #333;border-radius:4px;padding:8px 12px;display:none;font-size:11px;z-index:200}
         .toast.success{border-color:#10b981}.toast.error{border-color:#ef4444}.toast.warning{border-color:#f59e0b}
-        @media(max-width:900px){.grid{grid-template-columns:1fr}.stats{flex-wrap:wrap}.stat{min-width:45%}}
+        .hidden{display:none!important}
+        @media(max-width:900px){.grid{grid-template-columns:1fr}.stats{flex-wrap:wrap}.stat{min-width:45%}.main-layout{grid-template-columns:1fr}.sidebar{max-height:200px}}
     </style>
 </head>
 <body>
     <div class="nav">
-        <div class="nav-title">🎯 Focus</div>
+        <div class="nav-title">🎯 Focus Dashboard</div>
         <div class="nav-links">
             <a href="/" class="nav-link">Tasks</a>
             <button class="nav-link" onclick="refreshData()">↻</button>
@@ -75,21 +150,81 @@
             <div class="stat"><div class="stat-val err" id="pendingTasks">-</div><div class="stat-lbl">Pending</div></div>
         </div>
 
-        <div class="grid">
-            <div>
-                <div class="panel" style="margin-bottom:12px">
-                    <div class="panel-hd"><span class="panel-title">🎯 Focus Next</span><span class="badge">Smart</span></div>
-                    <div class="panel-body" id="suggestionPanel"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+        <!-- View Tabs - Hidden, using new layout -->
+        <div class="view-tabs" style="display:none">
+            <button class="view-tab active" onclick="switchView('cards')" id="tabCards">📁 By Project</button>
+            <button class="view-tab" onclick="switchView('all')" id="tabAll">🔄 All (Round-Robin)</button>
+        </div>
+
+        <!-- Main Split Layout -->
+        <div class="main-layout">
+            <!-- Left Sidebar - Project List -->
+            <div class="sidebar" id="projectSidebar">
+                <div class="loading"><div class="spinner"></div>Loading...</div>
+            </div>
+            
+            <!-- Right Panel - Task Queue (Persistent) -->
+            <div class="task-panel">
+                <div class="task-panel-header">
+                    <div class="task-panel-title" id="taskPanelTitle">🌐 All Projects</div>
+                    <div class="task-panel-tabs">
+                        <button class="task-tab active" onclick="switchTaskTab('today')" id="tabToday">🔥 Today</button>
+                        <button class="task-tab" onclick="switchTaskTab('upcoming')" id="tabUpcoming">📅 Upcoming</button>
+                    </div>
+                </div>
+                <div class="task-panel-stats" id="taskPanelStats">
+                    <div class="panel-stat"><div class="panel-stat-val" style="color:#ef4444" id="panelOverdue">-</div><div class="panel-stat-lbl">Overdue</div></div>
+                    <div class="panel-stat"><div class="panel-stat-val" style="color:#fbbf24" id="panelToday">-</div><div class="panel-stat-lbl">Today</div></div>
+                    <div class="panel-stat"><div class="panel-stat-val" style="color:#10b981" id="panelDone">-</div><div class="panel-stat-lbl">Done</div></div>
+                    <div class="panel-stat"><div class="panel-stat-val" style="color:#6366f1" id="panelEstimate">-</div><div class="panel-stat-lbl">Est. Work</div></div>
+                </div>
+                <div class="task-panel-body" id="taskPanelBody">
+                    <div class="loading"><div class="spinner"></div>Loading tasks...</div>
+                </div>
+                <div class="task-panel-footer" id="taskPanelFooter">
+                    <button class="start-btn" id="startBtn" onclick="startFirstTask()">▶️ Start First Task</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cards View - Hidden -->
+        <div id="cardsView" class="hidden">
+            <div class="cards-grid" id="projectCardsGrid">
+                <div class="loading"><div class="spinner"></div>Loading projects...</div>
+            </div>
+        </div>
+
+        <!-- All View (Original) -->
+        <div id="allView" class="hidden">
+            <div class="grid">
+                <div>
+                    <div class="panel" style="margin-bottom:12px">
+                        <div class="panel-hd"><span class="panel-title">🎯 Focus Next</span><span class="badge">Round-Robin</span></div>
+                        <div class="panel-body" id="suggestionPanel"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-hd"><span class="panel-title">📊 7-Day Activity</span></div>
+                        <div class="panel-body" id="timelinePanel"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+                    </div>
                 </div>
                 <div class="panel">
-                    <div class="panel-hd"><span class="panel-title">📊 7-Day Activity</span></div>
-                    <div class="panel-body" id="timelinePanel"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+                    <div class="panel-hd"><span class="panel-title">📁 Projects</span><span class="badge" id="projectCount">-</span></div>
+                    <div class="panel-body" id="projectsPanel"><div class="loading"><div class="spinner"></div>Loading...</div></div>
                 </div>
             </div>
-            <div class="panel">
-                <div class="panel-hd"><span class="panel-title">📁 Projects</span><span class="badge" id="projectCount">-</span></div>
-                <div class="panel-body" id="projectsPanel"><div class="loading"><div class="spinner"></div>Loading...</div></div>
-            </div>
+        </div>
+    </div>
+
+    <!-- Focus Panel (Slide-in when clicking a project card) -->
+    <div class="focus-overlay" id="focusOverlay" onclick="closeFocusPanel()"></div>
+    <div class="focus-panel" id="focusPanel">
+        <div class="focus-header">
+            <button class="focus-back" onclick="closeFocusPanel()">← Back</button>
+            <div class="focus-title" id="focusTitle">Project Name</div>
+            <div></div>
+        </div>
+        <div class="focus-body" id="focusBody">
+            <!-- Populated dynamically -->
         </div>
     </div>
 
@@ -247,19 +382,33 @@
                 // High Priority
                 '5_overdue': 400,
                 '5_today': 350,
+                '5_future': 280,  // Added for upcoming
                 // Medium Priority  
                 '3_overdue': 300,
                 '3_today': 250,
+                '3_future': 200,  // Added for upcoming
                 // Low Priority
                 '1_overdue': 200,
                 '1_today': 150,
+                '1_future': 100,  // Added for upcoming
                 // None Priority
                 '0_overdue': 120,
-                '0_today': 80
+                '0_today': 80,
+                '0_future': 50    // Added for upcoming
             };
             
             const key = `${priority}_${dueStatus}`;
-            return scoreTable[key] || 0;  // Return 0 for future/none dates
+            return scoreTable[key] || 0;
+        }
+        
+        // Urgency Bonus for upcoming tasks - sooner = higher bonus
+        function calculateUrgencyBonus(daysUntilDue) {
+            if (daysUntilDue <= 0) return 0; // Today or overdue handled separately
+            if (daysUntilDue === 1) return 100;  // Tomorrow
+            if (daysUntilDue <= 3) return 60;    // 2-3 days
+            if (daysUntilDue <= 7) return 30;    // 4-7 days (this week)
+            if (daysUntilDue <= 14) return 10;   // 8-14 days (next week)
+            return 0;                             // > 2 weeks
         }
         
         // Overdue Severity Score - the further past deadline, the higher the bonus
@@ -278,29 +427,83 @@
             
             if (daysOverdue <= 0) return { bonus: 0, daysOverdue: 0 };
             
-            // Bonus: 10 points per day overdue, capped at 140 (14 days)
-            const bonus = Math.min(daysOverdue * 10, 140);
+            // Bonus: 25 points per day overdue, capped at 140 (~6 days to hit cap)
+            const bonus = Math.min(daysOverdue * 25, 140);
             
             return { bonus, daysOverdue };
         }
         
-        // Quick Win Bonus - small bonus for short duration tasks (tiebreaker)
+        // Parse duration from tags (e.g., "5-min", "15-min", "1-hour", "2-day", "1-week")
+        function parseDurationFromTags(tags) {
+            if (!tags || !Array.isArray(tags)) return 0;
+            
+            for (const tag of tags) {
+                const tagLower = tag.toLowerCase();
+                
+                // Match patterns like "5-min", "15-min", "30-min"
+                const minMatch = tagLower.match(/^(\d+)-min$/);
+                if (minMatch) {
+                    return parseInt(minMatch[1], 10);
+                }
+                
+                // Match patterns like "1-hour", "2-hour", "3-hour", "4-hour", "8-hour", "12-hour"
+                const hourMatch = tagLower.match(/^(\d+)-hour$/);
+                if (hourMatch) {
+                    return parseInt(hourMatch[1], 10) * 60;
+                }
+                
+                // Match patterns like "1-day", "2-day", "3-day" (1 day = 8 work hours)
+                const dayMatch = tagLower.match(/^(\d+)-day$/);
+                if (dayMatch) {
+                    return parseInt(dayMatch[1], 10) * 8 * 60; // 8 hours per day
+                }
+                
+                // Match patterns like "1-week" (1 week = 5 work days = 40 hours)
+                const weekMatch = tagLower.match(/^(\d+)-week$/);
+                if (weekMatch) {
+                    return parseInt(weekMatch[1], 10) * 5 * 8 * 60; // 5 days × 8 hours
+                }
+            }
+            
+            return 0;
+        }
+        
+        // Quick Win Bonus - smaller tasks get bonus to finish them first
         function calculateDurationBonus(task) {
-            // Duration in TickTick is stored in seconds
-            const durationSeconds = task.duration || 0;
-            const durationMinutes = durationSeconds / 60;
+            // Try duration field first, then parse from tags
+            let durationMinutes = 0;
             
-            if (durationMinutes <= 0) return { bonus: 0, durationMinutes: 0, label: '' };
+            if (task.duration) {
+                // Duration in TickTick is stored in seconds
+                durationMinutes = task.duration / 60;
+            } else if (task.tags) {
+                // Parse from tags like "5-min", "1-hour", "2-day"
+                durationMinutes = parseDurationFromTags(task.tags);
+            }
             
-            // Quick win bonuses (small, just for tiebreaking)
+            if (durationMinutes <= 0) return { bonus: 0, durationMinutes: 0, label: '', isDeepWork: false };
+            
+            // Quick win bonuses - finish small tasks first, then focus on long ones
             if (durationMinutes <= 15) {
-                return { bonus: 15, durationMinutes, label: '⚡ Quick' };
+                return { bonus: 15, durationMinutes, label: '⚡ Quick', isDeepWork: false };
             } else if (durationMinutes <= 30) {
-                return { bonus: 5, durationMinutes, label: '🏃 Short' };
+                return { bonus: 5, durationMinutes, label: '🏃 Short', isDeepWork: false };
             } else if (durationMinutes <= 60) {
-                return { bonus: 0, durationMinutes, label: '⏱️ 1hr' };
+                return { bonus: 0, durationMinutes, label: '⏱️ 1hr', isDeepWork: false };
+            } else if (durationMinutes <= 240) {
+                // 1-4 hours
+                return { bonus: 0, durationMinutes, label: `🕐 ${Math.round(durationMinutes/60)}hr`, isDeepWork: false };
+            } else if (durationMinutes <= 480) {
+                // 4-8 hours (1 day)
+                return { bonus: 0, durationMinutes, label: `📅 ${Math.round(durationMinutes/60)}hr`, isDeepWork: false };
+            } else if (durationMinutes <= 2400) {
+                // 1-5 days
+                const days = Math.round(durationMinutes / 480);
+                return { bonus: 0, durationMinutes, label: `📆 ${days}d`, isDeepWork: false };
             } else {
-                return { bonus: 0, durationMinutes, label: `🕐 ${Math.round(durationMinutes/60)}hr` };
+                // 1+ weeks
+                const weeks = Math.round(durationMinutes / 2400);
+                return { bonus: 0, durationMinutes, label: `🗓️ ${weeks}w`, isDeepWork: false };
             }
         }
         
@@ -308,9 +511,20 @@
         function formatDuration(minutes) {
             if (!minutes || minutes <= 0) return '';
             if (minutes < 60) return `${Math.round(minutes)}m`;
-            const hrs = Math.floor(minutes / 60);
-            const mins = Math.round(minutes % 60);
-            return mins > 0 ? `${hrs}h${mins}m` : `${hrs}h`;
+            if (minutes < 480) {
+                // Less than 1 work day - show hours
+                const hrs = Math.floor(minutes / 60);
+                const mins = Math.round(minutes % 60);
+                return mins > 0 ? `${hrs}h${mins}m` : `${hrs}h`;
+            }
+            if (minutes < 2400) {
+                // 1-5 work days
+                const days = (minutes / 480).toFixed(1);
+                return `${days}d`;
+            }
+            // 1+ weeks
+            const weeks = (minutes / 2400).toFixed(1);
+            return `${weeks}w`;
         }
         
         // Calculate individual task score
@@ -318,18 +532,25 @@
             const now = new Date();
             const todayStr = now.toISOString().split('T')[0];
             
-            // Determine due status (only 'overdue' or 'today' get scores)
+            // Determine due status and days until due
             let dueStatus = 'none';
+            let daysUntilDue = 0;
+            
             if (task.dueDate) {
                 const dueDate = new Date(task.dueDate);
                 const dueDateStr = task.dueDate.split('T')[0];
                 
-                if (dueDate < now && dueDateStr !== todayStr) {
+                // Calculate days difference
+                const today = new Date(todayStr);
+                const dueDateOnly = new Date(dueDateStr);
+                daysUntilDue = Math.floor((dueDateOnly - today) / (1000 * 60 * 60 * 24));
+                
+                if (daysUntilDue < 0) {
                     dueStatus = 'overdue';
-                } else if (dueDateStr === todayStr) {
+                } else if (daysUntilDue === 0) {
                     dueStatus = 'today';
                 } else {
-                    dueStatus = 'future';  // Tomorrow or later - score 0
+                    dueStatus = 'future';
                 }
             }
             
@@ -337,29 +558,35 @@
             const priority = task.priority || 0;
             const baseScore = getBaseScore(priority, dueStatus);
             
-            // Get Overdue Severity Bonus (NEW)
+            // Get Overdue Severity Bonus (only for overdue tasks)
             const overdueInfo = calculateOverdueSeverity(task);
             
-            // Get Quick Win Duration Bonus (NEW)
+            // Get Urgency Bonus (only for future tasks)
+            const urgencyBonus = dueStatus === 'future' ? calculateUrgencyBonus(daysUntilDue) : 0;
+            
+            // Get Quick Win Duration Bonus
             const durationInfo = calculateDurationBonus(task);
             
             // Get Daily Touch Bonus
             const touchBonus = getDailyTouchBonus(projectId);
             
             // Return total score with breakdown info
-            const totalScore = baseScore + overdueInfo.bonus + durationInfo.bonus + touchBonus;
+            const totalScore = baseScore + overdueInfo.bonus + urgencyBonus + durationInfo.bonus + touchBonus;
             
             return {
                 total: totalScore,
                 breakdown: {
                     base: baseScore,
                     overdue: overdueInfo.bonus,
+                    urgency: urgencyBonus,
                     duration: durationInfo.bonus,
                     touch: touchBonus
                 },
                 daysOverdue: overdueInfo.daysOverdue,
+                daysUntilDue: daysUntilDue,
                 durationMinutes: durationInfo.durationMinutes,
-                durationLabel: durationInfo.label
+                durationLabel: durationInfo.label,
+                isDeepWork: durationInfo.isDeepWork
             };
         }
         
@@ -489,6 +716,7 @@
                         daysOverdue: scoreResult.daysOverdue,
                         durationMinutes: scoreResult.durationMinutes,
                         durationLabel: scoreResult.durationLabel,
+                        isDeepWork: scoreResult.isDeepWork,
                         tier: tierInfo.tier,
                         tierName: tierInfo.name,
                         tierColor: tierInfo.color,
@@ -775,7 +1003,7 @@
                         <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
                             <span style="color:#555;font-size:10px">${i+1}</span>
                             <span style="flex:1;font-size:11px;color:#ddd;font-weight:500">${task.title}</span>
-                            ${task.durationLabel ? `<span style="background:#1a2a3a;color:#7dd3fc;padding:1px 5px;border-radius:2px;font-size:9px">${task.durationLabel}</span>` : ''}
+                            ${task.durationLabel ? `<span style="background:${task.isDeepWork ? '#2a1a3a' : '#1a2a3a'};color:${task.isDeepWork ? '#c4b5fd' : '#7dd3fc'};padding:1px 5px;border-radius:2px;font-size:9px">${task.durationLabel}</span>` : ''}
                             <span style="background:${task.tierColor}22;color:${task.tierColor};padding:1px 5px;border-radius:2px;font-size:9px" title="Base:${task.scoreBreakdown?.base || 0} +OD:${task.scoreBreakdown?.overdue || 0} +Dur:${task.scoreBreakdown?.duration || 0} +Touch:${task.scoreBreakdown?.touch || 0}">${task.score}</span>
                         </div>
                         <div style="display:flex;gap:8px;font-size:9px;color:#666;margin-top:4px;margin-left:14px">
@@ -887,6 +1115,652 @@
             window.location.href = `/?project=${projectId}`;
         }
 
+        // View Switching
+        let currentView = 'cards';
+        let selectedProjectId = null; // null means "All Projects"
+        let currentTaskTab = 'today'; // 'today' or 'upcoming'
+        
+        function switchView(view) {
+            currentView = view;
+            document.getElementById('cardsView').classList.toggle('hidden', view !== 'cards');
+            document.getElementById('allView').classList.toggle('hidden', view !== 'all');
+            document.getElementById('tabCards').classList.toggle('active', view === 'cards');
+            document.getElementById('tabAll').classList.toggle('active', view === 'all');
+        }
+        
+        function switchTaskTab(tab) {
+            currentTaskTab = tab;
+            document.getElementById('tabToday').classList.toggle('active', tab === 'today');
+            document.getElementById('tabUpcoming').classList.toggle('active', tab === 'upcoming');
+            renderTaskPanel();
+        }
+        
+        function selectProject(projectId) {
+            selectedProjectId = projectId;
+            
+            // Update selected state in sidebar
+            document.querySelectorAll('.project-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            const selectedCard = document.querySelector(`.project-card[data-project-id="${projectId || 'all'}"]`);
+            if (selectedCard) selectedCard.classList.add('selected');
+            
+            // Update panel title
+            if (projectId === null) {
+                document.getElementById('taskPanelTitle').textContent = '🌐 All Projects';
+            } else {
+                const project = projectAnalysis.find(p => p.id === projectId);
+                document.getElementById('taskPanelTitle').textContent = '📁 ' + (project?.name || 'Project');
+            }
+            
+            renderTaskPanel();
+        }
+        
+        function startFirstTask() {
+            const tasks = getTasksForPanel();
+            if (tasks.length > 0) {
+                goToProject(tasks[0].projectId);
+            }
+        }
+        
+        // Focus Panel Functions
+        function openFocusPanel(projectId) {
+            const project = projectAnalysis.find(p => p.id === projectId);
+            if (!project) return;
+            
+            document.getElementById('focusTitle').textContent = '📁 ' + project.name;
+            document.getElementById('focusOverlay').classList.add('open');
+            document.getElementById('focusPanel').classList.add('open');
+            
+            renderFocusPanel(project);
+        }
+        
+        function closeFocusPanel() {
+            document.getElementById('focusOverlay').classList.remove('open');
+            document.getElementById('focusPanel').classList.remove('open');
+        }
+        
+        // Get tasks for specific project (no round-robin, just priority sorted)
+        function getProjectTasks(projectId) {
+            const project = projectAnalysis.find(p => p.id === projectId);
+            if (!project) return [];
+            
+            const now = new Date();
+            const todayStr = now.toISOString().split('T')[0];
+            const tasks = [];
+            
+            project.allPendingTasks?.forEach(task => {
+                let isOverdue = false;
+                let isDueToday = false;
+                
+                if (task.dueDate) {
+                    const dueDateStr = task.dueDate.split('T')[0];
+                    const dueDate = new Date(task.dueDate);
+                    
+                    isDueToday = dueDateStr === todayStr;
+                    isOverdue = dueDate < now && !isDueToday;
+                }
+                
+                // Include all tasks due today or overdue
+                if (!isOverdue && !isDueToday) return;
+                
+                const scoreResult = calculateTaskScore(task, projectId);
+                const tierInfo = getScoreTier(scoreResult.total);
+                
+                tasks.push({
+                    ...task,
+                    projectName: project.name,
+                    projectId: projectId,
+                    score: scoreResult.total,
+                    scoreBreakdown: scoreResult.breakdown,
+                    daysOverdue: scoreResult.daysOverdue,
+                    durationMinutes: scoreResult.durationMinutes,
+                    durationLabel: scoreResult.durationLabel,
+                    isDeepWork: scoreResult.isDeepWork,
+                    tier: tierInfo.tier,
+                    tierName: tierInfo.name,
+                    tierColor: tierInfo.color,
+                    isOverdue,
+                    isDueToday
+                });
+            });
+            
+            // Sort by score (highest first) - no round robin for single project
+            tasks.sort((a, b) => b.score - a.score);
+            
+            return tasks;
+        }
+        
+        function renderFocusPanel(project) {
+            const tasks = getProjectTasks(project.id);
+            const todayCompletions = getTodayCompletionsPerProject();
+            const doneToday = todayCompletions[project.id] || 0;
+            
+            // Calculate total estimated hours
+            const totalMinutes = tasks.reduce((sum, t) => sum + (t.durationMinutes || 0), 0);
+            const totalHours = (totalMinutes / 60).toFixed(1);
+            
+            // Calculate high priority hours
+            const highPrioMinutes = tasks.filter(t => t.priority === 5).reduce((sum, t) => sum + (t.durationMinutes || 0), 0);
+            const highPrioHours = (highPrioMinutes / 60).toFixed(1);
+            
+            const overdueCount = tasks.filter(t => t.isOverdue).length;
+            const todayCount = tasks.filter(t => t.isDueToday).length;
+            
+            const body = document.getElementById('focusBody');
+            body.innerHTML = `
+                <div class="focus-stats">
+                    <div class="focus-stat">
+                        <div class="focus-stat-val" style="color:#ef4444">${overdueCount}</div>
+                        <div class="focus-stat-lbl">Overdue</div>
+                    </div>
+                    <div class="focus-stat">
+                        <div class="focus-stat-val" style="color:#fbbf24">${todayCount}</div>
+                        <div class="focus-stat-lbl">Today</div>
+                    </div>
+                    <div class="focus-stat">
+                        <div class="focus-stat-val" style="color:#10b981">${doneToday}</div>
+                        <div class="focus-stat-lbl">Done</div>
+                    </div>
+                    <div class="focus-stat">
+                        <div class="focus-stat-val" style="color:#6366f1">${totalHours}h</div>
+                        <div class="focus-stat-lbl">Est. Work</div>
+                    </div>
+                </div>
+                
+                ${highPrioHours > 0 ? `<div style="background:#3d1515;padding:8px 10px;border-radius:4px;margin-bottom:12px;font-size:10px;color:#fca5a5">🔥 High Priority work: ${highPrioHours} hours</div>` : ''}
+                
+                <div class="focus-queue-title">
+                    <span>TODAY'S QUEUE</span>
+                    <span>${tasks.length} tasks</span>
+                </div>
+                
+                ${tasks.length === 0 ? `
+                    <div class="empty"><div class="empty-icon">🎉</div><p>All caught up for this project!</p></div>
+                ` : tasks.map((task, i) => `
+                    <div class="focus-task tier${task.tier}">
+                        <div class="focus-task-header">
+                            <span class="focus-task-num">${i + 1}</span>
+                            <span class="focus-task-title">${task.title}</span>
+                            <span class="focus-task-score" title="Base:${task.scoreBreakdown?.base || 0} +OD:${task.scoreBreakdown?.overdue || 0} +Dur:${task.scoreBreakdown?.duration || 0} +Touch:${task.scoreBreakdown?.touch || 0}">${task.score}</span>
+                        </div>
+                        <div class="focus-task-meta">
+                            <span class="focus-task-badge ${task.isOverdue ? 'overdue' : 'today'}">${task.isOverdue ? (task.daysOverdue > 1 ? task.daysOverdue + 'd OVERDUE' : 'OVERDUE') : 'Today'}</span>
+                            ${task.durationLabel ? `<span class="focus-task-badge ${task.isDeepWork ? 'deep' : 'duration'}">${task.durationLabel}</span>` : ''}
+                            ${task.durationMinutes > 0 ? `<span style="color:#7dd3fc">${formatDuration(task.durationMinutes)}</span>` : ''}
+                            ${task.priority === 5 ? '<span style="color:#ef4444">High</span>' : task.priority === 3 ? '<span style="color:#fbbf24">Med</span>' : ''}
+                        </div>
+                    </div>
+                `).join('')}
+                
+                ${tasks.length > 0 ? `<button class="focus-start-btn" onclick="goToProject('${project.id}')">▶️ Start: ${tasks[0].title}</button>` : ''}
+            `;
+        }
+        
+        // Project Cards Rendering
+        function renderProjectCards() {
+            const grid = document.getElementById('projectCardsGrid');
+            
+            if (projectAnalysis.length === 0) {
+                grid.innerHTML = `<div class="empty"><div class="empty-icon">📁</div><p>No projects. Configure token first.</p></div>`;
+                return;
+            }
+            
+            const todayCompletions = getTodayCompletionsPerProject();
+            
+            grid.innerHTML = projectAnalysis.map(project => {
+                const tasks = getProjectTasks(project.id);
+                const doneToday = todayCompletions[project.id] || 0;
+                
+                // Calculate estimated hours
+                const totalMinutes = tasks.reduce((sum, t) => sum + (t.durationMinutes || 0), 0);
+                const totalHours = (totalMinutes / 60).toFixed(1);
+                
+                // High priority hours
+                const highPrioMinutes = tasks.filter(t => (t.priority || 0) === 5).reduce((sum, t) => sum + (t.durationMinutes || 0), 0);
+                const highPrioHours = (highPrioMinutes / 60).toFixed(1);
+                
+                const overdueCount = tasks.filter(t => t.isOverdue).length;
+                const todayCount = tasks.filter(t => t.isDueToday).length;
+                const nextTask = tasks[0];
+                
+                // Calculate completion percentage (done today vs total actionable)
+                const totalActionable = tasks.length + doneToday;
+                const completionPercent = totalActionable > 0 ? Math.round((doneToday / totalActionable) * 100) : 100;
+                
+                return `
+                    <div class="project-card ${project.status}" onclick="openFocusPanel('${project.id}')">
+                        <div class="card-header">
+                            <span class="card-title">${project.name}</span>
+                            <span class="card-status ${project.status}">${project.status === 'neglected' ? '⚠️ Neglected' : project.status === 'moderate' ? '• Moderate' : '✓ Active'}</span>
+                        </div>
+                        <div class="card-stats-row" style="display:flex;gap:8px;margin-bottom:10px">
+                            <div style="flex:1;background:#151515;border-radius:4px;padding:8px;text-align:center">
+                                <div style="font-size:14px;font-weight:700;color:#ef4444">${overdueCount}</div>
+                                <div style="font-size:8px;color:#666;text-transform:uppercase;margin-top:2px">Overdue</div>
+                            </div>
+                            <div style="flex:1;background:#151515;border-radius:4px;padding:8px;text-align:center">
+                                <div style="font-size:14px;font-weight:700;color:#fbbf24">${todayCount}</div>
+                                <div style="font-size:8px;color:#666;text-transform:uppercase;margin-top:2px">Today</div>
+                            </div>
+                            <div style="flex:1;background:#151515;border-radius:4px;padding:8px;text-align:center">
+                                <div style="font-size:14px;font-weight:700;color:#10b981">${doneToday}</div>
+                                <div style="font-size:8px;color:#666;text-transform:uppercase;margin-top:2px">Done</div>
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:12px;font-size:10px;color:#666;margin-bottom:10px">
+                            <div style="display:flex;align-items:center;gap:4px">⏱️ ~${totalHours}h work</div>
+                            ${highPrioHours > 0 ? `<div style="display:flex;align-items:center;gap:4px;color:#fca5a5">🔥 ${highPrioHours}h high prio</div>` : ''}
+                        </div>
+                        ${nextTask ? `
+                            <div style="background:#151515;border-radius:4px;padding:8px;font-size:10px">
+                                <div style="color:#666;margin-bottom:4px">Next →</div>
+                                <div style="color:#ddd;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${nextTask.title}</div>
+                            </div>
+                        ` : `
+                            <div style="background:#151515;border-radius:4px;padding:8px;font-size:10px">
+                                <div style="color:#10b981;font-weight:500">🎉 All caught up!</div>
+                            </div>
+                        `}
+                        <div style="margin-top:10px">
+                            <div style="height:4px;background:#252525;border-radius:2px;overflow:hidden">
+                                <div style="height:100%;background:#6366f1;border-radius:2px;width:${completionPercent}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Render Project Sidebar
+        function renderProjectSidebar() {
+            const sidebar = document.getElementById('projectSidebar');
+            
+            if (projectAnalysis.length === 0) {
+                sidebar.innerHTML = `<div class="empty"><div class="empty-icon">📁</div><p>No projects</p></div>`;
+                return;
+            }
+            
+            const todayCompletions = getTodayCompletionsPerProject();
+            
+            // Calculate totals for "All" card
+            let totalOverdue = 0;
+            let totalToday = 0;
+            let totalDone = 0;
+            let totalMinutes = 0;
+            
+            projectAnalysis.forEach(project => {
+                const tasks = getProjectTasks(project.id);
+                totalOverdue += tasks.filter(t => t.isOverdue).length;
+                totalToday += tasks.filter(t => t.isDueToday).length;
+                totalDone += todayCompletions[project.id] || 0;
+                totalMinutes += tasks.reduce((sum, t) => sum + (t.durationMinutes || 0), 0);
+            });
+            
+            const totalHours = (totalMinutes / 60).toFixed(1);
+            
+            let html = `
+                <div class="project-card all-projects selected" data-project-id="all" onclick="selectProject(null)">
+                    <div class="card-header">
+                        <span class="card-title">🌐 All Projects</span>
+                    </div>
+                    <div class="card-stats-row">
+                        <span class="card-stat-item red">🔴 ${totalOverdue}</span>
+                        <span class="card-stat-item yellow">🟡 ${totalToday}</span>
+                        <span class="card-stat-item green">✅ ${totalDone}</span>
+                        <span class="card-stat-item blue">⏱️ ${totalHours}h</span>
+                    </div>
+                </div>
+            `;
+            
+            html += projectAnalysis.map(project => {
+                const tasks = getProjectTasks(project.id);
+                const doneToday = todayCompletions[project.id] || 0;
+                const overdueCount = tasks.filter(t => t.isOverdue).length;
+                const todayCount = tasks.filter(t => t.isDueToday).length;
+                const minutes = tasks.reduce((sum, t) => sum + (t.durationMinutes || 0), 0);
+                const hours = (minutes / 60).toFixed(1);
+                
+                return `
+                    <div class="project-card ${project.status}" data-project-id="${project.id}" onclick="selectProject('${project.id}')">
+                        <div class="card-header">
+                            <span class="card-title">${project.name}</span>
+                        </div>
+                        <div class="card-stats-row">
+                            <span class="card-stat-item red">🔴 ${overdueCount}</span>
+                            <span class="card-stat-item yellow">🟡 ${todayCount}</span>
+                            <span class="card-stat-item green">✅ ${doneToday}</span>
+                            <span class="card-stat-item blue">⏱️ ${hours}h</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            sidebar.innerHTML = html;
+        }
+        
+        // Get tasks for the right panel based on selection and tab
+        function getTasksForPanel() {
+            const now = new Date();
+            const todayStr = now.toISOString().split('T')[0];
+            
+            // Get tomorrow and week boundaries
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowStr = tomorrow.toISOString().split('T')[0];
+            
+            const weekEnd = new Date(now);
+            weekEnd.setDate(weekEnd.getDate() + 7);
+            const weekEndStr = weekEnd.toISOString().split('T')[0];
+            
+            let tasks = [];
+            
+            if (selectedProjectId === null) {
+                // All projects - use round-robin
+                if (currentTaskTab === 'today') {
+                    tasks = getAllPendingTasksSorted();
+                } else {
+                    // Upcoming - get future tasks
+                    tasks = getUpcomingTasks();
+                }
+            } else {
+                // Single project
+                if (currentTaskTab === 'today') {
+                    tasks = getProjectTasks(selectedProjectId);
+                } else {
+                    tasks = getProjectUpcomingTasks(selectedProjectId);
+                }
+            }
+            
+            return tasks;
+        }
+        
+        // Get upcoming tasks (tomorrow, this week, next week)
+        function getUpcomingTasks() {
+            const now = new Date();
+            const todayStr = now.toISOString().split('T')[0];
+            
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowStr = tomorrow.toISOString().split('T')[0];
+            
+            const weekEnd = new Date(now);
+            weekEnd.setDate(weekEnd.getDate() + 7);
+            
+            const tasks = [];
+            
+            projectAnalysis.forEach(project => {
+                project.allPendingTasks?.forEach(task => {
+                    if (!task.dueDate) return;
+                    
+                    const dueDateStr = task.dueDate.split('T')[0];
+                    const dueDate = new Date(task.dueDate);
+                    
+                    // Skip today and overdue - only future
+                    if (dueDateStr <= todayStr) return;
+                    
+                    // Only include tasks within next 2 weeks
+                    const twoWeeksEnd = new Date(now);
+                    twoWeeksEnd.setDate(twoWeeksEnd.getDate() + 14);
+                    if (dueDate > twoWeeksEnd) return;
+                    
+                    const scoreResult = calculateTaskScore(task, project.id);
+                    const tierInfo = getScoreTier(scoreResult.total);
+                    
+                    // Determine time bucket
+                    let timeBucket = 'later';
+                    if (dueDateStr === tomorrowStr) {
+                        timeBucket = 'tomorrow';
+                    } else if (dueDate <= weekEnd) {
+                        timeBucket = 'thisweek';
+                    } else {
+                        timeBucket = 'nextweek';
+                    }
+                    
+                    tasks.push({
+                        ...task,
+                        projectName: project.name,
+                        projectId: project.id,
+                        score: scoreResult.total,
+                        scoreBreakdown: scoreResult.breakdown,
+                        durationMinutes: scoreResult.durationMinutes,
+                        durationLabel: scoreResult.durationLabel,
+                        tier: tierInfo.tier,
+                        tierColor: tierInfo.color,
+                        timeBucket,
+                        dueDateStr
+                    });
+                });
+            });
+            
+            // Sort by score (highest first) - urgency is already factored in
+            tasks.sort((a, b) => b.score - a.score);
+            
+            return tasks;
+        }
+        
+        // Get upcoming tasks for single project
+        function getProjectUpcomingTasks(projectId) {
+            const project = projectAnalysis.find(p => p.id === projectId);
+            if (!project) return [];
+            
+            const now = new Date();
+            const todayStr = now.toISOString().split('T')[0];
+            
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowStr = tomorrow.toISOString().split('T')[0];
+            
+            const weekEnd = new Date(now);
+            weekEnd.setDate(weekEnd.getDate() + 7);
+            
+            const tasks = [];
+            
+            project.allPendingTasks?.forEach(task => {
+                if (!task.dueDate) return;
+                
+                const dueDateStr = task.dueDate.split('T')[0];
+                const dueDate = new Date(task.dueDate);
+                
+                // Skip today and overdue
+                if (dueDateStr <= todayStr) return;
+                
+                // Only include tasks within next 2 weeks
+                const twoWeeksEnd = new Date(now);
+                twoWeeksEnd.setDate(twoWeeksEnd.getDate() + 14);
+                if (dueDate > twoWeeksEnd) return;
+                
+                const scoreResult = calculateTaskScore(task, projectId);
+                const tierInfo = getScoreTier(scoreResult.total);
+                
+                let timeBucket = 'later';
+                if (dueDateStr === tomorrowStr) {
+                    timeBucket = 'tomorrow';
+                } else if (dueDate <= weekEnd) {
+                    timeBucket = 'thisweek';
+                } else {
+                    timeBucket = 'nextweek';
+                }
+                
+                tasks.push({
+                    ...task,
+                    projectName: project.name,
+                    projectId: projectId,
+                    score: scoreResult.total,
+                    scoreBreakdown: scoreResult.breakdown,
+                    durationMinutes: scoreResult.durationMinutes,
+                    durationLabel: scoreResult.durationLabel,
+                    tier: tierInfo.tier,
+                    tierColor: tierInfo.color,
+                    timeBucket,
+                    dueDateStr
+                });
+            });
+            
+            // Sort by score (highest first) - urgency is already factored in
+            tasks.sort((a, b) => b.score - a.score);
+            
+            return tasks;
+        }
+        
+        // Render Task Panel
+        function renderTaskPanel() {
+            const tasks = getTasksForPanel();
+            const body = document.getElementById('taskPanelBody');
+            const todayCompletions = getTodayCompletionsPerProject();
+            
+            // Calculate stats
+            let overdueCount = 0;
+            let todayCount = 0;
+            let doneCount = 0;
+            let totalMinutes = 0;
+            
+            if (currentTaskTab === 'today') {
+                overdueCount = tasks.filter(t => t.isOverdue).length;
+                todayCount = tasks.filter(t => t.isDueToday).length;
+                totalMinutes = tasks.reduce((sum, t) => sum + (t.durationMinutes || 0), 0);
+                
+                if (selectedProjectId === null) {
+                    doneCount = Object.values(todayCompletions).reduce((a, b) => a + b, 0);
+                } else {
+                    doneCount = todayCompletions[selectedProjectId] || 0;
+                }
+            } else {
+                // Upcoming stats
+                const tomorrowTasks = tasks.filter(t => t.timeBucket === 'tomorrow');
+                const weekTasks = tasks.filter(t => t.timeBucket === 'thisweek');
+                overdueCount = tomorrowTasks.length;
+                todayCount = weekTasks.length;
+                totalMinutes = tasks.reduce((sum, t) => sum + (t.durationMinutes || 0), 0);
+            }
+            
+            const totalHours = (totalMinutes / 60).toFixed(1);
+            
+            // Update stats
+            document.getElementById('panelOverdue').textContent = currentTaskTab === 'today' ? overdueCount : tasks.filter(t => t.timeBucket === 'tomorrow').length;
+            document.getElementById('panelToday').textContent = currentTaskTab === 'today' ? todayCount : tasks.filter(t => t.timeBucket === 'thisweek').length;
+            document.getElementById('panelDone').textContent = doneCount;
+            document.getElementById('panelEstimate').textContent = totalHours + 'h';
+            
+            // Update stat labels for upcoming
+            if (currentTaskTab === 'upcoming') {
+                document.querySelector('#taskPanelStats .panel-stat:nth-child(1) .panel-stat-lbl').textContent = 'Tomorrow';
+                document.querySelector('#taskPanelStats .panel-stat:nth-child(2) .panel-stat-lbl').textContent = 'This Week';
+            } else {
+                document.querySelector('#taskPanelStats .panel-stat:nth-child(1) .panel-stat-lbl').textContent = 'Overdue';
+                document.querySelector('#taskPanelStats .panel-stat:nth-child(2) .panel-stat-lbl').textContent = 'Today';
+            }
+            
+            if (tasks.length === 0) {
+                body.innerHTML = `<div class="empty"><div class="empty-icon">🎉</div><p>${currentTaskTab === 'today' ? 'All caught up!' : 'No upcoming tasks'}</p></div>`;
+                document.getElementById('startBtn').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('startBtn').style.display = 'block';
+            document.getElementById('startBtn').textContent = `▶️ Start: ${tasks[0].title.substring(0, 30)}${tasks[0].title.length > 30 ? '...' : ''}`;
+            
+            if (currentTaskTab === 'today') {
+                // Render today view
+                body.innerHTML = tasks.map((task, i) => `
+                    <div class="task-item tier${task.tier}">
+                        <div class="task-header">
+                            <span class="task-num">${i + 1}</span>
+                            <span class="task-title">${task.title}</span>
+                            <span class="task-score" title="Base:${task.scoreBreakdown?.base || 0} +OD:${task.scoreBreakdown?.overdue || 0} +Urg:${task.scoreBreakdown?.urgency || 0} +Dur:${task.scoreBreakdown?.duration || 0} +Touch:${task.scoreBreakdown?.touch || 0}">${task.score}</span>
+                        </div>
+                        <div class="task-meta">
+                            ${selectedProjectId === null ? `<span class="task-badge project">${task.projectName}</span>` : ''}
+                            <span class="task-badge ${task.isOverdue ? 'overdue' : 'today'}">${task.isOverdue ? (task.daysOverdue > 1 ? task.daysOverdue + 'd OVERDUE' : 'OVERDUE') : 'Today'}</span>
+                            ${task.durationLabel ? `<span class="task-badge duration">${task.durationLabel}</span>` : ''}
+                            ${task.durationMinutes > 0 ? `<span>${formatDuration(task.durationMinutes)}</span>` : ''}
+                            ${task.priority === 5 ? '<span style="color:#ef4444">High</span>' : task.priority === 3 ? '<span style="color:#fbbf24">Med</span>' : ''}
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                // Render upcoming view with groups
+                const tomorrow = tasks.filter(t => t.timeBucket === 'tomorrow');
+                const thisWeek = tasks.filter(t => t.timeBucket === 'thisweek');
+                const nextWeek = tasks.filter(t => t.timeBucket === 'nextweek');
+                
+                let html = '';
+                
+                if (tomorrow.length > 0) {
+                    const tomorrowMinutes = tomorrow.reduce((sum, t) => sum + (t.durationMinutes || 0), 0);
+                    html += `
+                        <div class="task-group">
+                            <div class="task-group-title">
+                                <span>📅 TOMORROW</span>
+                                <span>${tomorrow.length} tasks · ${(tomorrowMinutes/60).toFixed(1)}h</span>
+                            </div>
+                            ${renderTaskGroup(tomorrow)}
+                        </div>
+                    `;
+                }
+                
+                if (thisWeek.length > 0) {
+                    const weekMinutes = thisWeek.reduce((sum, t) => sum + (t.durationMinutes || 0), 0);
+                    html += `
+                        <div class="task-group">
+                            <div class="task-group-title">
+                                <span>📆 THIS WEEK</span>
+                                <span>${thisWeek.length} tasks · ${(weekMinutes/60).toFixed(1)}h</span>
+                            </div>
+                            ${renderTaskGroup(thisWeek)}
+                        </div>
+                    `;
+                }
+                
+                if (nextWeek.length > 0) {
+                    const nextWeekMinutes = nextWeek.reduce((sum, t) => sum + (t.durationMinutes || 0), 0);
+                    html += `
+                        <div class="task-group">
+                            <div class="task-group-title">
+                                <span>🗓️ NEXT WEEK</span>
+                                <span>${nextWeek.length} tasks · ${(nextWeekMinutes/60).toFixed(1)}h</span>
+                            </div>
+                            ${renderTaskGroup(nextWeek)}
+                        </div>
+                    `;
+                }
+                
+                body.innerHTML = html || `<div class="empty"><div class="empty-icon">📅</div><p>No upcoming tasks</p></div>`;
+            }
+        }
+        
+        function renderTaskGroup(tasks) {
+            return tasks.map((task, i) => `
+                <div class="task-item tier${task.tier}">
+                    <div class="task-header">
+                        <span class="task-num">${i + 1}</span>
+                        <span class="task-title">${task.title}</span>
+                        <span class="task-score" title="Base:${task.scoreBreakdown?.base || 0} +Urg:${task.scoreBreakdown?.urgency || 0} +Dur:${task.scoreBreakdown?.duration || 0} +Touch:${task.scoreBreakdown?.touch || 0}">${task.score}</span>
+                    </div>
+                    <div class="task-meta">
+                        ${selectedProjectId === null ? `<span class="task-badge project">${task.projectName}</span>` : ''}
+                        <span class="task-badge ${task.timeBucket}">${formatDueDate(task.dueDateStr)}</span>
+                        ${task.durationLabel ? `<span class="task-badge duration">${task.durationLabel}</span>` : ''}
+                        ${task.priority === 5 ? '<span style="color:#ef4444">High</span>' : task.priority === 3 ? '<span style="color:#fbbf24">Med</span>' : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function formatDueDate(dateStr) {
+            const date = new Date(dateStr);
+            const now = new Date();
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            if (dateStr === tomorrow.toISOString().split('T')[0]) {
+                return 'Tomorrow';
+            }
+            
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            return dayNames[date.getDay()] + ' ' + date.getDate();
+        }
+
         // Main Load Function
         async function refreshData() {
             showToast('Loading data...', 'info');
@@ -928,6 +1802,9 @@
             // Analyze and render
             analyzeProjects();
             renderStats();
+            renderProjectSidebar();
+            renderTaskPanel();
+            renderProjectCards();
             renderSuggestion();
             renderProjects();
             renderTimeline();
@@ -941,6 +1818,19 @@
             if (config.token) {
                 refreshData();
             } else {
+                document.getElementById('projectSidebar').innerHTML = `
+                    <div class="empty"><div class="empty-icon">🔑</div><p>Configure token</p>
+                    <a href="/" class="btn" style="max-width:120px;margin:10px auto 0;display:block;text-decoration:none;padding:6px">Setup</a></div>
+                `;
+                document.getElementById('taskPanelBody').innerHTML = `
+                    <div class="empty"><div class="empty-icon">🔑</div><p>Configure token in main app first</p>
+                    <a href="/" class="btn" style="max-width:150px;margin:10px auto 0;display:block;text-decoration:none">Setup</a></div>
+                `;
+                document.getElementById('taskPanelFooter').style.display = 'none';
+                document.getElementById('projectCardsGrid').innerHTML = `
+                    <div class="empty"><div class="empty-icon">🔑</div><p>Configure token in main app</p>
+                    <a href="/" class="btn" style="max-width:150px;margin:10px auto 0;display:block;text-decoration:none">Setup</a></div>
+                `;
                 document.getElementById('suggestionPanel').innerHTML = `
                     <div class="empty"><div class="empty-icon">🔑</div><p>Configure token in main app</p>
                     <a href="/" class="btn" style="max-width:150px;margin:10px auto 0;display:block;text-decoration:none">Setup</a></div>
