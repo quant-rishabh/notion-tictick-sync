@@ -692,6 +692,34 @@ async function batchMoveTasks(tasks, toProjectId) {
   }
 }
 
+// ==================== BATCH BLOCK FETCH (Optimization) ====================
+
+/**
+ * Fetch all blocks of a page in one API call
+ * Returns a Map of blockId -> block for O(1) lookup
+ */
+async function fetchPageBlocks(pageId, maxBlocks = 100) {
+  console.log(`[BATCH-FETCH] Fetching up to ${maxBlocks} blocks from page ${pageId}`);
+  
+  const { data, status } = await notionRequest(`/blocks/${pageId}/children?page_size=${maxBlocks}`);
+  
+  if (status !== 200 || !data.results) {
+    console.log(`[BATCH-FETCH] Failed: status=${status}`);
+    return new Map();
+  }
+  
+  const blockMap = new Map();
+  let todoCount = 0;
+  
+  for (const block of data.results) {
+    blockMap.set(block.id, block);
+    if (block.type === 'to_do') todoCount++;
+  }
+  
+  console.log(`[BATCH-FETCH] ✓ Got ${data.results.length} blocks (${todoCount} todos) in 1 API call`);
+  return blockMap;
+}
+
 // ==================== SYNC SINGLE BLOCK ====================
 
 function getNotionLink(pageId, blockId) {
@@ -1089,6 +1117,13 @@ export default async function handler(req, res) {
     } // end of else block for listDirectiveDetected check
 
     // ==================== STEP 3: Process all updated blocks ====================
+    // OPTIMIZATION: Fetch all page blocks in 1 API call instead of N calls
+    let pageBlocksCache = null;
+    if (taskPageId && updatedBlocks.length > 2) {
+      // Only use batch fetch if we have multiple blocks to process
+      pageBlocksCache = await fetchPageBlocks(taskPageId, 100);
+    }
+    
     for (const blockInfo of updatedBlocks) {
       const blockId = blockInfo.id;
       
@@ -1098,6 +1133,19 @@ export default async function handler(req, res) {
         results.skipped++;
         results.processed++;
         continue;
+      }
+
+      // OPTIMIZATION: Check cache first before making API call
+      if (pageBlocksCache && pageBlocksCache.has(blockId)) {
+        const cachedBlock = pageBlocksCache.get(blockId);
+        if (cachedBlock.type !== 'to_do') {
+          console.log(`[SKIP] Block ${blockId} is ${cachedBlock.type} (from cache - no API call!)`);
+          results.skipped++;
+          results.processed++;
+          continue;
+        }
+        // It's a todo - process it (syncBlock will still fetch, but we know it's worth it)
+        console.log(`[CACHE-HIT] Block ${blockId} is a todo - processing`);
       }
 
       try {
