@@ -558,10 +558,25 @@ async function batchDeleteTasks(tasks) {
   }
 
   try {
+    // Debug: Log task structure from search API
+    console.log(`[BATCH-DELETE] Task structure sample:`, JSON.stringify(tasks[0], null, 2));
+    
+    // Search API returns tasks with 'id' and 'projectId' fields
     const deletePayload = tasks.map(t => ({
       taskId: t.id,
       projectId: t.projectId
     }));
+    
+    console.log(`[BATCH-DELETE] Delete payload:`, JSON.stringify(deletePayload, null, 2));
+
+    const requestBody = {
+      add: [],
+      update: [],
+      delete: deletePayload,
+      addAttachments: [],
+      updateAttachments: [],
+      deleteAttachments: []
+    };
 
     const response = await fetch('https://api.ticktick.com/api/v2/batch/task', {
       method: 'POST',
@@ -570,22 +585,30 @@ async function batchDeleteTasks(tasks) {
         'Content-Type': 'application/json;charset=UTF-8',
         'x-tz': 'UTC'
       },
-      body: JSON.stringify({
-        add: [],
-        update: [],
-        delete: deletePayload,
-        addAttachments: [],
-        updateAttachments: [],
-        deleteAttachments: []
-      })
+      body: JSON.stringify(requestBody)
     });
+
+    const responseText = await response.text();
+    console.log(`[BATCH-DELETE] Response status: ${response.status}, body: ${responseText.substring(0, 500)}`);
 
     if (!response.ok) {
       console.log(`[BATCH-DELETE] API returned ${response.status}`);
-      return { success: false, deleted: 0 };
+      // If batch fails, try individual deletes as fallback
+      console.log(`[BATCH-DELETE] Falling back to single deletes...`);
+      let deleted = 0;
+      for (const task of tasks) {
+        try {
+          await deleteTask(task.id, task.projectId);
+          deleted++;
+          console.log(`[BATCH-DELETE] ✓ Deleted ${task.id} individually`);
+        } catch (e) {
+          console.log(`[BATCH-DELETE] ✗ Failed to delete ${task.id}: ${e.message}`);
+        }
+      }
+      return { success: deleted > 0, deleted };
     }
 
-    const data = await response.json();
+    const data = responseText ? JSON.parse(responseText) : {};
     console.log(`[BATCH-DELETE] ✓ Batch deleted ${tasks.length} tasks`);
     return { success: true, deleted: tasks.length, response: data };
   } catch (e) {
