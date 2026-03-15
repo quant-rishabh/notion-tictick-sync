@@ -419,50 +419,58 @@ async function getBlock(blockId) {
 // ==================== TICKTICK SEARCH (Fast O(1) lookup) ====================
 
 async function findTickTickTaskByNotionId(notionBlockId) {
-  // Method 1: Try Search API (requires cookie - fastest)
-  if (TICKTICK_COOKIE_TOKEN) {
-    try {
-      const searchUrl = `https://api.ticktick.com/api/v2/search/all?keywords=notion:${notionBlockId}`;
-      const response = await fetch(searchUrl, {
-        headers: {
-          'Cookie': `t=${TICKTICK_COOKIE_TOKEN}`
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.tasks && data.tasks.length > 0) {
-          console.log(`   Found via Search API`);
-          return data.tasks[0];
-        }
-      }
-    } catch (e) {
-      console.log(`   Search API failed, falling back to Open API`);
-    }
+  // Search API only - no fallback to avoid rate limits
+  if (!TICKTICK_COOKIE_TOKEN) {
+    console.log(`   ⚠️ TICKTICK_COOKIE_TOKEN not set - cannot search for existing tasks`);
+    console.log(`   ⚠️ Task will be created (may cause duplicates if task exists)`);
+    return null;
   }
 
-  // Method 2: Fallback to Open API (scan all projects)
-  console.log(`   Searching via Open API...`);
-  const projects = await ticktickRequest('/project');
-  const inboxId = `inbox${TICKTICK_USER_ID}`;
-  const projectIds = [...(projects || []).map(p => p.id), inboxId];
-
-  for (const projectId of projectIds) {
-    try {
-      const data = await ticktickRequest(`/project/${projectId}/data`);
-      if (data && data.tasks) {
-        const found = data.tasks.find(t => {
-          const match = t.content ? t.content.match(/notion:([a-f0-9-]+)/) : null;
-          return match && match[1] === notionBlockId;
-        });
-        if (found) return found;
+  try {
+    const searchUrl = `https://api.ticktick.com/api/v2/search/all?keywords=notion:${notionBlockId}`;
+    const response = await fetch(searchUrl, {
+      headers: {
+        'Cookie': `t=${TICKTICK_COOKIE_TOKEN}`
       }
-    } catch (e) {
-      // Skip failed projects
-    }
-  }
+    });
 
-  return null;
+    // Check for expired/invalid token
+    if (response.status === 401 || response.status === 403) {
+      console.log(`   ❌ TICKTICK_COOKIE_TOKEN expired or invalid (status: ${response.status})`);
+      console.log(`   ❌ Please refresh your cookie token in environment variables`);
+      return null;
+    }
+
+    if (!response.ok) {
+      console.log(`   ⚠️ Search API returned status ${response.status}`);
+      return null;
+    }
+
+    const data = await response.json();
+
+    // Check for error response (another sign of expired token)
+    if (data.errorCode || data.errorMessage) {
+      console.log(`   ❌ Search API error: ${data.errorCode} - ${data.errorMessage}`);
+      if (data.errorCode === 'invalid_token' || data.errorCode === 'token_expired') {
+        console.log(`   ❌ TICKTICK_COOKIE_TOKEN is expired - please refresh it`);
+      }
+      return null;
+    }
+
+    // Valid response - check for tasks
+    if (data.tasks && data.tasks.length > 0) {
+      console.log(`   ✓ Found via Search API`);
+      return data.tasks[0];
+    }
+
+    // No tasks found - this is normal for new tasks
+    console.log(`   ✓ Search complete - no existing task`);
+    return null;
+
+  } catch (e) {
+    console.log(`   ⚠️ Search API error: ${e.message}`);
+    return null;
+  }
 }
 
 // ==================== TICKTICK OPERATIONS ====================
