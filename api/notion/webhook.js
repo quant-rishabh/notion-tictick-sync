@@ -1025,36 +1025,21 @@ export default async function handler(req, res) {
       errors: []
     };
 
-    // ==================== STEP 1: Get target project for this page ====================
-    // This checks the first 3 blocks of the page for @list:project-name directive
+    // ==================== STEP 1: Check if @list: was ADDED/CHANGED in this webhook ====================
+    // This MUST happen first - if @list: is in updated_blocks, we need to migrate ALL tasks
+    // Even if the page already had @list:, we need to migrate when it changes
+    
     let targetProjectId = `inbox${TICKTICK_USER_ID}`;
-    let listDirectiveDetected = false;
+    let migrationTriggered = false;
     
-    if (taskPageId) {
-      console.log(`\n[LIST] ========================================`);
-      console.log(`[LIST] STEP 1: Checking for @list: directive`);
-      console.log(`[LIST] Page ID: ${taskPageId}`);
-      console.log(`[LIST] ========================================`);
-      targetProjectId = await getTargetProjectId(taskPageId);
-      listDirectiveDetected = targetProjectId !== `inbox${TICKTICK_USER_ID}`;
-      console.log(`[LIST] RESULT: Target project = ${targetProjectId}`);
-      console.log(`[LIST] RESULT: Directive detected = ${listDirectiveDetected}`);
-      console.log(`[LIST] ========================================\n`);
-    } else {
-      console.log(`[LIST] No taskPageId available, skipping @list: detection`);
+    // OPTIMIZATION: Fetch all page blocks in 1 API call (reused in STEP 2)
+    let pageBlocksCache = null;
+    if (taskPageId && updatedBlocks.length > 2) {
+      pageBlocksCache = await fetchPageBlocks(taskPageId, 100);
     }
-
-    // ==================== STEP 2: Check if @list: block was added/changed ====================
-    // If any updated block is a paragraph containing @list:, trigger migration
-    // This handles the case where user ADDS @list: to a page with existing tasks
-    // SKIP if we already found directive in STEP 1 (avoid duplicate work)
-    console.log(`\n[MIGRATE] ========================================`);
-    console.log(`[MIGRATE] STEP 2: Checking if @list: was added/changed`);
     
-    if (listDirectiveDetected) {
-      console.log(`[MIGRATE] ⚡ Skipping - @list: already detected in STEP 1`);
-      console.log(`[MIGRATE] ========================================\n`);
-    } else {
+    console.log(`\n[MIGRATE] ========================================`);
+    console.log(`[MIGRATE] STEP 1: Checking if @list: was added/changed`);
     console.log(`[MIGRATE] Checking ${updatedBlocks.length} updated blocks...`);
     console.log(`[MIGRATE] ========================================`);
     
@@ -1066,9 +1051,19 @@ export default async function handler(req, res) {
       }
       
       try {
-        console.log(`[MIGRATE-DEBUG] Checking block ${blockInfo.id}...`);
-        const { data: block, status } = await getBlock(blockInfo.id);
-        console.log(`[MIGRATE-DEBUG] Block status=${status}, type=${block?.type}`);
+        // OPTIMIZATION: Use cache if available
+        let block, status;
+        if (pageBlocksCache && pageBlocksCache.has(blockInfo.id)) {
+          block = pageBlocksCache.get(blockInfo.id);
+          status = 200;
+          console.log(`[MIGRATE-DEBUG] Block ${blockInfo.id} from cache: type=${block.type}`);
+        } else {
+          console.log(`[MIGRATE-DEBUG] Fetching block ${blockInfo.id}...`);
+          const result = await getBlock(blockInfo.id);
+          block = result.data;
+          status = result.status;
+          console.log(`[MIGRATE-DEBUG] Block status=${status}, type=${block?.type}`);
+        }
         
         if (status === 200 && block.type === 'paragraph' && block.paragraph?.rich_text) {
           const text = block.paragraph.rich_text.map(r => r.plain_text).join('');
@@ -1076,7 +1071,7 @@ export default async function handler(req, res) {
           const listName = extractListDirective(text);
           
           if (listName) {
-            console.log(`\n[MIGRATE] 📦 @list:${listName} directive detected in updated blocks!`);
+            console.log(`\n[MIGRATE] 📦 @list:${listName} CHANGED/ADDED in this webhook!`);
             console.log(`[MIGRATE] Triggering migration for page ${taskPageId}...`);
             
             // Get project ID for migration
@@ -1084,8 +1079,8 @@ export default async function handler(req, res) {
             console.log(`[MIGRATE] Migration target project ID: ${migrationProjectId}`);
             
             if (migrationProjectId) {
-              // Find all existing tasks from this page
-              console.log(`[MIGRATE] Searching for existing tasks from this page...`);
+              // Find ALL existing tasks from this page (not just updated ones)
+              console.log(`[MIGRATE] Searching for ALL existing tasks from this page...`);
               const existingTasks = await findTasksByNotionPageId(taskPageId);
               
               if (existingTasks.length > 0) {
@@ -1099,8 +1094,9 @@ export default async function handler(req, res) {
                 console.log(`[MIGRATE] No existing tasks to migrate`);
               }
               
-              // Update targetProjectId for new tasks
+              // Set targetProjectId for any new tasks in this webhook
               targetProjectId = migrationProjectId;
+              migrationTriggered = true;
               console.log(`[MIGRATE] Updated targetProjectId to: ${targetProjectId}`);
             }
             
@@ -1114,15 +1110,26 @@ export default async function handler(req, res) {
       }
     }
     console.log(`[MIGRATE] ========================================\n`);
-    } // end of else block for listDirectiveDetected check
+
+    // ==================== STEP 2: Get target project if not already set by migration ====================
+    // If @list: was not in updated_blocks, check the page's first blocks for existing @list:
+    
+    if (!migrationTriggered && taskPageId) {
+      console.log(`\n[LIST] ========================================`);
+      console.log(`[LIST] STEP 2: Checking page for existing @list: directive`);
+      console.log(`[LIST] Page ID: ${taskPageId}`);
+      console.log(`[LIST] ========================================`);
+      targetProjectId = await getTargetProjectId(taskPageId);
+      console.log(`[LIST] RESULT: Target project = ${targetProjectId}`);
+      console.log(`[LIST] ========================================\n`);
+    } else if (migrationTriggered) {
+      console.log(`[LIST] STEP 2: Skipped - targetProjectId already set by migration`);
+    } else {
+      console.log(`[LIST] No taskPageId available, using Inbox`);
+    }
 
     // ==================== STEP 3: Process all updated blocks ====================
-    // OPTIMIZATION: Fetch all page blocks in 1 API call instead of N calls
-    let pageBlocksCache = null;
-    if (taskPageId && updatedBlocks.length > 2) {
-      // Only use batch fetch if we have multiple blocks to process
-      pageBlocksCache = await fetchPageBlocks(taskPageId, 100);
-    }
+    // pageBlocksCache was already fetched before STEP 2
     
     for (const blockInfo of updatedBlocks) {
       const blockId = blockInfo.id;
