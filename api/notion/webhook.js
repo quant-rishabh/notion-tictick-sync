@@ -12,6 +12,14 @@
  * 5. CHECK (recurring): Block checked:true -> DELETE from TickTick (stops forever)
  *
  * Uses TickTick Search API for O(1) lookup by block ID
+ * 
+ * @list: FEATURE (v2.0):
+ * - Add @list:project-name as first line of Notion page
+ * - Tasks will be created in matching TickTick project
+ * - Supports: dash-to-space (@list:my-project → "my project")
+ * - Supports: fuzzy matching (70% threshold for typos)
+ * - Supports: auto-create project if not exists
+ * - Supports: auto-migrate existing tasks when @list added
  */
 
 import { parseTask } from '../../lib/ai-parser.js';
@@ -25,6 +33,356 @@ const NOTION_API_BASE = 'https://api.notion.com/v1';
 const TICKTICK_API_BASE = 'https://api.ticktick.com/open/v1';
 const NOTION_SYNC_TAG = 'notion-sync';
 const NOTION_RECURRING_TAG = 'notion-recurring';
+const MAX_MIGRATE_TASKS = 50; // Safety limit for migration
+
+// ==================== FUZZY MATCHING & HELPERS ====================
+
+/**
+ * Calculate similarity between two strings (0.0 to 1.0)
+ * Uses Levenshtein distance
+ */
+function similarity(str1, str2) {
+  const s1 = str1.toLowerCase();
+  const s2 = str2.toLowerCase();
+  
+  if (s1 === s2) return 1.0;
+  if (s1.length === 0 || s2.length === 0) return 0.0;
+  
+  const matrix = [];
+  for (let i = 0; i <= s1.length; i++) {
+    matrix[i] = [i];
+  }
+  for (let j = 0; j <= s2.length; j++) {
+    matrix[0][j] = j;
+  }
+  
+  for (let i = 1; i <= s1.length; i++) {
+    for (let j = 1; j <= s2.length; j++) {
+      const cost = s1[i - 1] === s2[j - 1] ? 0 : 1;
+      matrix[i][j] = Math.min(
+        matrix[i - 1][j] + 1,
+        matrix[i][j - 1] + 1,
+        matrix[i - 1][j - 1] + cost
+      );
+    }
+  }
+  
+  const maxLen = Math.max(s1.length, s2.length);
+  return 1 - matrix[s1.length][s2.length] / maxLen;
+}
+
+/**
+ * Normalize list name: dash/underscore → space, lowercase
+ * @list:linkedin-social-media → "linkedin social media"
+ */
+function normalizeListName(name) {
+  return name.replace(/[-_]/g, ' ').toLowerCase().trim();
+}
+
+/**
+ * Extract @list:xxx from text
+ * Returns the list name or null
+ */
+function extractListDirective(text) {
+  const match = text.match(/@list:([\w-]+)/i);
+  if (match) {
+    console.log(`[LIST-DEBUG] extractListDirective: Found "@list:${match[1]}" in text: "${text.substring(0, 50)}..."`);
+  }
+  return match ? match[1] : null;
+}
+
+/**
+ * Get first few blocks of a Notion page
+ */
+async function getPageFirstBlocks(pageId, limit = 5) {
+  console.log(`[LIST-DEBUG] getPageFirstBlocks: Fetching first ${limit} blocks of page ${pageId}`);
+  const { data, status } = await notionRequest(`/blocks/${pageId}/children?page_size=${limit}`);
+  if (status !== 200 || !data.results) {
+    console.log(`[LIST-DEBUG] getPageFirstBlocks: FAILED - status=${status}, data=${JSON.stringify(data)}`);
+    return [];
+  }
+  console.log(`[LIST-DEBUG] getPageFirstBlocks: Got ${data.results.length} blocks`);
+  // Log block types for debugging
+  data.results.forEach((b, i) => {
+    const text = b[b.type]?.rich_text?.map(r => r.plain_text).join('') || '';
+    console.log(`[LIST-DEBUG]   Block ${i}: type=${b.type}, text="${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`);
+  });
+  return data.results;
+}
+
+/**
+ * Find @list: directive from page's first block
+ */
+async function findListDirective(pageId) {
+  console.log(`[LIST-DEBUG] findListDirective: Searching for @list: in page ${pageId}`);
+  const blocks = await getPageFirstBlocks(pageId, 3);
+  
+  if (blocks.length === 0) {
+    console.log(`[LIST-DEBUG] findListDirective: No blocks found in page`);
+    return null;
+  }
+  
+  for (const block of blocks) {
+    console.log(`[LIST-DEBUG] findListDirective: Checking block type=${block.type}`);
+    if (block.type === 'paragraph' && block.paragraph?.rich_text) {
+      const text = block.paragraph.rich_text.map(r => r.plain_text).join('');
+      console.log(`[LIST-DEBUG] findListDirective: Paragraph text="${text}"`);
+      const listName = extractListDirective(text);
+      if (listName) {
+        console.log(`[LIST] ✓ Found @list:${listName} in page ${pageId}`);
+        return { listName, blockId: block.id };
+      }
+    } else {
+      console.log(`[LIST-DEBUG] findListDirective: Skipping block - not a paragraph or no rich_text`);
+    }
+  }
+  
+  console.log(`[LIST-DEBUG] findListDirective: No @list: directive found in first 3 blocks`);
+  return null;
+}
+
+// Cache for TickTick projects (refreshed per webhook)
+let cachedProjects = null;
+
+/**
+ * Get all TickTick projects (cached per request)
+ */
+async function getTickTickProjects(forceRefresh = false) {
+  if (cachedProjects && !forceRefresh) {
+    return cachedProjects;
+  }
+  cachedProjects = await ticktickRequest('/project') || [];
+  return cachedProjects;
+}
+
+/**
+ * Find TickTick project by name (supports fuzzy matching)
+ */
+async function findProjectByName(listName) {
+  console.log(`[LIST-DEBUG] findProjectByName: Looking for project matching "${listName}"`);
+  const projects = await getTickTickProjects();
+  const normalized = normalizeListName(listName);
+  console.log(`[LIST-DEBUG] findProjectByName: Normalized name="${normalized}", checking ${projects.length} projects`);
+  
+  // Log all project names for debugging
+  console.log(`[LIST-DEBUG] findProjectByName: Available projects: [${projects.map(p => `"${p.name}"`).join(', ')}]`);
+  
+  // 1. Try exact match first
+  const exact = projects.find(p => p.name.toLowerCase() === normalized);
+  if (exact) {
+    console.log(`[LIST] ✓ Exact match: "${listName}" → "${exact.name}" (ID: ${exact.id})`);
+    return exact;
+  }
+  console.log(`[LIST-DEBUG] findProjectByName: No exact match, trying fuzzy...`);
+  
+  // 2. Try fuzzy match (70% threshold)
+  let bestMatch = null;
+  let bestScore = 0;
+  
+  for (const project of projects) {
+    const score = similarity(normalized, project.name.toLowerCase());
+    console.log(`[LIST-DEBUG]   Fuzzy: "${normalized}" vs "${project.name.toLowerCase()}" = ${Math.round(score * 100)}%`);
+    if (score > bestScore && score >= 0.7) {
+      bestMatch = project;
+      bestScore = score;
+    }
+  }
+  
+  if (bestMatch) {
+    console.log(`[LIST] ✓ Fuzzy match: "${listName}" → "${bestMatch.name}" (${Math.round(bestScore * 100)}%)`);
+    return bestMatch;
+  }
+  
+  console.log(`[LIST] ✗ No match found for "${listName}" (will create new project)`);
+  return null;
+}
+
+/**
+ * Create a new TickTick project
+ */
+async function createProject(name) {
+  console.log(`[LIST] Creating new project: "${name}"`);
+  const result = await ticktickRequest('/project', {
+    method: 'POST',
+    body: JSON.stringify({
+      name: name,
+      viewMode: 'list',
+      kind: 'TASK'
+    })
+  });
+  
+  if (result && result.id) {
+    console.log(`[LIST] ✓ Created project: "${result.name}" (ID: ${result.id})`);
+    // Refresh cache
+    cachedProjects = null;
+    return result;
+  }
+  
+  console.log(`[LIST] ✗ Failed to create project`);
+  return null;
+}
+
+/**
+ * Get or create TickTick project by name
+ */
+async function getOrCreateProject(listName) {
+  console.log(`[LIST-DEBUG] getOrCreateProject: Getting/creating project for "${listName}"`);
+  
+  // First try to find existing project
+  let project = await findProjectByName(listName);
+  
+  if (project) {
+    console.log(`[LIST-DEBUG] getOrCreateProject: Found existing project, ID=${project.id}`);
+    return project.id;
+  }
+  
+  // Create new project with normalized name
+  const normalizedName = normalizeListName(listName)
+    .split(' ')
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' '); // Title case
+  
+  console.log(`[LIST-DEBUG] getOrCreateProject: Creating new project with name="${normalizedName}"`);
+  const newProject = await createProject(normalizedName);
+  
+  if (newProject) {
+    console.log(`[LIST-DEBUG] getOrCreateProject: ✓ Created new project, ID=${newProject.id}`);
+  } else {
+    console.log(`[LIST-DEBUG] getOrCreateProject: ✗ Failed to create project`);
+  }
+  
+  return newProject ? newProject.id : null;
+}
+
+/**
+ * Find all TickTick tasks from a specific Notion page
+ */
+async function findTasksByNotionPageId(pageId) {
+  const tasks = [];
+  
+  // Method 1: Try Search API (faster)
+  if (TICKTICK_COOKIE_TOKEN) {
+    try {
+      // Search for tasks containing this page ID in content
+      const searchUrl = `https://api.ticktick.com/api/v2/search/all?keywords=notion.so/${pageId.replace(/-/g, '')}`;
+      const response = await fetch(searchUrl, {
+        headers: { 'Cookie': `t=${TICKTICK_COOKIE_TOKEN}` }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.tasks) {
+          console.log(`[MIGRATE] Found ${data.tasks.length} tasks via Search API`);
+          return data.tasks;
+        }
+      }
+    } catch (e) {
+      console.log(`[MIGRATE] Search API failed, using Open API`);
+    }
+  }
+  
+  // Method 2: Fallback - scan all projects
+  const projects = await getTickTickProjects();
+  const inboxId = `inbox${TICKTICK_USER_ID}`;
+  const projectIds = [...projects.map(p => p.id), inboxId];
+  
+  for (const projectId of projectIds) {
+    try {
+      const data = await ticktickRequest(`/project/${projectId}/data`);
+      if (data && data.tasks) {
+        for (const task of data.tasks) {
+          // Check if task content contains this page ID
+          if (task.content && task.content.includes(pageId.replace(/-/g, ''))) {
+            tasks.push(task);
+          }
+        }
+      }
+    } catch (e) {
+      // Skip failed projects
+    }
+  }
+  
+  console.log(`[MIGRATE] Found ${tasks.length} tasks via Open API`);
+  return tasks;
+}
+
+/**
+ * Migrate tasks to a new project
+ */
+async function migrateTasksToProject(tasks, newProjectId, newProjectName) {
+  const toMigrate = tasks.slice(0, MAX_MIGRATE_TASKS);
+  
+  if (tasks.length > MAX_MIGRATE_TASKS) {
+    console.log(`[MIGRATE] ⚠️ Only migrating first ${MAX_MIGRATE_TASKS} of ${tasks.length} tasks`);
+  }
+  
+  let migrated = 0;
+  let failed = 0;
+  
+  for (const task of toMigrate) {
+    // Skip if already in target project
+    if (task.projectId === newProjectId) {
+      console.log(`[MIGRATE] Skipping "${task.title}" - already in target project`);
+      continue;
+    }
+    
+    try {
+      // Update task with new projectId
+      await updateTask({
+        id: task.id,
+        projectId: newProjectId,
+        title: task.title,
+        content: task.content,
+        tags: task.tags,
+        priority: task.priority || 0
+      });
+      
+      console.log(`[MIGRATE] ✓ Moved "${task.title}" → ${newProjectName}`);
+      migrated++;
+    } catch (e) {
+      console.log(`[MIGRATE] ✗ Failed to move "${task.title}": ${e.message}`);
+      failed++;
+    }
+  }
+  
+  return { migrated, failed, skipped: tasks.length - toMigrate.length };
+}
+
+/**
+ * Get target project ID for a page (main function)
+ * Returns projectId or inbox if not specified
+ */
+async function getTargetProjectId(pageId) {
+  console.log(`\n[LIST-DEBUG] ========== getTargetProjectId START ==========`);
+  console.log(`[LIST-DEBUG] pageId: ${pageId}`);
+  
+  if (!pageId) {
+    console.log(`[LIST-DEBUG] No pageId provided, using Inbox`);
+    console.log(`[LIST-DEBUG] ========== getTargetProjectId END ==========\n`);
+    return `inbox${TICKTICK_USER_ID}`;
+  }
+  
+  const directive = await findListDirective(pageId);
+  
+  if (!directive) {
+    console.log(`[LIST] No @list: directive found, using Inbox`);
+    console.log(`[LIST-DEBUG] ========== getTargetProjectId END (no directive) ==========\n`);
+    return `inbox${TICKTICK_USER_ID}`;
+  }
+  
+  console.log(`[LIST-DEBUG] Found directive: @list:${directive.listName}`);
+  const projectId = await getOrCreateProject(directive.listName);
+  
+  if (projectId) {
+    console.log(`[LIST] ✓ Target project resolved: ${projectId}`);
+    console.log(`[LIST-DEBUG] ========== getTargetProjectId END (success) ==========\n`);
+    return projectId;
+  }
+  
+  console.log(`[LIST] Failed to get/create project, using Inbox`);
+  console.log(`[LIST-DEBUG] ========== getTargetProjectId END (fallback) ==========\n`);
+  return `inbox${TICKTICK_USER_ID}`;
+}
 
 // ==================== API HELPERS ====================
 
@@ -109,7 +467,7 @@ async function findTickTickTaskByNotionId(notionBlockId) {
 
 // ==================== TICKTICK OPERATIONS ====================
 
-async function createTask(taskData) {
+async function createTask(taskData, projectId = null) {
   const tags = taskData.tags || [];
 
   // Use different tag for recurring vs one-time tasks
@@ -121,7 +479,7 @@ async function createTask(taskData) {
   const body = {
     title: taskData.title,
     content: taskData.content || '',
-    projectId: `inbox${TICKTICK_USER_ID}`,
+    projectId: projectId || `inbox${TICKTICK_USER_ID}`,
     tags: tags,
     priority: taskData.priority || 0,
   };
@@ -168,8 +526,9 @@ function getNotionLink(pageId, blockId) {
   return `https://notion.so/${cleanPageId}#${cleanBlockId}`;
 }
 
-async function syncBlock(blockId, pageId = '') {
+async function syncBlock(blockId, pageId = '', targetProjectId = null) {
   console.log(`\n========== SYNC BLOCK: ${blockId} ==========`);
+  console.log(`[SYNC] Target project: ${targetProjectId || 'not specified (will use Inbox)'}`);
 
   // 1. Get block from Notion
   console.log(`[NOTION] Fetching block...`);
@@ -280,12 +639,17 @@ async function syncBlock(blockId, pageId = '') {
     const existingUserTags = (existingTask.tags || [])
       .filter(t => t !== NOTION_SYNC_TAG && t !== NOTION_RECURRING_TAG).sort().join(',');
     const newUserTags = (parsed.tags || []).sort().join(',');
+    
+    // Check if task needs to be moved to new project
+    const needsProjectMove = targetProjectId && existingTask.projectId !== targetProjectId;
 
     console.log(`[UPDATE] Checking for changes...`);
     console.log(`[UPDATE]   Old title: "${existingTask.title}" → New: "${parsed.title}"`);
     console.log(`[UPDATE]   Old tags: [${existingUserTags}] → New: [${newUserTags}]`);
+    console.log(`[UPDATE]   Old project: ${existingTask.projectId} → Target: ${targetProjectId || 'same'}`);
+    console.log(`[UPDATE]   Needs project move: ${needsProjectMove}`);
 
-    if (existingTask.title !== parsed.title || existingUserTags !== newUserTags) {
+    if (existingTask.title !== parsed.title || existingUserTags !== newUserTags || needsProjectMove) {
       console.log(`[UPDATE] 📝 Changes detected, updating task`);
 
       const syncTag = parsed.isRecurring ? NOTION_RECURRING_TAG : NOTION_SYNC_TAG;
@@ -296,15 +660,19 @@ async function syncBlock(blockId, pageId = '') {
 
       const updateResult = await updateTask({
         id: existingTask.id,
-        projectId: existingTask.projectId,
+        projectId: needsProjectMove ? targetProjectId : existingTask.projectId,
         title: parsed.title,
         content: existingTask.content,
         tags: updatedTags,
         priority: parsed.priority || 0
       });
       console.log(`[UPDATE]   Result: ${updateResult ? 'SUCCESS' : 'DONE'}`);
+      
+      if (needsProjectMove) {
+        console.log(`[UPDATE]   📦 Task moved to project: ${targetProjectId}`);
+      }
 
-      return { action: 'updated', title: parsed.title };
+      return { action: 'updated', title: parsed.title, moved: needsProjectMove };
     }
 
     console.log(`[SKIP] No changes detected`);
@@ -350,16 +718,17 @@ async function syncBlock(blockId, pageId = '') {
     console.log(`[CREATE]   Full payload being sent to TickTick:`);
     console.log(`[CREATE]   ${JSON.stringify(taskPayload, null, 2).split('\n').join('\n[CREATE]   ')}`);
 
-    const createResult = await createTask(taskPayload);
+    const createResult = await createTask(taskPayload, targetProjectId);
 
     if (createResult) {
       console.log(`[CREATE]   ✓ SUCCESS - Task ID: ${createResult.id}`);
+      console.log(`[CREATE]   Project: ${createResult.projectId}`);
       console.log(`[CREATE]   TickTick response: ${JSON.stringify(createResult, null, 2).split('\n').join('\n[CREATE]   ')}`);
     } else {
       console.log(`[CREATE]   ⚠️ No response from TickTick (might still be created)`);
     }
 
-    return { action: 'created', title: parsed.title, recurring: parsed.isRecurring };
+    return { action: 'created', title: parsed.title, recurring: parsed.isRecurring, projectId: createResult?.projectId };
   }
 }
 
@@ -424,6 +793,9 @@ export default async function handler(req, res) {
     const taskPageId = payload.entity?.id || payload.data?.parent?.id || '';
     console.log(`Processing ${updatedBlocks.length} updated blocks (page: ${taskPageId})`);
 
+    // Reset project cache for fresh data
+    cachedProjects = null;
+
     const results = {
       processed: 0,
       created: 0,
@@ -431,14 +803,94 @@ export default async function handler(req, res) {
       completed: 0,
       deleted: 0,
       skipped: 0,
+      migrated: 0,
       errors: []
     };
 
+    // ==================== STEP 1: Get target project for this page ====================
+    // This checks the first 3 blocks of the page for @list:project-name directive
+    let targetProjectId = `inbox${TICKTICK_USER_ID}`;
+    let listDirectiveDetected = false;
+    
+    if (taskPageId) {
+      console.log(`\n[LIST] ========================================`);
+      console.log(`[LIST] STEP 1: Checking for @list: directive`);
+      console.log(`[LIST] Page ID: ${taskPageId}`);
+      console.log(`[LIST] ========================================`);
+      targetProjectId = await getTargetProjectId(taskPageId);
+      listDirectiveDetected = targetProjectId !== `inbox${TICKTICK_USER_ID}`;
+      console.log(`[LIST] RESULT: Target project = ${targetProjectId}`);
+      console.log(`[LIST] RESULT: Directive detected = ${listDirectiveDetected}`);
+      console.log(`[LIST] ========================================\n`);
+    } else {
+      console.log(`[LIST] No taskPageId available, skipping @list: detection`);
+    }
+
+    // ==================== STEP 2: Check if @list: block was added/changed ====================
+    // If any updated block is a paragraph containing @list:, trigger migration
+    // This handles the case where user ADDS @list: to a page with existing tasks
+    console.log(`\n[MIGRATE] ========================================`);
+    console.log(`[MIGRATE] STEP 2: Checking if @list: was added/changed`);
+    console.log(`[MIGRATE] Checking ${updatedBlocks.length} updated blocks...`);
+    console.log(`[MIGRATE] ========================================`);
+    
+    for (const blockInfo of updatedBlocks) {
+      try {
+        console.log(`[MIGRATE-DEBUG] Checking block ${blockInfo.id}...`);
+        const { data: block, status } = await getBlock(blockInfo.id);
+        console.log(`[MIGRATE-DEBUG] Block status=${status}, type=${block?.type}`);
+        
+        if (status === 200 && block.type === 'paragraph' && block.paragraph?.rich_text) {
+          const text = block.paragraph.rich_text.map(r => r.plain_text).join('');
+          console.log(`[MIGRATE-DEBUG] Block is paragraph with text: "${text}"`);
+          const listName = extractListDirective(text);
+          
+          if (listName) {
+            console.log(`\n[MIGRATE] 📦 @list:${listName} directive detected in updated blocks!`);
+            console.log(`[MIGRATE] Triggering migration for page ${taskPageId}...`);
+            
+            // Get project ID for migration
+            const migrationProjectId = await getOrCreateProject(listName);
+            console.log(`[MIGRATE] Migration target project ID: ${migrationProjectId}`);
+            
+            if (migrationProjectId) {
+              // Find all existing tasks from this page
+              console.log(`[MIGRATE] Searching for existing tasks from this page...`);
+              const existingTasks = await findTasksByNotionPageId(taskPageId);
+              
+              if (existingTasks.length > 0) {
+                console.log(`[MIGRATE] Found ${existingTasks.length} existing tasks to migrate:`);
+                existingTasks.forEach((t, i) => console.log(`[MIGRATE]   ${i+1}. "${t.title}" (current project: ${t.projectId})`));
+                
+                const migrationResult = await migrateTasksToProject(existingTasks, migrationProjectId, listName);
+                results.migrated = migrationResult.migrated;
+                console.log(`[MIGRATE] ✓ Migration complete: ${migrationResult.migrated} moved, ${migrationResult.failed} failed`);
+              } else {
+                console.log(`[MIGRATE] No existing tasks to migrate`);
+              }
+              
+              // Update targetProjectId for new tasks
+              targetProjectId = migrationProjectId;
+              console.log(`[MIGRATE] Updated targetProjectId to: ${targetProjectId}`);
+            }
+            
+            // Only migrate once per webhook
+            console.log(`[MIGRATE] Breaking after first @list: detection`);
+            break;
+          }
+        }
+      } catch (e) {
+        console.log(`[MIGRATE] ✗ Could not check block ${blockInfo.id}: ${e.message}`);
+      }
+    }
+    console.log(`[MIGRATE] ========================================\n`);
+
+    // ==================== STEP 3: Process all updated blocks ====================
     for (const blockInfo of updatedBlocks) {
       const blockId = blockInfo.id;
 
       try {
-        const result = await syncBlock(blockId, taskPageId);
+        const result = await syncBlock(blockId, taskPageId, targetProjectId);
         results.processed++;
 
         switch (result.action) {
@@ -454,10 +906,11 @@ export default async function handler(req, res) {
       }
     }
 
-    console.log(`Webhook processed: ${results.created} created, ${results.updated} updated, ${results.completed} completed, ${results.deleted} deleted, ${results.skipped} skipped`);
+    console.log(`\nWebhook processed: ${results.created} created, ${results.updated} updated, ${results.completed} completed, ${results.deleted} deleted, ${results.skipped} skipped, ${results.migrated} migrated`);
     return res.status(200).json({
       ok: true,
       event: eventType,
+      targetProject: targetProjectId,
       ...results,
       timestamp: new Date().toISOString()
     });
