@@ -35,6 +35,39 @@ const NOTION_SYNC_TAG = 'notion-sync';
 const NOTION_RECURRING_TAG = 'notion-recurring';
 const MAX_MIGRATE_TASKS = 50; // Safety limit for migration
 
+// ==================== WEBHOOK DEDUPLICATION ====================
+// Track processed webhook IDs to prevent duplicate processing on retries
+// Uses in-memory cache (cleared on cold start, but that's fine - better than duplicates)
+const processedWebhooks = new Map(); // webhookId -> timestamp
+const WEBHOOK_CACHE_TTL = 60 * 1000; // 60 seconds - Notion retries within this window
+
+function isWebhookAlreadyProcessed(webhookId) {
+  const processed = processedWebhooks.get(webhookId);
+  if (processed) {
+    const age = Date.now() - processed;
+    if (age < WEBHOOK_CACHE_TTL) {
+      return true; // Already processed recently
+    }
+    // Expired, remove it
+    processedWebhooks.delete(webhookId);
+  }
+  return false;
+}
+
+function markWebhookProcessed(webhookId) {
+  processedWebhooks.set(webhookId, Date.now());
+  
+  // Cleanup old entries (keep cache small)
+  if (processedWebhooks.size > 100) {
+    const now = Date.now();
+    for (const [id, timestamp] of processedWebhooks) {
+      if (now - timestamp > WEBHOOK_CACHE_TTL) {
+        processedWebhooks.delete(id);
+      }
+    }
+  }
+}
+
 // ==================== FUZZY MATCHING & HELPERS ====================
 
 /**
@@ -307,7 +340,7 @@ async function findTasksByNotionPageId(pageId) {
 }
 
 /**
- * Migrate tasks to a new project
+ * Migrate tasks to a new project (uses batch API for efficiency)
  */
 async function migrateTasksToProject(tasks, newProjectId, newProjectName) {
   const toMigrate = tasks.slice(0, MAX_MIGRATE_TASKS);
@@ -315,37 +348,17 @@ async function migrateTasksToProject(tasks, newProjectId, newProjectName) {
   if (tasks.length > MAX_MIGRATE_TASKS) {
     console.log(`[MIGRATE] ⚠️ Only migrating first ${MAX_MIGRATE_TASKS} of ${tasks.length} tasks`);
   }
+
+  // Use batch move API (1 request instead of N)
+  const result = await batchMoveTasks(toMigrate, newProjectId);
   
-  let migrated = 0;
-  let failed = 0;
+  console.log(`[MIGRATE] Batch move result: ${result.moved} moved, ${result.skipped || 0} skipped, ${result.errors || 0} errors`);
   
-  for (const task of toMigrate) {
-    // Skip if already in target project
-    if (task.projectId === newProjectId) {
-      console.log(`[MIGRATE] Skipping "${task.title}" - already in target project`);
-      continue;
-    }
-    
-    try {
-      // Update task with new projectId
-      await updateTask({
-        id: task.id,
-        projectId: newProjectId,
-        title: task.title,
-        content: task.content,
-        tags: task.tags,
-        priority: task.priority || 0
-      });
-      
-      console.log(`[MIGRATE] ✓ Moved "${task.title}" → ${newProjectName}`);
-      migrated++;
-    } catch (e) {
-      console.log(`[MIGRATE] ✗ Failed to move "${task.title}": ${e.message}`);
-      failed++;
-    }
-  }
-  
-  return { migrated, failed, skipped: tasks.length - toMigrate.length };
+  return { 
+    migrated: result.moved, 
+    failed: result.errors || 0, 
+    skipped: (result.skipped || 0) + (tasks.length - toMigrate.length)
+  };
 }
 
 /**
@@ -523,6 +536,137 @@ async function completeTask(taskId, projectId) {
   return ticktickRequest(`/project/${projectId}/task/${taskId}/complete`, {
     method: 'POST'
   });
+}
+
+// Batch delete multiple tasks at once (Cookie API - more efficient)
+async function batchDeleteTasks(tasks) {
+  if (!tasks || tasks.length === 0) return { success: true, deleted: 0 };
+  
+  if (!TICKTICK_COOKIE_TOKEN) {
+    console.log(`[BATCH-DELETE] No TICKTICK_COOKIE_TOKEN, falling back to single deletes`);
+    // Fallback to single deletes
+    let deleted = 0;
+    for (const task of tasks) {
+      try {
+        await deleteTask(task.id, task.projectId);
+        deleted++;
+      } catch (e) {
+        console.log(`[BATCH-DELETE] Failed to delete ${task.id}: ${e.message}`);
+      }
+    }
+    return { success: true, deleted };
+  }
+
+  try {
+    const deletePayload = tasks.map(t => ({
+      taskId: t.id,
+      projectId: t.projectId
+    }));
+
+    const response = await fetch('https://api.ticktick.com/api/v2/batch/task', {
+      method: 'POST',
+      headers: {
+        'Cookie': `t=${TICKTICK_COOKIE_TOKEN}`,
+        'Content-Type': 'application/json;charset=UTF-8',
+        'x-tz': 'UTC'
+      },
+      body: JSON.stringify({
+        add: [],
+        update: [],
+        delete: deletePayload,
+        addAttachments: [],
+        updateAttachments: [],
+        deleteAttachments: []
+      })
+    });
+
+    if (!response.ok) {
+      console.log(`[BATCH-DELETE] API returned ${response.status}`);
+      return { success: false, deleted: 0 };
+    }
+
+    const data = await response.json();
+    console.log(`[BATCH-DELETE] ✓ Batch deleted ${tasks.length} tasks`);
+    return { success: true, deleted: tasks.length, response: data };
+  } catch (e) {
+    console.log(`[BATCH-DELETE] Error: ${e.message}`);
+    return { success: false, deleted: 0, error: e.message };
+  }
+}
+
+// Batch move multiple tasks to a new project (Cookie API - more efficient)
+async function batchMoveTasks(tasks, toProjectId) {
+  if (!tasks || tasks.length === 0) return { success: true, moved: 0 };
+  
+  if (!TICKTICK_COOKIE_TOKEN) {
+    console.log(`[BATCH-MOVE] No TICKTICK_COOKIE_TOKEN, falling back to single updates`);
+    // Fallback to single updates
+    let moved = 0;
+    for (const task of tasks) {
+      if (task.projectId === toProjectId) continue; // Skip if already in target
+      try {
+        await updateTask({
+          id: task.id,
+          projectId: toProjectId,
+          title: task.title,
+          content: task.content,
+          tags: task.tags,
+          priority: task.priority || 0
+        });
+        moved++;
+      } catch (e) {
+        console.log(`[BATCH-MOVE] Failed to move ${task.id}: ${e.message}`);
+      }
+    }
+    return { success: true, moved };
+  }
+
+  try {
+    // Filter out tasks already in target project
+    const tasksToMove = tasks.filter(t => t.projectId !== toProjectId);
+    
+    if (tasksToMove.length === 0) {
+      console.log(`[BATCH-MOVE] All tasks already in target project`);
+      return { success: true, moved: 0, skipped: tasks.length };
+    }
+
+    const movePayload = tasksToMove.map(t => ({
+      taskId: t.id,
+      fromProjectId: t.projectId,
+      toProjectId: toProjectId
+    }));
+
+    const response = await fetch('https://api.ticktick.com/api/v2/batch/taskProject', {
+      method: 'POST',
+      headers: {
+        'Cookie': `t=${TICKTICK_COOKIE_TOKEN}`,
+        'Content-Type': 'application/json;charset=UTF-8',
+        'x-tz': 'UTC'
+      },
+      body: JSON.stringify(movePayload)
+    });
+
+    if (!response.ok) {
+      console.log(`[BATCH-MOVE] API returned ${response.status}`);
+      return { success: false, moved: 0 };
+    }
+
+    const data = await response.json();
+    const movedCount = Object.keys(data.id2etag || {}).length;
+    const errorCount = Object.keys(data.id2error || {}).length;
+    
+    console.log(`[BATCH-MOVE] ✓ Batch moved ${movedCount} tasks (${errorCount} errors)`);
+    return { 
+      success: true, 
+      moved: movedCount, 
+      errors: errorCount,
+      skipped: tasks.length - tasksToMove.length,
+      response: data 
+    };
+  } catch (e) {
+    console.log(`[BATCH-MOVE] Error: ${e.message}`);
+    return { success: false, moved: 0, error: e.message };
+  }
 }
 
 // ==================== SYNC SINGLE BLOCK ====================
@@ -791,6 +935,27 @@ export default async function handler(req, res) {
 
   console.log('Received webhook:', JSON.stringify(payload, null, 2));
 
+  // ==================== DEDUPLICATE WEBHOOKS ====================
+  // Skip if we already processed this exact webhook (Notion retries)
+  const webhookId = payload.id;
+  if (webhookId && isWebhookAlreadyProcessed(webhookId)) {
+    console.log(`⚠️ SKIPPING DUPLICATE WEBHOOK: ${webhookId} (attempt ${payload.attempt_number || '?'})`);
+    console.log(`   Already processed within last 60 seconds`);
+    return res.status(200).json({ 
+      ok: true, 
+      skipped: true, 
+      reason: 'duplicate webhook',
+      webhookId: webhookId,
+      attemptNumber: payload.attempt_number
+    });
+  }
+  
+  // Mark as processed BEFORE doing any work
+  if (webhookId) {
+    markWebhookProcessed(webhookId);
+    console.log(`✓ Webhook ${webhookId} marked as processing (attempt ${payload.attempt_number || 1})`);
+  }
+
   // Handle different event types
   const eventType = payload.type;
 
@@ -932,8 +1097,48 @@ export default async function handler(req, res) {
 
   // Handle page.deleted
   if (eventType === 'page.deleted') {
-    console.log('Page deleted event received');
-    return res.status(200).json({ ok: true, event: eventType, message: 'Acknowledged' });
+    const deletedPageId = payload.entity?.id;
+    console.log(`[PAGE-DELETE] ========================================`);
+    console.log(`[PAGE-DELETE] Page deleted: ${deletedPageId}`);
+    
+    if (!deletedPageId) {
+      console.log(`[PAGE-DELETE] No page ID found in webhook`);
+      return res.status(200).json({ ok: true, event: eventType, message: 'No page ID' });
+    }
+
+    // Find all TickTick tasks linked to this page
+    console.log(`[PAGE-DELETE] Searching for tasks from this page...`);
+    const tasksToDelete = await findTasksByNotionPageId(deletedPageId);
+    
+    if (tasksToDelete.length === 0) {
+      console.log(`[PAGE-DELETE] No tasks found for this page`);
+      console.log(`[PAGE-DELETE] ========================================`);
+      return res.status(200).json({ 
+        ok: true, 
+        event: eventType, 
+        pageId: deletedPageId,
+        tasksFound: 0,
+        tasksDeleted: 0 
+      });
+    }
+
+    console.log(`[PAGE-DELETE] Found ${tasksToDelete.length} tasks to cleanup:`);
+    tasksToDelete.forEach((t, i) => console.log(`[PAGE-DELETE]   ${i+1}. "${t.title}"`));
+
+    // Batch delete all tasks at once
+    const result = await batchDeleteTasks(tasksToDelete);
+    
+    console.log(`[PAGE-DELETE] ✓ Cleanup complete: ${result.deleted} tasks deleted`);
+    console.log(`[PAGE-DELETE] ========================================`);
+    
+    return res.status(200).json({
+      ok: true,
+      event: eventType,
+      pageId: deletedPageId,
+      tasksFound: tasksToDelete.length,
+      tasksDeleted: result.deleted,
+      timestamp: new Date().toISOString()
+    });
   }
 
   // Unknown event type - still acknowledge
