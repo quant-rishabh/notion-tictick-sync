@@ -705,25 +705,16 @@ async function syncBlock(blockId, pageId = '', targetProjectId = null) {
   console.log(`\n========== SYNC BLOCK: ${blockId} ==========`);
   console.log(`[SYNC] Target project: ${targetProjectId || 'not specified (will use Inbox)'}`);
 
-  // 1. Get block from Notion
+  // 1. Get block from Notion FIRST (to check type before expensive TickTick search)
   console.log(`[NOTION] Fetching block...`);
   const { data: block, status } = await getBlock(blockId);
   console.log(`[NOTION] Response status: ${status}`);
 
-  // 2. Fast lookup in TickTick
-  console.log(`[TICKTICK] Searching for existing task...`);
-  const existingTask = await findTickTickTaskByNotionId(blockId);
-  if (existingTask) {
-    console.log(`[TICKTICK] ✓ Found task: "${existingTask.title}" (ID: ${existingTask.id})`);
-    console.log(`[TICKTICK]   Tags: [${(existingTask.tags || []).join(', ')}]`);
-    console.log(`[TICKTICK]   Project: ${existingTask.projectId}`);
-  } else {
-    console.log(`[TICKTICK] ✗ No existing task found`);
-  }
-
-  // CASE 1: Block deleted from Notion (404)
+  // CASE 1: Block deleted from Notion (404) - need to search TickTick to delete
   if (status === 404 || block.object === 'error') {
     console.log(`[NOTION] ⚠️ Block NOT FOUND (deleted or error)`);
+    console.log(`[TICKTICK] Searching for existing task to delete...`);
+    const existingTask = await findTickTickTaskByNotionId(blockId);
     if (existingTask) {
       console.log(`[DELETE] 🗑️ Deleting from TickTick because block deleted from Notion`);
       console.log(`[DELETE]   Task: "${existingTask.title}"`);
@@ -736,18 +727,21 @@ async function syncBlock(blockId, pageId = '', targetProjectId = null) {
     return { action: 'skipped', reason: 'block not found, no task' };
   }
 
-  // CASE 2: Not a todo block
+  // CASE 2: Not a todo block - SKIP EARLY without expensive TickTick search
   if (block.type !== 'to_do') {
-    console.log(`[NOTION] Block type: ${block.type} (not a todo)`);
-    if (existingTask) {
-      console.log(`[DELETE] 🗑️ Block changed from todo to ${block.type}, deleting task`);
-      console.log(`[DELETE]   Task: "${existingTask.title}"`);
-      const deleteResult = await deleteTask(existingTask.id, existingTask.projectId);
-      console.log(`[DELETE]   Result: ${deleteResult ? 'SUCCESS' : 'DONE'}`);
-      return { action: 'deleted', reason: 'block type changed' };
-    }
-    console.log(`[SKIP] Not a todo block`);
+    console.log(`[NOTION] Block type: ${block.type} (not a todo) - skipping`);
     return { action: 'skipped', reason: 'not a todo' };
+  }
+
+  // 2. Only search TickTick for TODO blocks (expensive operation)
+  console.log(`[TICKTICK] Searching for existing task...`);
+  const existingTask = await findTickTickTaskByNotionId(blockId);
+  if (existingTask) {
+    console.log(`[TICKTICK] ✓ Found task: "${existingTask.title}" (ID: ${existingTask.id})`);
+    console.log(`[TICKTICK]   Tags: [${(existingTask.tags || []).join(', ')}]`);
+    console.log(`[TICKTICK]   Project: ${existingTask.projectId}`);
+  } else {
+    console.log(`[TICKTICK] ✗ No existing task found`);
   }
 
   const rawText = block.to_do.rich_text.map(r => r.plain_text).join('');
@@ -1025,12 +1019,24 @@ export default async function handler(req, res) {
     // ==================== STEP 2: Check if @list: block was added/changed ====================
     // If any updated block is a paragraph containing @list:, trigger migration
     // This handles the case where user ADDS @list: to a page with existing tasks
+    // SKIP if we already found directive in STEP 1 (avoid duplicate work)
     console.log(`\n[MIGRATE] ========================================`);
     console.log(`[MIGRATE] STEP 2: Checking if @list: was added/changed`);
+    
+    if (listDirectiveDetected) {
+      console.log(`[MIGRATE] ⚡ Skipping - @list: already detected in STEP 1`);
+      console.log(`[MIGRATE] ========================================\n`);
+    } else {
     console.log(`[MIGRATE] Checking ${updatedBlocks.length} updated blocks...`);
     console.log(`[MIGRATE] ========================================`);
     
     for (const blockInfo of updatedBlocks) {
+      // Skip child pages - they can't contain @list: directive
+      if (blockInfo.type === 'page') {
+        console.log(`[MIGRATE-DEBUG] Skipping block ${blockInfo.id} (type=page)`);
+        continue;
+      }
+      
       try {
         console.log(`[MIGRATE-DEBUG] Checking block ${blockInfo.id}...`);
         const { data: block, status } = await getBlock(blockInfo.id);
@@ -1080,10 +1086,19 @@ export default async function handler(req, res) {
       }
     }
     console.log(`[MIGRATE] ========================================\n`);
+    } // end of else block for listDirectiveDetected check
 
     // ==================== STEP 3: Process all updated blocks ====================
     for (const blockInfo of updatedBlocks) {
       const blockId = blockInfo.id;
+      
+      // Skip child pages immediately - webhook tells us the type, no need to fetch
+      if (blockInfo.type === 'page') {
+        console.log(`[SKIP] Block ${blockId} is a child page (type=page in webhook)`);
+        results.skipped++;
+        results.processed++;
+        continue;
+      }
 
       try {
         const result = await syncBlock(blockId, taskPageId, targetProjectId);
