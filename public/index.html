@@ -2383,6 +2383,7 @@
                     <option value="priority">Priority</option>
                     <option value="priority_date">Priority → Date</option>
                     <option value="date_priority">Date → Priority</option>
+                    <option value="smart">🎯 Smart Score</option>
                 </select>
             </div>
             
@@ -8058,8 +8059,171 @@
             }).join('');
         }
 
+        // ============================================
+        // SMART SCORE SORTING SYSTEM (from focus-dashboard)
+        // ============================================
+        
+        // Base Score Table (Priority × Due Status)
+        function getSmartBaseScore(priority, dueStatus) {
+            const scoreTable = {
+                '5_overdue': 400, '5_today': 350, '5_future': 280,
+                '3_overdue': 300, '3_today': 250, '3_future': 200,
+                '1_overdue': 200, '1_today': 150, '1_future': 100,
+                '0_overdue': 120, '0_today': 80,  '0_future': 50
+            };
+            return scoreTable[`${priority}_${dueStatus}`] || 0;
+        }
+        
+        // Parse duration from tags (e.g., "5-min", "1-hour", "2-day")
+        function parseSmartDuration(tags) {
+            if (!tags || !Array.isArray(tags)) return 0;
+            for (const tag of tags) {
+                const t = tag.toLowerCase();
+                const minMatch = t.match(/^(\d+)-min$/);
+                if (minMatch) return parseInt(minMatch[1], 10);
+                const hourMatch = t.match(/^(\d+)-hour$/);
+                if (hourMatch) return parseInt(hourMatch[1], 10) * 60;
+                const dayMatch = t.match(/^(\d+)-day$/);
+                if (dayMatch) return parseInt(dayMatch[1], 10) * 480;
+                const weekMatch = t.match(/^(\d+)-week$/);
+                if (weekMatch) return parseInt(weekMatch[1], 10) * 2400;
+            }
+            return 0;
+        }
+        
+        // Calculate Smart Score for a single task
+        function calculateSmartScore(task, todayStr, todayCompletions) {
+            const priority = task.priority || 0;
+            let dueStatus = 'none';
+            let daysUntilDue = 0;
+            let daysOverdue = 0;
+            
+            if (task.dueDate) {
+                const dueDateStr = task.dueDate.split('T')[0];
+                const dueDate = new Date(dueDateStr);
+                const today = new Date(todayStr);
+                daysUntilDue = Math.floor((dueDate - today) / (1000 * 60 * 60 * 24));
+                
+                if (daysUntilDue < 0) {
+                    dueStatus = 'overdue';
+                    daysOverdue = Math.abs(daysUntilDue);
+                } else if (daysUntilDue === 0) {
+                    dueStatus = 'today';
+                } else {
+                    dueStatus = 'future';
+                }
+            }
+            
+            // Base score from table
+            let score = getSmartBaseScore(priority, dueStatus);
+            
+            // Overdue Severity: +25 per day, max 140
+            if (dueStatus === 'overdue') {
+                score += Math.min(daysOverdue * 25, 140);
+            }
+            
+            // Urgency Bonus for future tasks
+            if (dueStatus === 'future') {
+                if (daysUntilDue === 1) score += 100;
+                else if (daysUntilDue <= 3) score += 60;
+                else if (daysUntilDue <= 7) score += 30;
+                else if (daysUntilDue <= 14) score += 10;
+            }
+            
+            // Quick Win Bonus (short tasks)
+            const durationMins = parseSmartDuration(task.tags);
+            if (durationMins > 0 && durationMins <= 15) score += 15;
+            else if (durationMins > 0 && durationMins <= 30) score += 5;
+            
+            // Daily Touch Bonus (untouched projects get priority)
+            const projectTouches = todayCompletions[task.projectId] || 0;
+            if (projectTouches === 0) score += 50;
+            else if (projectTouches === 1) score += 30;
+            else if (projectTouches === 2) score += 15;
+            
+            return { score, dueStatus, daysOverdue, daysUntilDue };
+        }
+        
+        // Get Score Tier for grouping
+        function getSmartTier(score) {
+            if (score >= 400) return 1;
+            if (score >= 300) return 2;
+            if (score >= 200) return 3;
+            if (score >= 100) return 4;
+            return 5;
+        }
+        
+        // Smart Score Sort with Round-Robin by project within tiers
+        function sortBySmartScore(tasks) {
+            const now = new Date();
+            const todayStr = now.toISOString().split('T')[0];
+            
+            // For Daily Touch Bonus, we'd need completed tasks - skip for now (use empty)
+            const todayCompletions = {};
+            
+            // Calculate scores for all tasks
+            const scoredTasks = tasks.map(task => {
+                const result = calculateSmartScore(task, todayStr, todayCompletions);
+                return { ...task, smartScore: result.score, smartTier: getSmartTier(result.score) };
+            });
+            
+            // Group by tier
+            const tierGroups = {};
+            scoredTasks.forEach(task => {
+                if (!tierGroups[task.smartTier]) tierGroups[task.smartTier] = [];
+                tierGroups[task.smartTier].push(task);
+            });
+            
+            // Round-robin within each tier by project
+            const sortedTasks = [];
+            const tiers = Object.keys(tierGroups).sort((a, b) => a - b);
+            
+            tiers.forEach(tier => {
+                const tasksInTier = tierGroups[tier];
+                
+                // Group by project within this tier
+                const projectGroups = {};
+                tasksInTier.forEach(task => {
+                    const pid = task.projectId || 'no-project';
+                    if (!projectGroups[pid]) projectGroups[pid] = [];
+                    projectGroups[pid].push(task);
+                });
+                
+                // Sort within each project by score descending
+                Object.values(projectGroups).forEach(tasks => {
+                    tasks.sort((a, b) => b.smartScore - a.smartScore);
+                });
+                
+                // Round-robin: take one from each project, repeat
+                const projectIds = Object.keys(projectGroups);
+                let hasMore = true;
+                let index = 0;
+                
+                while (hasMore) {
+                    hasMore = false;
+                    for (const pid of projectIds) {
+                        if (projectGroups[pid].length > index) {
+                            sortedTasks.push(projectGroups[pid][index]);
+                            hasMore = true;
+                        }
+                    }
+                    index++;
+                }
+            });
+            
+            return sortedTasks;
+        }
+        // ============================================
+        // END SMART SCORE SYSTEM
+        // ============================================
+
         // Sort tasks based on selected sort option
         function sortTasks(tasks, sortOption) {
+            // Handle smart score separately (uses different algorithm)
+            if (sortOption === 'smart') {
+                return sortBySmartScore(tasks);
+            }
+            
             const now = new Date();
             const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             const todayTime = today.getTime();
@@ -9044,10 +9208,10 @@ Answer the question clearly. Only show relevant tasks.`;
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
             
-            // Auto-load cached tasks if available
-            const cachedTasks = localStorage.getItem('ticktick_tasks');
-            if (cachedTasks) {
-                loadFromCache();
+            // Auto-refresh from TickTick on page load (if token available)
+            const token = localStorage.getItem('ticktick_token');
+            if (token) {
+                refreshFromTickTick();
                 
                 // Show project filter notification if coming from Focus Dashboard
                 const focusProjectId = sessionStorage.getItem('focusProjectId');
