@@ -505,11 +505,13 @@ async function createTask(taskData, projectId = null) {
     priority: taskData.priority || 0,
   };
 
-  // Add optional fields
-  if (taskData.dueDate) body.dueDate = taskData.dueDate;
-  if (taskData.startDate) body.startDate = taskData.startDate;
+  // Add date fields only when present (dateless tasks should omit all date fields)
+  if (taskData.dueDate) {
+    body.dueDate = taskData.dueDate;
+    body.startDate = taskData.startDate || taskData.dueDate;
+    body.isAllDay = taskData.isAllDay !== undefined ? taskData.isAllDay : true;
+  }
   if (taskData.repeatFlag) body.repeatFlag = taskData.repeatFlag;
-  if (taskData.isAllDay !== undefined) body.isAllDay = taskData.isAllDay;
   if (taskData.reminders && taskData.reminders.length > 0) body.reminders = taskData.reminders;
 
   return ticktickRequest('/task', {
