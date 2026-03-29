@@ -13,13 +13,15 @@
  *
  * Uses TickTick Search API for O(1) lookup by block ID
  * 
- * @list: FEATURE (v2.0):
- * - Add @list:project-name as first line of Notion page
+ * List Directive FEATURE (v2.0):
+ * - Add >>project-name or @list:project-name as first line of Notion page
+ * - Short syntax: >>fitness, >>work, >>my-project
+ * - Long syntax: @list:fitness (still supported)
  * - Tasks will be created in matching TickTick project
- * - Supports: dash-to-space (@list:my-project → "my project")
+ * - Supports: dash-to-space (>>my-project → "my project")
  * - Supports: fuzzy matching (70% threshold for typos)
  * - Supports: auto-create project if not exists
- * - Supports: auto-migrate existing tasks when @list added
+ * - Supports: auto-migrate existing tasks when directive added
  */
 
 import { parseTask } from '../../lib/ai-parser.js';
@@ -106,20 +108,21 @@ function similarity(str1, str2) {
 
 /**
  * Normalize list name: dash/underscore → space, lowercase
- * @list:linkedin-social-media → "linkedin social media"
+ * >>linkedin-social-media → "linkedin social media"
  */
 function normalizeListName(name) {
   return name.replace(/[-_]/g, ' ').toLowerCase().trim();
 }
 
 /**
- * Extract @list:xxx from text
+ * Extract list directive from text
+ * Supports: >>name (short) or @list:name (legacy)
  * Returns the list name or null
  */
 function extractListDirective(text) {
-  const match = text.match(/@list:([\w-]+)/i);
+  const match = text.match(/(?:>>|@list:)([\w-]+)/i);
   if (match) {
-    console.log(`[LIST-DEBUG] extractListDirective: Found "@list:${match[1]}" in text: "${text.substring(0, 50)}..."`);
+    console.log(`[LIST-DEBUG] extractListDirective: Found "${match[0]}" in text: "${text.substring(0, 50)}..."`);
   }
   return match ? match[1] : null;
 }
@@ -144,10 +147,10 @@ async function getPageFirstBlocks(pageId, limit = 5) {
 }
 
 /**
- * Find @list: directive from page's first block
+ * Find list directive (>>name or @list:name) from page's first block
  */
 async function findListDirective(pageId) {
-  console.log(`[LIST-DEBUG] findListDirective: Searching for @list: in page ${pageId}`);
+  console.log(`[LIST-DEBUG] findListDirective: Searching for list directive in page ${pageId}`);
   const blocks = await getPageFirstBlocks(pageId, 3);
   
   if (blocks.length === 0) {
@@ -162,7 +165,7 @@ async function findListDirective(pageId) {
       console.log(`[LIST-DEBUG] findListDirective: Paragraph text="${text}"`);
       const listName = extractListDirective(text);
       if (listName) {
-        console.log(`[LIST] ✓ Found @list:${listName} in page ${pageId}`);
+        console.log(`[LIST] ✓ Found list directive "${listName}" in page ${pageId}`);
         return { listName, blockId: block.id };
       }
     } else {
@@ -170,7 +173,7 @@ async function findListDirective(pageId) {
     }
   }
   
-  console.log(`[LIST-DEBUG] findListDirective: No @list: directive found in first 3 blocks`);
+  console.log(`[LIST-DEBUG] findListDirective: No list directive found in first 3 blocks`);
   return null;
 }
 
@@ -378,12 +381,12 @@ async function getTargetProjectId(pageId) {
   const directive = await findListDirective(pageId);
   
   if (!directive) {
-    console.log(`[LIST] No @list: directive found, using Inbox`);
+    console.log(`[LIST] No list directive found, using Inbox`);
     console.log(`[LIST-DEBUG] ========== getTargetProjectId END (no directive) ==========\n`);
     return `inbox${TICKTICK_USER_ID}`;
   }
   
-  console.log(`[LIST-DEBUG] Found directive: @list:${directive.listName}`);
+  console.log(`[LIST-DEBUG] Found directive: >>${directive.listName}`);
   const projectId = await getOrCreateProject(directive.listName);
   
   if (projectId) {
@@ -1027,9 +1030,9 @@ export default async function handler(req, res) {
       errors: []
     };
 
-    // ==================== STEP 1: Check if @list: was ADDED/CHANGED in this webhook ====================
-    // This MUST happen first - if @list: is in updated_blocks, we need to migrate ALL tasks
-    // Even if the page already had @list:, we need to migrate when it changes
+    // ==================== STEP 1: Check if list directive was ADDED/CHANGED in this webhook ====================
+    // This MUST happen first - if directive is in updated_blocks, we need to migrate ALL tasks
+    // Even if the page already had a directive, we need to migrate when it changes
     
     let targetProjectId = `inbox${TICKTICK_USER_ID}`;
     let migrationTriggered = false;
@@ -1041,12 +1044,12 @@ export default async function handler(req, res) {
     }
     
     console.log(`\n[MIGRATE] ========================================`);
-    console.log(`[MIGRATE] STEP 1: Checking if @list: was added/changed`);
+    console.log(`[MIGRATE] STEP 1: Checking if list directive was added/changed`);
     console.log(`[MIGRATE] Checking ${updatedBlocks.length} updated blocks...`);
     console.log(`[MIGRATE] ========================================`);
     
     for (const blockInfo of updatedBlocks) {
-      // Skip child pages - they can't contain @list: directive
+      // Skip child pages - they can't contain list directive
       if (blockInfo.type === 'page') {
         console.log(`[MIGRATE-DEBUG] Skipping block ${blockInfo.id} (type=page)`);
         continue;
@@ -1073,7 +1076,7 @@ export default async function handler(req, res) {
           const listName = extractListDirective(text);
           
           if (listName) {
-            console.log(`\n[MIGRATE] 📦 @list:${listName} CHANGED/ADDED in this webhook!`);
+            console.log(`\n[MIGRATE] 📦 >>${listName} CHANGED/ADDED in this webhook!`);
             console.log(`[MIGRATE] Triggering migration for page ${taskPageId}...`);
             
             // Get project ID for migration
@@ -1103,7 +1106,7 @@ export default async function handler(req, res) {
             }
             
             // Only migrate once per webhook
-            console.log(`[MIGRATE] Breaking after first @list: detection`);
+            console.log(`[MIGRATE] Breaking after first list directive detection`);
             break;
           }
         }
@@ -1114,11 +1117,11 @@ export default async function handler(req, res) {
     console.log(`[MIGRATE] ========================================\n`);
 
     // ==================== STEP 2: Get target project if not already set by migration ====================
-    // If @list: was not in updated_blocks, check the page's first blocks for existing @list:
+    // If directive was not in updated_blocks, check the page's first blocks for existing directive
     
     if (!migrationTriggered && taskPageId) {
       console.log(`\n[LIST] ========================================`);
-      console.log(`[LIST] STEP 2: Checking page for existing @list: directive`);
+      console.log(`[LIST] STEP 2: Checking page for existing list directive`);
       console.log(`[LIST] Page ID: ${taskPageId}`);
       console.log(`[LIST] ========================================`);
       targetProjectId = await getTargetProjectId(taskPageId);
