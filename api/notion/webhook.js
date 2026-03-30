@@ -432,6 +432,28 @@ async function getBlock(blockId) {
   return notionRequest(`/blocks/${blockId}`);
 }
 
+/**
+ * Get the title of a Notion page by ID
+ * Returns empty string if page not found or no title
+ */
+async function getPageTitle(pageId) {
+  try {
+    const { data, status } = await notionRequest(`/pages/${pageId}`);
+    if (status !== 200 || !data.properties) return '';
+    
+    // Page title can be in different property types
+    for (const prop of Object.values(data.properties)) {
+      if (prop.type === 'title' && prop.title?.length > 0) {
+        return prop.title.map(t => t.plain_text).join('');
+      }
+    }
+    return '';
+  } catch (e) {
+    console.log(`[PAGE-TITLE] Failed to get title for ${pageId}: ${e.message}`);
+    return '';
+  }
+}
+
 // ==================== TICKTICK SEARCH (Fast O(1) lookup) ====================
 
 async function findTickTickTaskByNotionId(notionBlockId) {
@@ -734,9 +756,10 @@ function getNotionLink(pageId, blockId) {
   return `https://notion.so/${cleanPageId}#${cleanBlockId}`;
 }
 
-async function syncBlock(blockId, pageId = '', targetProjectId = null) {
+async function syncBlock(blockId, pageId = '', targetProjectId = null, pageName = '') {
   console.log(`\n========== SYNC BLOCK: ${blockId} ==========`);
   console.log(`[SYNC] Target project: ${targetProjectId || 'not specified (will use Inbox)'}`);
+  if (pageName) console.log(`[SYNC] Page name: ${pageName}`);
 
   // 1. Get block from Notion FIRST (to check type before expensive TickTick search)
   console.log(`[NOTION] Fetching block...`);
@@ -838,6 +861,7 @@ async function syncBlock(blockId, pageId = '', targetProjectId = null) {
 
   if (existingTask) {
     // UPDATE existing task
+    const finalTitle = pageName ? `${pageName} → ${parsed.title}` : parsed.title;
     const existingUserTags = (existingTask.tags || [])
       .filter(t => t !== NOTION_SYNC_TAG && t !== NOTION_RECURRING_TAG).sort().join(',');
     const newUserTags = (parsed.tags || []).sort().join(',');
@@ -846,12 +870,12 @@ async function syncBlock(blockId, pageId = '', targetProjectId = null) {
     const needsProjectMove = targetProjectId && existingTask.projectId !== targetProjectId;
 
     console.log(`[UPDATE] Checking for changes...`);
-    console.log(`[UPDATE]   Old title: "${existingTask.title}" → New: "${parsed.title}"`);
+    console.log(`[UPDATE]   Old title: "${existingTask.title}" → New: "${finalTitle}"`);
     console.log(`[UPDATE]   Old tags: [${existingUserTags}] → New: [${newUserTags}]`);
     console.log(`[UPDATE]   Old project: ${existingTask.projectId} → Target: ${targetProjectId || 'same'}`);
     console.log(`[UPDATE]   Needs project move: ${needsProjectMove}`);
 
-    if (existingTask.title !== parsed.title || existingUserTags !== newUserTags || needsProjectMove) {
+    if (existingTask.title !== finalTitle || existingUserTags !== newUserTags || needsProjectMove) {
       console.log(`[UPDATE] 📝 Changes detected, updating task`);
 
       const syncTag = parsed.isRecurring ? NOTION_RECURRING_TAG : NOTION_SYNC_TAG;
@@ -863,7 +887,7 @@ async function syncBlock(blockId, pageId = '', targetProjectId = null) {
       const updateResult = await updateTask({
         id: existingTask.id,
         projectId: needsProjectMove ? targetProjectId : existingTask.projectId,
-        title: parsed.title,
+        title: finalTitle,
         content: existingTask.content,
         tags: updatedTags,
         priority: parsed.priority || 0
@@ -874,7 +898,7 @@ async function syncBlock(blockId, pageId = '', targetProjectId = null) {
         console.log(`[UPDATE]   📦 Task moved to project: ${targetProjectId}`);
       }
 
-      return { action: 'updated', title: parsed.title, moved: needsProjectMove };
+      return { action: 'updated', title: finalTitle, moved: needsProjectMove };
     }
 
     console.log(`[SKIP] No changes detected`);
@@ -904,8 +928,11 @@ async function syncBlock(blockId, pageId = '', targetProjectId = null) {
       ? `notion:${blockId}\n\n📎 Open in Notion:\n${notionLink}`
       : `notion:${blockId}`;
 
+    // Prefix title with page name for context (e.g. "Dev Notes → Create unit 2606")
+    const finalTitle = pageName ? `${pageName} → ${parsed.title}` : parsed.title;
+
     const taskPayload = {
-      title: parsed.title,
+      title: finalTitle,
       content: content,
       tags: parsed.tags || [],
       priority: parsed.priority || 0,
@@ -930,7 +957,7 @@ async function syncBlock(blockId, pageId = '', targetProjectId = null) {
       console.log(`[CREATE]   ⚠️ No response from TickTick (might still be created)`);
     }
 
-    return { action: 'created', title: parsed.title, recurring: parsed.isRecurring, projectId: createResult?.projectId };
+    return { action: 'created', title: finalTitle, recurring: parsed.isRecurring, projectId: createResult?.projectId };
   }
 }
 
@@ -1015,6 +1042,13 @@ export default async function handler(req, res) {
     // data.parent.id is the PARENT of that page (wrong!)
     const taskPageId = payload.entity?.id || payload.data?.parent?.id || '';
     console.log(`Processing ${updatedBlocks.length} updated blocks (page: ${taskPageId})`);
+
+    // Fetch page title ONCE (cached for all tasks in this webhook)
+    let pageName = '';
+    if (taskPageId) {
+      pageName = await getPageTitle(taskPageId);
+      console.log(`[PAGE-TITLE] Page name: "${pageName || '(untitled)'}"`);
+    }
 
     // Reset project cache for fresh data
     cachedProjects = null;
@@ -1161,7 +1195,7 @@ export default async function handler(req, res) {
       }
 
       try {
-        const result = await syncBlock(blockId, taskPageId, targetProjectId);
+        const result = await syncBlock(blockId, taskPageId, targetProjectId, pageName);
         results.processed++;
 
         switch (result.action) {
