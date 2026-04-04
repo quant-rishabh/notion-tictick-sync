@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habits</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:system-ui,sans-serif;background:#111;color:#ccc;font-size:12px;padding:40px 0 0;overflow:hidden;height:100vh}
+        .nav{position:fixed;top:0;left:0;right:0;background:#1a1a1a;border-bottom:1px solid #333;padding:8px 12px;z-index:100;display:flex;justify-content:space-between;align-items:center}
+        .nav-title{font-size:13px;font-weight:600;color:#fff}
+        .nav-links{display:flex;gap:6px}
+        .nav-link{padding:4px 10px;background:#252525;color:#888;border:1px solid #333;border-radius:4px;text-decoration:none;font-size:11px;cursor:pointer}
+        .nav-link:hover{background:#333;color:#fff}
+        .nav-link.active{background:#6366f1;color:#fff;border-color:#6366f1}
+
+        /* Master-detail layout */
+        .container{display:flex;height:calc(100vh - 40px);max-width:100%;margin:0}
+        .left-panel{width:45%;min-width:340px;border-right:1px solid #333;display:flex;flex-direction:column;overflow:hidden}
+        .right-panel{flex:1;overflow-y:auto;padding:16px 20px;background:#0d0d0d}
+
+        /* Left panel sections */
+        .left-header{padding:10px 12px 0;flex-shrink:0}
+        .stats{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+        .stat{flex:1;min-width:70px;background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:6px;text-align:center}
+        .stat-val{font-size:16px;font-weight:700;color:#fff}
+        .stat-lbl{font-size:8px;color:#666;text-transform:uppercase;margin-top:1px}
+        .filters{display:flex;gap:6px;margin-bottom:10px;align-items:center;flex-wrap:wrap}
+        .filter-btn{padding:4px 10px;background:#252525;color:#888;border:1px solid #333;border-radius:4px;font-size:10px;cursor:pointer}
+        .filter-btn:hover{background:#333;color:#fff}
+        .filter-btn.active{background:#6366f1;color:#fff;border-color:#6366f1}
+
+        /* Habit list */
+        .habit-list{flex:1;overflow-y:auto;padding:0 12px 12px}
+        .habit-item{background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:10px 12px;margin-bottom:6px;cursor:pointer;border-left:4px solid #333;transition:background 0.15s}
+        .habit-item:hover{background:#222}
+        .habit-item.selected{background:#1e1e3a;border-color:#6366f1}
+        .habit-item.active{border-left-color:#10b981}
+        .habit-item.slipping{border-left-color:#f59e0b}
+        .habit-item.dying{border-left-color:#ef4444}
+        .habit-item.archived{opacity:0.5;border-left-color:#555}
+        .habit-item-header{display:flex;justify-content:space-between;align-items:center}
+        .habit-item-name{font-size:12px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%}
+        .habit-item-right{display:flex;align-items:center;gap:8px}
+        .habit-item-neglect{font-size:10px;font-weight:600}
+        .habit-badge{font-size:8px;padding:2px 5px;border-radius:3px}
+        .habit-badge.active{background:#153d1f;color:#6ee7b7}
+        .habit-badge.slipping{background:#3d3515;color:#fcd34d}
+        .habit-badge.dying{background:#3d1515;color:#fca5a5}
+        .habit-badge.archived{background:#333;color:#888}
+        .habit-item-meta{display:flex;gap:10px;font-size:9px;color:#666;margin-top:4px}
+        .habit-item-bar{margin-top:5px;height:3px;background:#252525;border-radius:2px;overflow:hidden}
+        .habit-item-bar-fill{height:100%;border-radius:2px}
+
+        /* Right panel detail */
+        .detail-empty{display:flex;align-items:center;justify-content:center;height:100%;color:#555;font-size:14px;text-align:center}
+        .detail-header{margin-bottom:16px}
+        .detail-title{font-size:22px;font-weight:700;color:#fff;margin-bottom:4px}
+        .detail-subtitle{font-size:11px;color:#888;display:flex;gap:12px;flex-wrap:wrap}
+        .detail-actions{margin-top:10px;display:flex;gap:8px;align-items:center}
+        .checkin-btn{padding:6px 16px;background:#252525;color:#888;border:1px solid #333;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600}
+        .checkin-btn:hover{background:#333;color:#fff}
+        .checkin-btn.checked{background:#153d1f;color:#6ee7b7;border-color:#10b981}
+
+        /* Analysis cards */
+        .analysis-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));gap:10px;margin-bottom:16px}
+        .a-card{background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:14px;text-align:center}
+        .a-card-val{font-size:24px;font-weight:700;margin-bottom:2px}
+        .a-card-lbl{font-size:9px;color:#666;text-transform:uppercase}
+
+        /* Checkin heatmap */
+        .detail-section{margin-bottom:18px}
+        .detail-section-title{font-size:12px;font-weight:600;color:#aaa;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px}
+        .checkin-grid{display:flex;gap:3px;flex-wrap:wrap}
+        .checkin-day{width:18px;height:18px;border-radius:3px;background:#252525;position:relative;cursor:default;font-size:7px;display:flex;align-items:center;justify-content:center;color:transparent}
+        .checkin-day.done{background:#10b981}
+        .checkin-day.partial{background:#f59e0b}
+        .checkin-day.missed{background:#3d1515}
+        .checkin-day.future{background:#1a1a1a;border:1px solid #333}
+        .checkin-day.today{outline:2px solid #6366f1;outline-offset:1px}
+        .checkin-day:hover{color:#fff}
+        .checkin-tooltip{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:3px 6px;border-radius:3px;font-size:9px;white-space:nowrap;display:none;z-index:10}
+        .checkin-day:hover .checkin-tooltip{display:block}
+
+        /* Weekly breakdown */
+        .week-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:11px}
+        .week-label{width:80px;color:#888;text-align:right}
+        .week-bar{flex:1;height:8px;background:#252525;border-radius:4px;overflow:hidden}
+        .week-bar-fill{height:100%;border-radius:4px}
+        .week-val{width:40px;color:#aaa;font-size:10px}
+
+        /* Encouragement */
+        .detail-encourage{background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:14px;margin-bottom:16px;font-style:italic;color:#888;font-size:12px;border-left:3px solid #6366f1}
+
+        /* Nudge banner */
+        .nudge{background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid #4f46e5;border-radius:8px;padding:14px 16px;margin-bottom:16px;font-size:13px;color:#c4b5fd;line-height:1.5}
+        .nudge strong{color:#fff}
+        .coach-tip{background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:14px 16px;margin-top:16px;font-size:12px;color:#9ca3af;line-height:1.5;border-left:3px solid #f59e0b}
+        .coach-tip strong{color:#fcd34d}
+        .grade-badge{font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;display:inline-block;min-width:18px;text-align:center}
+        .grade-A{background:#153d1f;color:#6ee7b7}
+        .grade-B{background:#1a3d2f;color:#6ee7b7}
+        .grade-C{background:#3d3515;color:#fcd34d}
+        .grade-D{background:#3d2515;color:#fdba74}
+        .grade-F{background:#3d1515;color:#fca5a5}
+        .urgency-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;min-width:28px;text-align:center;display:inline-block}
+        .urgency-badge.low{background:#1a3d15;color:#6ee7b7}
+        .urgency-badge.med{background:#3d3515;color:#fcd34d}
+        .urgency-badge.high{background:#3d1515;color:#fca5a5}
+
+        .section-title{font-size:11px;font-weight:600;color:#fff;margin:12px 0 6px;padding-bottom:4px;border-bottom:1px solid #333}
+        .section-badge{font-size:9px;padding:2px 6px;border-radius:10px;background:#252525;color:#888}
+        .loading{text-align:center;padding:40px;color:#666}
+        .no-data{text-align:center;padding:40px;color:#555;font-size:13px}
+
+        .progress-bar{flex:1;height:4px;background:#252525;border-radius:2px;overflow:hidden}
+        .progress-fill{height:100%;border-radius:2px}
+
+        /* ========== MOBILE RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            body{padding:50px 0 0;overflow-y:auto;height:auto}
+            
+            .nav{padding:10px 12px;flex-wrap:wrap;gap:8px}
+            .nav-title{font-size:14px}
+            .nav-links{gap:4px;flex-wrap:wrap}
+            .nav-link{padding:8px 12px;font-size:12px;min-height:36px}
+            
+            .container{flex-direction:column;height:auto;min-height:calc(100vh - 50px)}
+            .left-panel{width:100%;min-width:100%;border-right:none;border-bottom:1px solid #333;max-height:none}
+            .right-panel{min-height:100vh;padding:16px 12px}
+            
+            .left-header{padding:12px}
+            .stats{gap:8px}
+            .stat{min-width:60px;padding:10px 6px}
+            .stat-val{font-size:18px}
+            .stat-lbl{font-size:9px}
+            
+            .filters{gap:8px;padding:0 4px}
+            .filter-btn{padding:8px 14px;font-size:12px;min-height:36px}
+            
+            .habit-list{max-height:400px;padding:0 12px 12px}
+            .habit-item{padding:14px;margin-bottom:8px}
+            .habit-item-name{font-size:14px;max-width:55%}
+            .habit-item-meta{font-size:11px;gap:12px;margin-top:6px;flex-wrap:wrap}
+            .habit-item-bar{height:4px;margin-top:8px}
+            .habit-badge{font-size:10px;padding:3px 8px}
+            .grade-badge{font-size:11px;padding:4px 8px}
+            .urgency-badge{font-size:10px;padding:4px 8px}
+            
+            .detail-empty{min-height:200px;font-size:16px}
+            .detail-header{margin-bottom:20px}
+            .detail-title{font-size:24px}
+            .detail-subtitle{font-size:13px;gap:16px}
+            .detail-actions{margin-top:14px;flex-wrap:wrap;gap:10px}
+            .checkin-btn{padding:12px 20px;font-size:14px;min-height:44px;flex:1;text-align:center}
+            
+            .nudge{padding:16px;font-size:14px;line-height:1.6}
+            .coach-tip{padding:16px;font-size:13px;line-height:1.6}
+            .detail-encourage{padding:16px;font-size:13px}
+            
+            .analysis-grid{grid-template-columns:1fr 1fr;gap:12px}
+            .a-card{padding:16px}
+            .a-card-val{font-size:22px}
+            .a-card-lbl{font-size:10px}
+            
+            .detail-section{margin-bottom:24px}
+            .detail-section-title{font-size:13px;margin-bottom:12px}
+            .checkin-grid{gap:4px}
+            .checkin-day{width:22px;height:22px;border-radius:4px;font-size:8px}
+            
+            .week-row{margin-bottom:10px;font-size:13px}
+            .week-label{width:90px}
+            .week-bar{height:10px}
+            .week-val{width:50px;font-size:12px}
+            
+            /* Touch-friendly inputs */
+            input, select, button, textarea{font-size:16px !important;min-height:44px}
+            
+            /* Paste UI */
+            #pasteArea{height:150px;font-size:14px !important}
+            
+            /* Score breakdown - make it scrollable */
+            [style*="font-family:monospace"]{overflow-x:auto}
+        }
+
+        /* Small phones (iPhone SE, etc) */
+        @media (max-width: 375px) {
+            .stat{min-width:50px;padding:8px 4px}
+            .stat-val{font-size:16px}
+            .filter-btn{padding:6px 10px;font-size:11px}
+            .analysis-grid{grid-template-columns:1fr}
+            .checkin-day{width:18px;height:18px}
+        }
+
+        /* Landscape mode on mobile */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .container{flex-direction:row}
+            .left-panel{width:50%;max-height:none;border-right:1px solid #333;border-bottom:none}
+            .right-panel{width:50%}
+            .habit-list{max-height:calc(100vh - 180px)}
+        }
+
+        /* Safe area for notch phones (iPhone X+) */
+        @supports (padding: max(0px)) {
+            .nav{padding-left:max(12px, env(safe-area-inset-left));padding-right:max(12px, env(safe-area-inset-right))}
+            .left-panel,.right-panel{padding-left:max(12px, env(safe-area-inset-left));padding-right:max(12px, env(safe-area-inset-right))}
+            body{padding-bottom:env(safe-area-inset-bottom)}
+        }
+
+        /* Mobile panel toggle */
+        .mobile-toggle{display:none;position:fixed;bottom:20px;right:20px;z-index:200;padding:14px 20px;background:#6366f1;color:#fff;border:none;border-radius:50px;font-size:14px;font-weight:600;box-shadow:0 4px 20px rgba(99,102,241,0.4);cursor:pointer}
+        .mobile-toggle:active{transform:scale(0.95)}
+        
+        @media (max-width: 768px) {
+            .mobile-toggle{display:flex;align-items:center;gap:8px}
+            .left-panel.hidden{display:none}
+            .right-panel.hidden{display:none}
+        }
+
+        /* Pull to refresh indicator */
+        .pull-indicator{display:none;text-align:center;padding:10px;color:#666;font-size:12px}
+        
+        /* Smooth scrolling for iOS */
+        .habit-list,.right-panel{-webkit-overflow-scrolling:touch}
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <div class="nav-title">🎯 Habits</div>
+        <div class="nav-links">
+            <a href="/" class="nav-link">📋 Tasks</a>
+            <a href="focus-dashboard.html" class="nav-link">🎯 Focus</a>
+            <a href="calendar.html" class="nav-link">📅 Calendar</a>
+            <a href="habit.html" class="nav-link active">🔥 Habits</a>
+            <button class="nav-link" onclick="refreshData()">↻</button>
+            <button class="nav-link" onclick="clearCache()" title="Clear cached data and re-paste">🗑️</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="left-panel">
+            <div class="left-header">
+                <div class="stats">
+                    <div class="stat"><div class="stat-val" style="color:#fff" id="totalHabits">-</div><div class="stat-lbl">Total</div></div>
+                    <div class="stat"><div class="stat-val" style="color:#10b981" id="activeCount">-</div><div class="stat-lbl">Active</div></div>
+                    <div class="stat"><div class="stat-val" style="color:#f59e0b" id="slippingCount">-</div><div class="stat-lbl">Slipping</div></div>
+                    <div class="stat"><div class="stat-val" style="color:#ef4444" id="dyingCount">-</div><div class="stat-lbl">Dying</div></div>
+                    <div class="stat"><div class="stat-val" style="color:#6366f1" id="todayScore">-</div><div class="stat-lbl">Today</div></div>
+                    <div class="stat"><div class="stat-val" style="color:#a78bfa" id="bestStreak">-</div><div class="stat-lbl">Best</div></div>
+                </div>
+
+                <div class="filters">
+                    <button class="filter-btn active" onclick="setFilter('all')">All</button>
+                    <button class="filter-btn" onclick="setFilter('active')">🟢</button>
+                    <button class="filter-btn" onclick="setFilter('slipping')">🟡</button>
+                    <button class="filter-btn" onclick="setFilter('dying')">🔴</button>
+                    <button class="filter-btn" onclick="setFilter('challenge')">⚔️</button>
+                    <button class="filter-btn" onclick="setFilter('archived')">📦</button>
+                    <span style="margin-left:auto;color:#666;font-size:9px" id="lastUpdated"></span>
+                </div>
+            </div>
+            <div class="habit-list" id="habitContainer">
+                <div class="loading">Loading habits...</div>
+            </div>
+        </div>
+        <div class="right-panel" id="detailPanel">
+            <div class="detail-empty">← Click a habit to see analysis</div>
+        </div>
+    </div>
+
+    <!-- Mobile Toggle Button -->
+    <button class="mobile-toggle" id="mobileToggle" onclick="toggleMobilePanel()">
+        <span id="toggleIcon">📊</span> <span id="toggleText">Details</span>
+    </button>
+
+    <!-- Auto-load habit data from file (generated by: node fetch-habits.js) -->
+    <script src="habits-data.js" onerror="window.__HABITS_DATA__=null"></script>
+
+    <script>
+        // State
+        let allHabits = [];
+        let allCheckins = {};
+        let allProjects = [];
+        let currentFilter = 'all';
+        let selectedHabitId = null;
+        let renderedHabits = []; // cached after render for detail lookup
+        let mobileShowingDetail = false; // for mobile panel toggle
+
+        // ============ MOBILE PANEL TOGGLE ============
+        function toggleMobilePanel() {
+            const leftPanel = document.querySelector('.left-panel');
+            const rightPanel = document.querySelector('.right-panel');
+            const toggleIcon = document.getElementById('toggleIcon');
+            const toggleText = document.getElementById('toggleText');
+            
+            mobileShowingDetail = !mobileShowingDetail;
+            
+            if (mobileShowingDetail) {
+                leftPanel.classList.add('hidden');
+                rightPanel.classList.remove('hidden');
+                toggleIcon.textContent = '📋';
+                toggleText.textContent = 'List';
+            } else {
+                leftPanel.classList.remove('hidden');
+                rightPanel.classList.add('hidden');
+                toggleIcon.textContent = '📊';
+                toggleText.textContent = 'Details';
+            }
+        }
+
+        // Auto-switch to detail view on mobile when selecting a habit
+        function showDetailOnMobile() {
+            if (window.innerWidth <= 768 && selectedHabitId) {
+                const leftPanel = document.querySelector('.left-panel');
+                const rightPanel = document.querySelector('.right-panel');
+                const toggleIcon = document.getElementById('toggleIcon');
+                const toggleText = document.getElementById('toggleText');
+                
+                mobileShowingDetail = true;
+                leftPanel.classList.add('hidden');
+                rightPanel.classList.remove('hidden');
+                toggleIcon.textContent = '📋';
+                toggleText.textContent = 'List';
+            }
+        }
+
+        // Initialize mobile view (show list first, hide detail)
+        function initMobileView() {
+            if (window.innerWidth <= 768) {
+                const rightPanel = document.querySelector('.right-panel');
+                rightPanel.classList.add('hidden');
+            }
+        }
+
+        // ============ DATA LOADING ============
+        // V2 API has no CORS — can't call from file:// or browser directly
+        // Strategy: try proxy (deployed) → try localStorage cache → show paste UI
+
+        function getCachedHabits() {
+            try { return JSON.parse(localStorage.getItem('habits_cache') || 'null'); } catch { return null; }
+        }
+        function setCachedHabits(data) {
+            localStorage.setItem('habits_cache', JSON.stringify(data));
+            localStorage.setItem('habits_cache_time', new Date().toISOString());
+        }
+        function getCacheTime() {
+            return localStorage.getItem('habits_cache_time') || '';
+        }
+
+        function getCookieT() { return localStorage.getItem('ticktick_cookie_t') || ''; }
+        function getCsrf() { return localStorage.getItem('ticktick_csrf') || ''; }
+        function getToken() { return localStorage.getItem('ticktick_token') || ''; }
+
+        async function fetchHabits() {
+            const cookieT = getCookieT();
+            const csrf = getCsrf();
+            
+            if (!cookieT || !csrf) {
+                console.log('[HABITS] No credentials in localStorage');
+                return null;
+            }
+            
+            try {
+                const res = await fetch(`/api/ticktick/habits?t=${encodeURIComponent(cookieT)}&csrf=${encodeURIComponent(csrf)}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    console.log(`[HABITS] ✓ Got ${data.length} habits from TickTick`);
+                    return data;
+                }
+            } catch (e) {
+                console.log('[HABITS] API error:', e.message);
+            }
+            return null;
+        }
+
+        async function fetchCheckinsBatch(habitIds, lookbackDays) {
+            const cookieT = getCookieT();
+            const csrf = getCsrf();
+            
+            try {
+                const afterStamp = getStamp(daysAgo(lookbackDays));
+                const res = await fetch('/api/ticktick/habits', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        action: 'query_checkins', 
+                        habitIds, 
+                        afterStamp,
+                        ticktick_cookie_t: cookieT,
+                        ticktick_csrf: csrf
+                    })
+                });
+                if (res.ok) return await res.json();
+            } catch (e) { console.log('[CHECKINS] Failed:', e.message); }
+            return {};
+        }
+
+        async function fetchCheckinsGrouped(habits) {
+            const active = habits.filter(h => h.status !== 1);
+            const shortIds = active.filter(h => getIntervalDays(h) <= 7).map(h => h.id);
+            const longHabits = active.filter(h => getIntervalDays(h) > 7);
+            const longIds = longHabits.map(h => h.id);
+
+            const promises = [];
+            if (shortIds.length > 0) {
+                console.log(`[CHECKINS] Short batch: ${shortIds.length} habits, 30d lookback`);
+                promises.push(fetchCheckinsBatch(shortIds, 30));
+            }
+            if (longIds.length > 0) {
+                const maxLookback = Math.max(...longHabits.map(h => Math.min(Math.round(getIntervalDays(h) * 3), 365)));
+                console.log(`[CHECKINS] Long batch: ${longIds.length} habits, ${maxLookback}d lookback`);
+                promises.push(fetchCheckinsBatch(longIds, maxLookback));
+            }
+
+            const results = await Promise.all(promises);
+            const merged = {};
+            for (const result of results) {
+                Object.assign(merged, result?.checkins || result || {});
+            }
+            return merged;
+        }
+
+        async function checkinHabit(habitId, stamp, value) {
+            const habit = allHabits.find(h => h.id === habitId);
+            if (!habit) throw new Error('Habit not found');
+            const cookieT = getCookieT();
+            const csrf = getCsrf();
+            const res = await fetch('/api/ticktick/habits', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    action: 'checkin', 
+                    habitId, 
+                    stamp, 
+                    value, 
+                    status: value === 0 ? 0 : 2, 
+                    goal: habit.goal || 1,
+                    ticktick_cookie_t: cookieT,
+                    ticktick_csrf: csrf
+                })
+            });
+            if (!res.ok) {
+                const err = await res.text();
+                console.error('[CHECKIN] Server response:', res.status, err);
+                throw new Error(`Checkin failed: ${res.status}`);
+            }
+            const text = await res.text();
+            return text ? JSON.parse(text) : {};
+        }
+
+        async function fetchProjects() {
+            const token = getToken();
+            if (!token) return [];
+            try {
+                const res = await fetch('https://api.ticktick.com/open/v1/project', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) return await res.json();
+            } catch (e) { console.log('[PROJECTS] Failed:', e.message); }
+            return [];
+        }
+
+        // Show paste UI when no data available
+        function showPasteUI() {
+            const container = document.getElementById('habitContainer');
+            container.innerHTML = `
+                <div style="max-width:600px;margin:20px auto;text-align:center">
+                    <div style="font-size:16px;color:#fff;margin-bottom:8px">📋 Paste Habits JSON</div>
+                    <div style="font-size:11px;color:#888;margin-bottom:12px">
+                        Open TickTick in Chrome → DevTools (F12) → Console → run this:
+                    </div>
+                    <div style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:10px;text-align:left;margin-bottom:12px">
+                        <code style="font-size:11px;color:#6ee7b7;word-break:break-all;user-select:all">
+                            fetch('https://api.ticktick.com/api/v2/habits').then(r=>r.json()).then(d=>{copy(JSON.stringify(d));console.log('✅ Copied '+d.length+' habits!')})
+                        </code>
+                    </div>
+                    <div style="font-size:11px;color:#888;margin-bottom:8px">
+                        OR run the curl command. Then paste the JSON array below:
+                    </div>
+                    <textarea id="pasteArea" style="width:100%;height:120px;background:#0d0d0d;color:#ccc;border:1px solid #333;border-radius:6px;padding:8px;font-family:monospace;font-size:11px;resize:vertical" placeholder='Paste JSON array here... [ { "id": "...", "name": "..." }, ... ]'></textarea>
+                    <div style="margin-top:8px;display:flex;gap:8px;justify-content:center">
+                        <button onclick="loadPastedData()" style="padding:8px 20px;background:#6366f1;color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer">Load Habits</button>
+                    </div>
+                    <div id="pasteError" style="color:#ef4444;font-size:11px;margin-top:6px"></div>
+                </div>`;
+        }
+
+        function loadPastedData() {
+            const text = document.getElementById('pasteArea').value.trim();
+            const errEl = document.getElementById('pasteError');
+            if (!text) { errEl.textContent = 'Paste the JSON first!'; return; }
+            try {
+                const data = JSON.parse(text);
+                if (!Array.isArray(data)) throw new Error('Expected a JSON array');
+                if (data.length === 0) throw new Error('Array is empty');
+                // Validate first item has expected fields
+                if (!data[0].id || !data[0].name) throw new Error('Objects must have id and name fields');
+                setCachedHabits(data);
+                allHabits = data;
+                allCheckins = {};
+                render();
+                console.log(`[HABITS] ✓ Loaded ${data.length} habits from paste`);
+            } catch (e) {
+                errEl.textContent = `Invalid JSON: ${e.message}`;
+            }
+        }
+
+        // ============ HELPERS ============
+
+        function daysAgo(n) {
+            const d = new Date();
+            d.setDate(d.getDate() - n);
+            return d;
+        }
+
+        function getStamp(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return parseInt(`${y}${m}${d}`);
+        }
+
+        function stampToDate(stamp) {
+            const s = String(stamp);
+            return new Date(parseInt(s.slice(0,4)), parseInt(s.slice(4,6)) - 1, parseInt(s.slice(6,8)));
+        }
+
+        function todayStamp() { return getStamp(new Date()); }
+
+        function formatDate(date) {
+            const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+            const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            return `${days[date.getDay()]} ${date.getDate()} ${months[date.getMonth()]}`;
+        }
+
+        // Parse RRULE to human text
+        function parseRepeatRule(rule) {
+            if (!rule) return 'Daily';
+            if (rule.includes('FREQ=DAILY') && rule.includes('INTERVAL=30')) return 'Monthly';
+            if (rule.includes('FREQ=DAILY') && !rule.includes('INTERVAL=')) return 'Daily';
+            if (rule.includes('FREQ=DAILY;INTERVAL=1')) return 'Daily';
+            if (rule.includes('FREQ=DAILY;INTERVAL=')) {
+                const m = rule.match(/INTERVAL=(\d+)/);
+                return m ? `Every ${m[1]} days` : 'Daily';
+            }
+            if (rule.includes('FREQ=WEEKLY')) {
+                const timesMatch = rule.match(/TT_TIMES=(\d+)/);
+                if (timesMatch) return `${timesMatch[1]}x per week`;
+                const dayMatch = rule.match(/BYDAY=([A-Z,]+)/);
+                if (dayMatch) {
+                    const days = dayMatch[1].split(',');
+                    if (days.length === 7) return 'Daily';
+                    const shortDays = days.map(d => d.slice(0,2)).join(',');
+                    return `${shortDays}`;
+                }
+                return 'Weekly';
+            }
+            if (rule.includes('FREQ=MONTHLY')) return 'Monthly';
+            return rule;
+        }
+
+        // Get cycle length in days from repeatRule
+        function getIntervalDays(habit) {
+            const rule = habit.repeatRule || '';
+            if (rule.includes('FREQ=DAILY;INTERVAL=1')) return 1;
+            if (rule.includes('FREQ=DAILY') && !rule.includes('INTERVAL=')) return 1;
+            if (rule.includes('FREQ=DAILY;INTERVAL=')) {
+                const m = rule.match(/INTERVAL=(\d+)/);
+                return m ? parseInt(m[1]) : 1;
+            }
+            if (rule.includes('FREQ=WEEKLY')) {
+                const timesMatch = rule.match(/TT_TIMES=(\d+)/);
+                if (timesMatch) return 7 / parseInt(timesMatch[1]);
+                const dayMatch = rule.match(/BYDAY=([A-Z,]+)/);
+                if (dayMatch) return 7 / dayMatch[1].split(',').length;
+                return 7;
+            }
+            if (rule.includes('FREQ=MONTHLY')) return 30;
+            return 1;
+        }
+
+        // Get how many times per week this habit expects
+        function getExpectedWeeklyFreq(habit) {
+            const rule = habit.repeatRule || '';
+            if (rule.includes('FREQ=DAILY') && !rule.includes('INTERVAL=')) return 7;
+            if (rule.includes('FREQ=DAILY;INTERVAL=1')) return 7;
+            if (rule.includes('FREQ=DAILY;INTERVAL=')) {
+                const m = rule.match(/INTERVAL=(\d+)/);
+                return m ? Math.floor(7 / parseInt(m[1])) : 7;
+            }
+            if (rule.includes('FREQ=WEEKLY')) {
+                const timesMatch = rule.match(/TT_TIMES=(\d+)/);
+                if (timesMatch) return parseInt(timesMatch[1]);
+                const dayMatch = rule.match(/BYDAY=([A-Z,]+)/);
+                if (dayMatch) return dayMatch[1].split(',').length;
+                return 1;
+            }
+            if (rule.includes('FREQ=MONTHLY')) return 0.25; // ~once a month
+            return 7; // default daily
+        }
+
+        // Day abbreviation → JS getDay() index
+        const BYDAY_MAP = { SU: 0, MO: 1, TU: 2, WE: 3, TH: 4, FR: 5, SA: 6 };
+
+        // For FREQ=WEEKLY;BYDAY=xx,yy (NOT TT_TIMES), returns array of day-of-week numbers, else null
+        function getByDaySchedule(habit) {
+            const rule = habit.repeatRule || '';
+            if (!rule.includes('FREQ=WEEKLY')) return null;
+            if (rule.includes('TT_TIMES=')) return null; // "3x per week" — no specific days known
+            const m = rule.match(/BYDAY=([A-Z,]+)/);
+            if (!m) return null;
+            return m[1].split(',').map(d => BYDAY_MAP[d]).filter(d => d !== undefined);
+        }
+
+        // Returns stamps of scheduled slots in the past windowDays (today included if scheduled), newest first
+        function getByDaySlots(scheduledDays, windowDays) {
+            const slots = [];
+            const now = new Date();
+            for (let i = 0; i < windowDays; i++) {
+                const d = new Date(now); d.setDate(d.getDate() - i);
+                if (scheduledDays.includes(d.getDay())) slots.push(getStamp(d));
+            }
+            return slots;
+        }
+
+        // Calculate streak for a habit
+        function calcStreak(habitId) {
+            const checkins = allCheckins[habitId] || [];
+            if (checkins.length === 0) return 0;
+
+            // Sort by stamp descending
+            const stamps = checkins
+                .filter(c => c.status === 2)
+                .map(c => c.checkinStamp)
+                .sort((a, b) => b - a);
+
+            if (stamps.length === 0) return 0;
+
+            // Count consecutive days from today backwards
+            let streak = 0;
+            let checkDate = new Date();
+            
+            for (let i = 0; i < 90; i++) {
+                const stamp = getStamp(checkDate);
+                if (stamps.includes(stamp)) {
+                    streak++;
+                } else if (i > 0) {
+                    // Allow today to be unchecked (day not over yet)
+                    break;
+                }
+                checkDate.setDate(checkDate.getDate() - 1);
+            }
+            return streak;
+        }
+
+        // Get habit age in days (capped, min 1)
+        function getHabitAge(habit) {
+            const created = new Date(habit.createdTime);
+            const now = new Date();
+            return Math.max(1, Math.floor((now - created) / 86400000));
+        }
+
+        // Determine habit health status (age-aware)
+        function getHabitStatus(habit) {
+            if (habit.status === 1) return 'archived';
+            
+            const checkins = allCheckins[habit.id] || [];
+            // Done today → always active, regardless of window math
+            if (checkins.some(c => c.status === 2 && c.checkinStamp === getStamp(new Date()))) return 'active';
+            const now = new Date();
+            const ageDays = getHabitAge(habit);
+            const windowDays = Math.min(ageDays, 7);
+            const stamps = [];
+            for (let i = 0; i < windowDays; i++) {
+                const d = new Date(now);
+                d.setDate(d.getDate() - i);
+                stamps.push(getStamp(d));
+            }
+
+            const weeklyExpected = getExpectedWeeklyFreq(habit);
+            const expected = weeklyExpected * windowDays / 7;
+            const done = checkins.filter(c => c.status === 2 && stamps.includes(c.checkinStamp)).length;
+            const ratio = expected > 0 ? done / expected : 0;
+
+            if (ratio >= 0.6) return 'active';
+            if (ratio >= 0.3) return 'slipping';
+            return 'dying';
+        }
+
+        // Get letter grade from percentage
+        function getGrade(pct) {
+            if (pct >= 80) return 'A';
+            if (pct >= 60) return 'B';
+            if (pct >= 40) return 'C';
+            if (pct >= 20) return 'D';
+            return 'F';
+        }
+
+        // Calculate best streak for a habit
+        function calcBestStreak(habitId) {
+            const checkins = allCheckins[habitId] || [];
+            const stamps = checkins.filter(c => c.status === 2).map(c => c.checkinStamp).sort();
+            let best = 0, curr = 0;
+            for (let i = 0; i < stamps.length; i++) {
+                if (i === 0) { curr = 1; }
+                else {
+                    const prev = stampToDate(stamps[i-1]);
+                    const now = stampToDate(stamps[i]);
+                    curr = Math.round((now - prev) / 86400000) === 1 ? curr + 1 : 1;
+                }
+                if (curr > best) best = curr;
+            }
+            return best;
+        }
+
+        // Check if habit matches a project (for challenge linking)
+        // Only match if the project name IS the habit name (or very close), not substring
+        function findMatchingProject(habit) {
+            const habitName = habit.name.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').trim();
+            return allProjects.find(p => {
+                const projName = p.name.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').trim();
+                // Exact match or one is a very close prefix (within 5 chars difference)
+                return projName === habitName 
+                    || (habitName.startsWith(projName) && habitName.length - projName.length < 5)
+                    || (projName.startsWith(habitName) && projName.length - habitName.length < 5);
+            });
+        }
+
+        // Calculate urgency score (higher = more neglected, no cap = no starvation)
+        // urgency = recentRatio (0-1) + recencyCycles (0→∞)
+        function calcUrgency(habit) {
+            if (habit.status === 1) return 0;
+            const checkins = allCheckins[habit.id] || [];
+            const now = new Date();
+            const ageDays = getHabitAge(habit);
+            const intervalDays = getIntervalDays(habit);
+
+            // Lookback used when fetching: short=30d, long=intervalDays*3 (capped 365)
+            const fetchedLookback = intervalDays > 7 ? Math.min(Math.round(intervalDays * 3), 365) : 30;
+
+            // Window: full fetched lookback, capped to habit age (new habits use only their age)
+            const windowDays = Math.min(ageDays, fetchedLookback);
+            const expected = windowDays / intervalDays;
+
+            // Count done in window
+            const windowStamps = [];
+            for (let i = 0; i < windowDays; i++) {
+                const d = new Date(now); d.setDate(d.getDate() - i);
+                windowStamps.push(getStamp(d));
+            }
+            const done = checkins.filter(c => c.status === 2 && windowStamps.includes(c.checkinStamp)).length;
+            const doneStamps = checkins.filter(c => c.status === 2).map(c => c.checkinStamp).sort((a, b) => b - a);
+
+            // consistency: how far behind your own plan, 0=perfect 1=completely missing
+            const consistency = Math.max(0, expected - done) / Math.max(expected, 1);
+
+            // BYDAY habits (exact scheduled days, not "Nx per week"): use slot-based counting
+            const scheduledDays = getByDaySchedule(habit);
+            if (scheduledDays) {
+                const slots = getByDaySlots(scheduledDays, windowDays);
+                const slotsDone = checkins.filter(c => c.status === 2 && slots.includes(c.checkinStamp)).length;
+                const slotsExpected = slots.length;
+                const byConsistency = Math.max(0, slotsExpected - slotsDone) / Math.max(slotsExpected, 1);
+                const slotsSinceLast = doneStamps.length > 0
+                    ? slots.filter(s => s > doneStamps[0]).length
+                    : slotsExpected;
+                const byUrgency = byConsistency + slotsSinceLast;
+                const bar = '█'.repeat(Math.min(20, Math.round(byUrgency))) + '░'.repeat(Math.max(0, 20 - Math.round(byUrgency)));
+                const tag = byUrgency >= 10 ? '🔴' : byUrgency >= 3 ? '🟡' : '🟢';
+                console.log(
+                    `${tag} %-40s  urgency=%s  |${bar}|\n` +
+                    `   age=${ageDays}d  [BYDAY] slots=${slotsDone}/${slotsExpected}  slotsMissed=${slotsSinceLast}` +
+                    `  consistency=${byConsistency.toFixed(2)}`,
+                    habit.name.slice(0, 40), byUrgency.toFixed(2)
+                );
+                return byUrgency;
+            }
+
+            // starvation: how many full cycles since you last did it (unbounded = anti-starvation)
+            // If no checkins in window but habit has lifetime checkins → done before window → cap at fetchedLookback
+            let daysSinceLast;
+            if (doneStamps.length > 0) {
+                const lastDate = stampToDate(doneStamps[0]);
+                daysSinceLast = Math.max(0, Math.floor((now - lastDate) / 86400000));
+            } else if (habit.totalCheckIns > 0) {
+                // Has historical checkins outside our fetch window — cap at fetchedLookback
+                daysSinceLast = fetchedLookback;
+            } else {
+                // Truly never done — use habit age
+                daysSinceLast = ageDays;
+            }
+            // Bug fix: TickTick can store checkins before createdTime (clock drift/reset)
+            daysSinceLast = Math.min(daysSinceLast, ageDays);
+            const starvation = daysSinceLast / intervalDays;
+
+            const urgency = consistency + starvation;
+            const bar = '█'.repeat(Math.min(20, Math.round(urgency))) + '░'.repeat(Math.max(0, 20 - Math.round(urgency)));
+            const tag = urgency >= 10 ? '🔴' : urgency >= 3 ? '🟡' : '🟢';
+            console.log(
+                `${tag} %-40s  urgency=%s  |${bar}|\n` +
+                `   age=${ageDays}d  cycle=${intervalDays.toFixed(1)}d  window=${windowDays}d  done=${done}/${expected.toFixed(1)}` +
+                `  last=${daysSinceLast === 0 ? 'today' : daysSinceLast + 'd ago'}` +
+                `  consistency=${consistency.toFixed(2)}  starvation=${starvation.toFixed(2)}`,
+                habit.name.slice(0, 40), urgency.toFixed(2)
+            );
+
+            return urgency;
+        }
+
+        // Get age-aware monthly score
+        function getMonthlyScore(habit) {
+            const checkins = allCheckins[habit.id] || [];
+            const ageDays = getHabitAge(habit);
+            const windowDays = Math.min(ageDays, 30);
+            const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - windowDays);
+            const done = checkins.filter(c => {
+                const d = stampToDate(c.checkinStamp);
+                return c.status === 2 && d >= cutoff;
+            }).length;
+            const expected = Math.max(1, Math.round(getExpectedWeeklyFreq(habit) * windowDays / 7));
+            const pct = Math.min(100, Math.round((done / expected) * 100));
+            return { done, expected, pct, windowDays };
+        }
+
+        function showError(msg) {
+            document.getElementById('habitContainer').innerHTML = `<div class="no-data">⚠️ ${msg}</div>`;
+        }
+
+        // ============ RENDER ============
+
+        function render() {
+            const container = document.getElementById('habitContainer');
+            
+            let habits = allHabits.map(h => {
+                const mapped = {
+                    ...h,
+                    _status: getHabitStatus(h),
+                    _streak: calcStreak(h.id),
+                    _project: findMatchingProject(h),
+                    _weeklyExpected: getExpectedWeeklyFreq(h),
+                    _intervalDays: getIntervalDays(h)
+                };
+                mapped._urgency = calcUrgency(h);
+                const dStamps = (allCheckins[h.id] || []).filter(c => c.status === 2).map(c => c.checkinStamp).sort((a,b)=>b-a);
+                const hInterval = getIntervalDays(h);
+                const hLookback = hInterval > 7 ? Math.min(Math.round(hInterval * 3), 365) : 30;
+                let rawDaysSince;
+                if (dStamps.length > 0) {
+                    rawDaysSince = Math.max(0, Math.floor((new Date() - stampToDate(dStamps[0])) / 86400000));
+                } else if (h.totalCheckIns > 0) {
+                    rawDaysSince = hLookback; // done before our fetch window
+                } else {
+                    rawDaysSince = getHabitAge(h); // truly never done
+                }
+                mapped._daysSinceLast = Math.min(rawDaysSince, getHabitAge(h));
+                mapped._outsideWindow = dStamps.length === 0 && h.totalCheckIns > 0;
+                return mapped;
+            });
+
+            // Stats
+            const activeHabits = habits.filter(h => h._status !== 'archived');
+            const statusCounts = { active: 0, slipping: 0, dying: 0 };
+            activeHabits.forEach(h => statusCounts[h._status]++);
+            
+            const todaysDone = activeHabits.filter(h => {
+                const checkins = allCheckins[h.id] || [];
+                return checkins.some(c => c.checkinStamp === todayStamp() && c.status === 2);
+            }).length;
+
+            const bestStreak = Math.max(0, ...habits.map(h => h._streak));
+
+            document.getElementById('totalHabits').textContent = activeHabits.length;
+            document.getElementById('activeCount').textContent = statusCounts.active;
+            document.getElementById('slippingCount').textContent = statusCounts.slipping;
+            document.getElementById('dyingCount').textContent = statusCounts.dying;
+            document.getElementById('todayScore').textContent = `${todaysDone}/${activeHabits.length}`;
+            document.getElementById('bestStreak').textContent = bestStreak;
+
+            // Filter
+            let filtered = habits;
+            if (currentFilter === 'active') filtered = habits.filter(h => h._status === 'active');
+            else if (currentFilter === 'slipping') filtered = habits.filter(h => h._status === 'slipping');
+            else if (currentFilter === 'dying') filtered = habits.filter(h => h._status === 'dying');
+            else if (currentFilter === 'archived') filtered = habits.filter(h => h._status === 'archived');
+            else if (currentFilter === 'challenge') filtered = habits.filter(h => h._project && h._status !== 'archived');
+            else filtered = habits.filter(h => h._status !== 'archived');
+
+            // Sort by urgency DESC (highest neglect first), archived always last
+            filtered.sort((a, b) => {
+                if (a._status === 'archived' && b._status !== 'archived') return 1;
+                if (b._status === 'archived' && a._status !== 'archived') return -1;
+                if (Math.abs(b._urgency - a._urgency) > 0.001) return b._urgency - a._urgency;
+                return b._daysSinceLast - a._daysSinceLast;
+            });
+
+            renderedHabits = filtered;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="no-data">No habits found for this filter</div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(h => renderHabitItem(h)).join('');
+
+            // Auto-select first if nothing selected or selected not in list
+            if (!selectedHabitId || !filtered.find(h => h.id === selectedHabitId)) {
+                selectHabit(filtered[0].id);
+            } else {
+                selectHabit(selectedHabitId);
+            }
+        }
+
+        function renderHabitItem(habit) {
+            const checkins = allCheckins[habit.id] || [];
+            const today = todayStamp();
+            const todayDone = checkins.some(c => c.checkinStamp === today && c.status === 2);
+
+            // Weekly progress
+            const weekCheckins = checkins.filter(c => {
+                const d = stampToDate(c.checkinStamp);
+                const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
+                return c.status === 2 && d >= weekAgo;
+            }).length;
+            const weeklyPct = habit._weeklyExpected > 0 ? Math.min(100, Math.round((weekCheckins / habit._weeklyExpected) * 100)) : 0;
+            let barColor = '#ef4444';
+            if (weeklyPct >= 80) barColor = '#10b981';
+            else if (weeklyPct >= 50) barColor = '#f59e0b';
+
+            const monthly = getMonthlyScore(habit);
+            const grade = getGrade(monthly.pct);
+            const isSelected = habit.id === selectedHabitId;
+
+            return `
+            <div class="habit-item ${habit._status} ${isSelected ? 'selected' : ''}" onclick="selectHabit('${habit.id}')">
+                <div class="habit-item-header">
+                    <div class="habit-item-name">${todayDone ? '✅' : '⬜'} ${habit.name}</div>
+                    <div class="habit-item-right">
+                        <span class="grade-badge grade-${grade}">${grade}</span>
+                        <span class="urgency-badge urgency-${habit._urgency >= 3 ? 'high' : habit._urgency >= 1 ? 'med' : 'low'}" title="Urgency score">${habit._urgency.toFixed(1)}</span>
+                    </div>
+                </div>
+                <div class="habit-item-meta">
+                    <span>🔄 ${parseRepeatRule(habit.repeatRule)}</span>
+                    <span>🔥 ${habit._streak} streak</span>
+                    <span>${weekCheckins}/${Math.ceil(habit._weeklyExpected)} this week</span>
+                </div>
+                <div class="habit-item-bar">
+                    <div class="habit-item-bar-fill" style="width:${weeklyPct}%;background:${barColor}"></div>
+                </div>
+            </div>`;
+        }
+
+        function selectHabit(habitId) {
+            selectedHabitId = habitId;
+            // Update selection highlight
+            document.querySelectorAll('.habit-item').forEach(el => el.classList.remove('selected'));
+            const items = document.querySelectorAll('.habit-item');
+            items.forEach(el => {
+                if (el.getAttribute('onclick')?.includes(habitId)) el.classList.add('selected');
+            });
+            renderDetail();
+            showDetailOnMobile(); // Auto-switch to detail on mobile
+        }
+
+        function renderDetail() {
+            const panel = document.getElementById('detailPanel');
+            const habit = renderedHabits.find(h => h.id === selectedHabitId);
+            if (!habit) {
+                panel.innerHTML = '<div class="detail-empty">← Click a habit to see analysis</div>';
+                return;
+            }
+
+            const checkins = allCheckins[habit.id] || [];
+            const today = todayStamp();
+            const todayDone = checkins.some(c => c.checkinStamp === today && c.status === 2);
+            const ageDays = getHabitAge(habit);
+
+            // Weekly done
+            const weekWindow = Math.min(ageDays, 7);
+            const weekCutoff = new Date(); weekCutoff.setDate(weekCutoff.getDate() - weekWindow);
+            const weekCheckins = checkins.filter(c => {
+                const d = stampToDate(c.checkinStamp);
+                return c.status === 2 && d >= weekCutoff;
+            }).length;
+            const weekExpected = Math.max(1, Math.ceil(habit._weeklyExpected * weekWindow / 7));
+            const youOwe = Math.max(0, weekExpected - weekCheckins);
+
+            // Monthly score (age-aware)
+            const monthly = getMonthlyScore(habit);
+            const grade = getGrade(monthly.pct);
+            const gradeColor = {A:'#10b981',B:'#6ee7b7',C:'#fcd34d',D:'#fdba74',F:'#ef4444'}[grade];
+
+            // Streaks
+            const bestStreak = calcBestStreak(habit.id);
+            const streakColor = habit._streak >= 7 ? '#10b981' : habit._streak >= 3 ? '#f59e0b' : '#ef4444';
+            const streakGap = bestStreak - habit._streak;
+
+            // Last done
+            const doneStamps = checkins.filter(c => c.status === 2).map(c => c.checkinStamp).sort((a, b) => b - a);
+            let daysSinceLast = '-';
+            if (doneStamps.length > 0) {
+                daysSinceLast = Math.max(0, Math.floor((new Date() - stampToDate(doneStamps[0])) / 86400000));
+            }
+
+            // ── Urgency Breakdown ──
+            const intervalDays = habit._intervalDays;
+            const fetchedLookback = intervalDays > 7 ? Math.min(Math.round(intervalDays * 3), 365) : 30;
+
+            const detailScheduledDays = getByDaySchedule(habit);
+            let doneCnt, urgencyExpected, uWindowDays, consistency, starvation, starvationLabel, opportunitiesLabel;
+
+            if (detailScheduledDays) {
+                // BYDAY-aware: count actual scheduled slots
+                uWindowDays = Math.min(ageDays, fetchedLookback);
+                const detailSlots = getByDaySlots(detailScheduledDays, uWindowDays);
+                urgencyExpected = detailSlots.length;
+                doneCnt = checkins.filter(c => c.status === 2 && detailSlots.includes(c.checkinStamp)).length;
+                consistency = Math.max(0, urgencyExpected - doneCnt) / Math.max(urgencyExpected, 1);
+                const doneStampsDetail = checkins.filter(c => c.status === 2).map(c => c.checkinStamp).sort((a,b) => b-a);
+                starvation = doneStampsDetail.length > 0
+                    ? detailSlots.filter(s => s > doneStampsDetail[0]).length
+                    : urgencyExpected;
+                const schedLabel = detailScheduledDays.length === 7 ? 'daily' : detailScheduledDays.map(d => ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d]).join('+');
+                starvationLabel = `${starvation} missed slot${starvation !== 1 ? 's' : ''}`;
+                opportunitiesLabel = `<strong style="color:#777">${urgencyExpected} slots</strong> <span style="color:#333">(${schedLabel})</span>`;
+            } else {
+                // Use full lookback window (30d for daily/weekly, more for monthly)
+                uWindowDays = Math.min(ageDays, fetchedLookback);
+                urgencyExpected = uWindowDays / intervalDays;
+                const uWindowStamps = [];
+                for (let i = 0; i < uWindowDays; i++) { const d = new Date(); d.setDate(d.getDate() - i); uWindowStamps.push(getStamp(d)); }
+                doneCnt = checkins.filter(c => c.status === 2 && uWindowStamps.includes(c.checkinStamp)).length;
+                consistency = Math.max(0, urgencyExpected - doneCnt) / Math.max(urgencyExpected, 1);
+                starvation = habit._daysSinceLast / intervalDays;
+                // Friendly label based on interval
+                const freqLabel = intervalDays === 1 ? 'daily' : intervalDays <= 7 ? `every ${Math.round(intervalDays)}d` : `${Math.round(intervalDays)}d cycle`;
+                starvationLabel = `${starvation.toFixed(1)} missed cycles`;
+                if (urgencyExpected < 1) {
+                    opportunitiesLabel = `<strong style="color:#777">first cycle</strong> <span style="color:#333">(${uWindowDays}d old · due every ${Math.round(intervalDays)}d)</span>`;
+                } else {
+                    opportunitiesLabel = `<strong style="color:#777">${Math.round(urgencyExpected)} slots</strong> <span style="color:#333">(${freqLabel})</span>`;
+                }
+            }
+
+            const daysSinceLastNum = habit._daysSinceLast;
+            const urgencyNow = habit._urgency;
+            const urgColor = urgencyNow >= 10 ? '#ef4444' : urgencyNow >= 3 ? '#fcd34d' : '#10b981';
+            // When habit is younger than one full cycle, clamp display expected to 1
+            // (avoids showing "1 / 0.0" for e.g. monthly habit on day 1)
+            const isFirstCycle = ageDays < intervalDays && !detailScheduledDays;
+            const urgExpDisplay = isFirstCycle ? '1' : (urgencyExpected < 1 ? urgencyExpected.toFixed(1) : urgencyExpected.toFixed(0));
+            const displayConsistency = isFirstCycle ? (doneCnt >= 1 ? 0 : 1) : consistency;
+            const behindCount = (urgencyExpected - doneCnt);
+
+            // ── Trend ──
+            const lastWeekStampsArr = [];
+            for (let i = 7; i < Math.min(14, 7 + ageDays); i++) { const d = new Date(); d.setDate(d.getDate() - i); lastWeekStampsArr.push(getStamp(d)); }
+            const lastWeekDoneCount = checkins.filter(c => c.status === 2 && lastWeekStampsArr.includes(c.checkinStamp)).length;
+            const lastWeekExp = Math.max(1, Math.ceil(habit._weeklyExpected * lastWeekStampsArr.length / 7));
+            const thisWeekPct = Math.round((weekCheckins / weekExpected) * 100);
+            const lastWeekPct = Math.round((lastWeekDoneCount / lastWeekExp) * 100);
+            const trendDiff = thisWeekPct - lastWeekPct;
+            const trendIcon = trendDiff > 5 ? '↑' : trendDiff < -5 ? '↓' : '→';
+            const trendColor = trendDiff > 5 ? '#10b981' : trendDiff < -5 ? '#ef4444' : '#f59e0b';
+            const trendText = (trendDiff > 0 ? '+' : '') + trendDiff + '% vs last week';
+
+            // ── Impact Simulator ──
+            const urgencyIfToday = (() => {
+                if (todayDone) return urgencyNow;
+                const nd = doneCnt + 1;
+                const nc = Math.max(0, urgencyExpected - nd) / Math.max(urgencyExpected, 1);
+                return Math.max(0, nc); // starvation=0: done today
+            })();
+            const urgencyAfter7 = (() => {
+                const extra = Math.round(7 / intervalDays);
+                const nd = doneCnt + extra + (todayDone ? 0 : 1);
+                const nc = Math.max(0, urgencyExpected - nd) / Math.max(urgencyExpected, 1);
+                return Math.max(0, nc);
+            })();
+
+            // ── Dynamic Nudge ──
+            let nudge = '';
+            if (todayDone) {
+                nudge = `✅ <strong>Done today!</strong> `;
+                if (habit._streak >= 3) nudge += `You're on a ${habit._streak}-day streak — keep it going!`;
+                else nudge += `Great start. Come back tomorrow to build your streak to ${habit._streak + 1}!`;
+            } else {
+                const newWeekDone = weekCheckins + 1;
+                const newWeekPct = Math.min(100, Math.round((newWeekDone / weekExpected) * 100));
+                const newStreak = habit._streak + 1;
+                nudge = `💡 <strong>Do it now</strong> → week: ${weekCheckins}/${weekExpected} → <strong>${newWeekDone}/${weekExpected} (${newWeekPct}%)</strong>`;
+                nudge += ` · streak: ${habit._streak} → <strong>${newStreak}</strong>`;
+                if (newStreak > bestStreak) nudge += ` 🏆 <strong>New record!</strong>`;
+                else if (streakGap <= 3 && streakGap > 0) nudge += ` · only <strong>${streakGap} more</strong> to beat your best!`;
+            }
+
+            // ── Coach Tip ──
+            const dayOfWeekCounts = [0,0,0,0,0,0,0];
+            checkins.filter(c => c.status === 2).forEach(c => {
+                dayOfWeekCounts[stampToDate(c.checkinStamp).getDay()]++;
+            });
+            const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+            const maxDayCount = Math.max(1, ...dayOfWeekCounts);
+            const strongDays = dayNames.filter((_, i) => dayOfWeekCounts[i] >= maxDayCount * 0.6);
+            const weakDays = dayNames.filter((_, i) => dayOfWeekCounts[i] === 0 || dayOfWeekCounts[i] < maxDayCount * 0.2);
+
+            let coachTip = '';
+            if (grade === 'F' || grade === 'D') {
+                if (ageDays <= 7) {
+                    coachTip = `🌱 This habit is <strong>only ${ageDays} day${ageDays === 1 ? '' : 's'} old</strong>. Focus on doing it just ${Math.ceil(habit._weeklyExpected)} times this week — small wins build momentum.`;
+                } else {
+                    coachTip = `⚠️ You did <strong>${monthly.done} of ${monthly.expected}</strong> in the last ${monthly.windowDays} days. Start with a <strong>3-day streak</strong> — that alone will move you from ${grade} to at least D.`;
+                    if (strongDays.length > 0) coachTip += ` You're strongest on <strong>${strongDays.join(', ')}</strong> — schedule it on those days first.`;
+                }
+            } else if (grade === 'C') {
+                coachTip = `📈 You're almost there — <strong>${monthly.done}/${monthly.expected}</strong>. `;
+                if (weakDays.length > 0 && weakDays.length <= 4) coachTip += `Add <strong>${weakDays.slice(0,2).join(' & ')}</strong> to your routine and you'll hit B grade.`;
+                else coachTip += `Just ${Math.ceil(monthly.expected * 0.6) - monthly.done} more check-ins in the next week would push you to <strong>B</strong>.`;
+            } else if (grade === 'B') {
+                coachTip = `🔥 Solid work — <strong>${monthly.done}/${monthly.expected} (${monthly.pct}%)</strong>. A few more and you'll be grade <strong>A</strong>! ${habit._streak >= 3 ? `Your ${habit._streak}-day streak is 💪.` : 'Try building a 5+ day streak.'}`;
+            } else {
+                coachTip = `🏆 <strong>Crushing it!</strong> ${monthly.done}/${monthly.expected} (${monthly.pct}%). ${habit._streak >= 7 ? `${habit._streak}-day streak is amazing — don't break the chain!` : 'Now try pushing your streak to 7+ days!'}`;
+            }
+
+            // ── Heatmap (age-aware, max 60 days) ──
+            const heatmapDays = Math.min(ageDays, 60);
+            let heatmapHtml = '';
+            const checkinStamps = new Set(checkins.filter(c => c.status === 2).map(c => c.checkinStamp));
+            const partialStamps = new Set(checkins.filter(c => c.status === 0 && c.value > 0).map(c => c.checkinStamp));
+            for (let i = heatmapDays - 1; i >= 0; i--) {
+                const d = new Date(); d.setDate(d.getDate() - i);
+                const stamp = getStamp(d);
+                const dateStr = formatDate(d);
+                let cls = 'checkin-day';
+                if (stamp === today) cls += ' today';
+                else if (checkinStamps.has(stamp)) cls += ' done';
+                else if (partialStamps.has(stamp)) cls += ' partial';
+                else cls += ' missed';
+                heatmapHtml += `<div class="${cls}"><div class="checkin-tooltip">${dateStr}</div></div>`;
+            }
+
+            // ── Weekly breakdown (age-aware, max 4 weeks) ──
+            const maxWeeks = Math.min(4, Math.ceil(ageDays / 7));
+            const weeklyBreakdown = [];
+            for (let w = 0; w < maxWeeks; w++) {
+                const stamps = [];
+                for (let d = 0; d < 7; d++) {
+                    const dt = new Date(); dt.setDate(dt.getDate() - (w * 7 + d));
+                    if ((w * 7 + d) < ageDays) stamps.push(getStamp(dt));
+                }
+                const done = checkins.filter(c => c.status === 2 && stamps.includes(c.checkinStamp)).length;
+                const exp = Math.max(1, Math.ceil(habit._weeklyExpected * stamps.length / 7));
+                const pct = Math.min(100, Math.round((done / exp) * 100));
+                const label = w === 0 ? 'This week' : w === 1 ? 'Last week' : `${w} wks ago`;
+                weeklyBreakdown.push({ label, done, expected: exp, pct });
+            }
+
+            // Challenge link
+            let challengeHtml = '';
+            if (habit._project) {
+                challengeHtml = `<div style="margin-bottom:12px;padding:8px 12px;background:#1a1a2a;border:1px solid #4f46e5;border-radius:6px;font-size:11px;color:#a78bfa">⚔️ Linked to project: <strong>${habit._project.name}</strong></div>`;
+            }
+
+            // Goal info
+            let goalInfo = '';
+            if (habit.type === 'Real' && habit.goal > 1) goalInfo = `🎯 ${habit.goal} ${habit.unit || ''} per day`;
+            if (habit.targetDays > 0) goalInfo += (goalInfo ? ' · ' : '') + `📅 ${habit.targetDays}-day target`;
+
+            panel.innerHTML = `
+                <div class="detail-header">
+                    <div class="detail-title">${habit.name}</div>
+                    <div class="detail-subtitle">
+                        <span>🔄 ${parseRepeatRule(habit.repeatRule)}</span>
+                        ${goalInfo ? `<span>${goalInfo}</span>` : ''}
+                    </div>
+                    <div class="detail-actions">
+                        <button class="checkin-btn ${todayDone ? 'checked' : ''}" onclick="toggleCheckin('${habit.id}')">
+                            ${todayDone ? '✅ Done today' : '⬜ Check in today'}
+                        </button>
+                        <span class="habit-badge ${habit._status}" style="font-size:10px;padding:4px 10px">${habit._status.toUpperCase()}</span>
+                    </div>
+                </div>
+
+                <div class="nudge">${nudge}</div>
+
+                <div style="background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:16px;margin-bottom:14px">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #252525">
+                        <div>
+                            <div style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Schedule</div>
+                            <div style="font-size:18px;font-weight:700;color:#fff">${parseRepeatRule(habit.repeatRule)}</div>
+                        </div>
+                        <div style="text-align:right">
+                            <div style="font-size:14px;font-weight:700;color:${trendColor}">${trendIcon} ${trendText}</div>
+                            <div style="font-size:9px;color:#555;margin-top:3px">Last week ${lastWeekPct}% → This week ${thisWeekPct}%</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom:6px;font-size:11px;color:#555">Last ${opportunitiesLabel}</div>
+                    <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:4px">
+                        <span style="font-size:52px;font-weight:800;color:${doneCnt >= urgencyExpected ? '#10b981' : '#ef4444'};line-height:1">${doneCnt}</span>
+                        <span style="font-size:26px;color:#333;font-weight:300">/ ${urgExpDisplay}</span>
+                        <span style="font-size:24px;font-weight:700;color:${displayConsistency <= 0.2 ? '#10b981' : displayConsistency <= 0.5 ? '#fcd34d' : '#ef4444'}">${Math.round((1-displayConsistency)*100)}%</span>
+                    </div>
+                    <div style="font-size:11px;color:#555;margin-bottom:10px">slots completed &nbsp;·&nbsp; ${isFirstCycle ? (doneCnt >= 1 ? 'first cycle done ✅' : 'within first cycle 🌱') : doneCnt >= urgencyExpected ? 'on track ✅' : behindCount.toFixed(0) + ' behind target'}</div>
+                    <div style="height:8px;background:#252525;border-radius:4px;overflow:hidden">
+                        <div style="width:${Math.min(100,(1-displayConsistency)*100).toFixed(1)}%;height:100%;background:linear-gradient(90deg,#ef4444,#10b981);border-radius:4px"></div>
+                    </div>
+
+                    <div style="margin-top:14px;padding-top:12px;border-top:1px solid #252525">
+                        <div style="font-size:9px;color:#555;text-transform:uppercase;margin-bottom:4px">Starvation (cycles missed)</div>
+                        <div style="display:flex;align-items:baseline;gap:8px">
+                            <span style="font-size:28px;font-weight:700;color:${starvation === 0 ? '#10b981' : starvation >= 3 ? '#ef4444' : '#fcd34d'}">${starvation.toFixed(1)}</span>
+                            <span style="font-size:12px;color:#666">${daysSinceLastNum === 0 ? '✅ done today' : detailScheduledDays ? `(${Math.round(starvation)} slot${Math.round(starvation) !== 1 ? 's' : ''} missed)` : `(${daysSinceLastNum}d / ${intervalDays.toFixed(1)}d cycle)`}</span>
+                        </div>
+                    </div>
+                </div>
+
+                ${habit.encouragement ? `<div class="detail-encourage">"${habit.encouragement}"</div>` : ''}
+                ${challengeHtml}
+
+                <div class="analysis-grid">
+                    <div class="a-card">
+                        <div class="a-card-val" style="color:${youOwe > 0 ? '#ef4444' : '#10b981'}">${weekCheckins} / ${weekExpected}</div>
+                        <div class="a-card-lbl">This Week${youOwe > 0 ? ` (${youOwe} left)` : ''}</div>
+                    </div>
+                    <div class="a-card">
+                        <div class="a-card-val" style="color:${streakColor}">🔥 ${habit._streak}</div>
+                        <div class="a-card-lbl">Streak</div>
+                    </div>
+                    <div class="a-card">
+                        <div class="a-card-val" style="color:#a78bfa">${streakGap > 0 ? streakGap + ' to go' : '🏆 Record!'}</div>
+                        <div class="a-card-lbl">Beat Best (${bestStreak})</div>
+                    </div>
+                </div>
+
+                <div style="background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:14px;margin-bottom:18px">
+                    <div style="font-size:11px;font-weight:600;color:#aaa;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">💡 Impact of Action</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;text-align:center">
+                        <div style="padding:8px">
+                            <div style="font-size:9px;color:#555;text-transform:uppercase;margin-bottom:6px">Right Now</div>
+                            <div style="font-size:26px;font-weight:700;color:${urgColor}">${urgencyNow.toFixed(1)}</div>
+                            <div style="font-size:9px;color:#555;margin-top:3px">urgency</div>
+                        </div>
+                        <div style="padding:8px;border-left:1px solid #333;border-right:1px solid #333">
+                            <div style="font-size:9px;color:#555;text-transform:uppercase;margin-bottom:6px">${todayDone ? 'Done! ✅' : 'Do It Today'}</div>
+                            <div style="font-size:26px;font-weight:700;color:#10b981">${urgencyIfToday.toFixed(1)}</div>
+                            <div style="font-size:9px;color:#10b981;margin-top:3px">${urgencyNow > urgencyIfToday ? '−' + (urgencyNow - urgencyIfToday).toFixed(1) + ' drop' : 'no change'}</div>
+                        </div>
+                        <div style="padding:8px">
+                            <div style="font-size:9px;color:#555;text-transform:uppercase;margin-bottom:6px">7-Day Streak</div>
+                            <div style="font-size:26px;font-weight:700;color:#6366f1">${urgencyAfter7.toFixed(1)}</div>
+                            <div style="font-size:9px;color:#6366f1;margin-top:3px">${urgencyNow > urgencyAfter7 ? '−' + (urgencyNow - urgencyAfter7).toFixed(1) + ' drop' : 'no change'}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-section-title">📅 Last ${heatmapDays} Days</div>
+                    <div class="checkin-grid">${heatmapHtml}</div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-section-title">📊 Weekly Consistency</div>
+                    ${weeklyBreakdown.map(w => {
+                        const wColor = w.pct >= 80 ? '#10b981' : w.pct >= 50 ? '#f59e0b' : '#ef4444';
+                        return `<div class="week-row">
+                            <div class="week-label">${w.label}</div>
+                            <div class="week-bar"><div class="week-bar-fill" style="width:${w.pct}%;background:${wColor}"></div></div>
+                            <div class="week-val">${w.done}/${w.expected}</div>
+                        </div>`;
+                    }).join('')}
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-section-title">📈 Best Days</div>
+                    ${dayNames.map((name, i) => {
+                        const pct = Math.round((dayOfWeekCounts[i] / maxDayCount) * 100);
+                        const c = dayOfWeekCounts[i];
+                        return `<div class="week-row">
+                            <div class="week-label">${name}</div>
+                            <div class="week-bar"><div class="week-bar-fill" style="width:${pct}%;background:#6366f1"></div></div>
+                            <div class="week-val">${c}x</div>
+                        </div>`;
+                    }).join('')}
+                </div>
+
+                <div class="coach-tip">💬 ${coachTip}</div>
+
+                <div style="background:#0d0d0d;border:1px solid #252525;border-radius:8px;padding:14px;margin-top:16px;font-family:monospace;font-size:11px;color:#666">
+                    <div style="font-size:10px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">📐 Score Breakdown</div>
+                    <div style="color:#888;line-height:1.8">
+                        <div style="color:#a78bfa;margin-bottom:8px"><strong>urgency = consistency + starvation</strong></div>
+                        
+                        <div style="border-left:2px solid #333;padding-left:10px;margin-bottom:10px">
+                            <div style="color:#6ee7b7">// Consistency: how far behind schedule</div>
+                            <div>windowDays = <span style="color:#fff">${uWindowDays}</span></div>
+                            <div>intervalDays = <span style="color:#fff">${intervalDays.toFixed(1)}</span></div>
+                            <div>expected = windowDays / intervalDays = ${uWindowDays} / ${intervalDays.toFixed(1)} = <span style="color:#fff">${urgencyExpected.toFixed(1)}</span></div>
+                            <div>done = <span style="color:#fff">${doneCnt}</span></div>
+                            <div>consistency = max(0, ${urgencyExpected.toFixed(1)} - ${doneCnt}) / max(${urgencyExpected.toFixed(1)}, 1)</div>
+                            <div style="padding-left:20px">= max(0, ${(urgencyExpected - doneCnt).toFixed(1)}) / ${Math.max(urgencyExpected, 1).toFixed(1)}</div>
+                            <div style="padding-left:20px">= <span style="color:#fcd34d;font-weight:bold">${consistency.toFixed(2)}</span></div>
+                        </div>
+                        
+                        <div style="border-left:2px solid #333;padding-left:10px;margin-bottom:10px">
+                            <div style="color:#6ee7b7">// Starvation: cycles since last done</div>
+                            <div>daysSinceLast = <span style="color:#fff">${daysSinceLastNum}</span></div>
+                            <div>starvation = daysSinceLast / intervalDays = ${daysSinceLastNum} / ${intervalDays.toFixed(1)}</div>
+                            <div style="padding-left:20px">= <span style="color:#fcd34d;font-weight:bold">${starvation.toFixed(2)}</span></div>
+                        </div>
+                        
+                        <div style="border-top:1px solid #333;padding-top:8px;margin-top:8px">
+                            <div style="color:#a78bfa">urgency = ${consistency.toFixed(2)} + ${starvation.toFixed(2)} = <span style="color:#fff;font-size:14px;font-weight:bold">${urgencyNow.toFixed(2)}</span></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ============ ACTIONS ============
+
+        function setFilter(f) {
+            currentFilter = f;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            render();
+        }
+
+        async function toggleCheckin(habitId) {
+            const stamp = todayStamp();
+            const checkins = allCheckins[habitId] || [];
+            const todayCheckin = checkins.find(c => c.checkinStamp === stamp && c.status === 2);
+
+            try {
+                if (todayCheckin) {
+                    // Undo — set status to 0
+                    await checkinHabit(habitId, stamp, 0);
+                    // Remove from local
+                    allCheckins[habitId] = checkins.filter(c => !(c.checkinStamp === stamp && c.status === 2));
+                } else {
+                    // Check in
+                    const habit = allHabits.find(h => h.id === habitId);
+                    const value = (habit && habit.type === 'Real') ? habit.goal : 1;
+                    await checkinHabit(habitId, stamp, value);
+                    // Add to local
+                    if (!allCheckins[habitId]) allCheckins[habitId] = [];
+                    allCheckins[habitId].push({ habitId, checkinStamp: stamp, status: 2, value, goal: habit?.goal || 1 });
+                }
+                render();
+                renderDetail();
+            } catch (e) {
+                console.error('Checkin error:', e);
+                alert('Failed to check in. Check console.');
+            }
+        }
+
+        // ============ INIT ============
+
+        async function refreshData() {
+            const container = document.getElementById('habitContainer');
+            container.innerHTML = '<div class="loading">Loading habits...</div>';
+
+            try {
+                const habits = await fetchHabits();
+
+                // No data from proxy or cache — show paste UI
+                if (!habits || habits.length === 0) {
+                    showPasteUI();
+                    return;
+                }
+
+                allHabits = habits;
+                
+                // Try to get projects (Open API works from file://)
+                try { allProjects = await fetchProjects(); } catch { allProjects = []; }
+
+                // Fetch checkins grouped by interval type (2 smart queries)
+                try {
+                    allCheckins = await fetchCheckinsGrouped(allHabits);
+                    console.log(`[CHECKINS] Loaded for ${Object.keys(allCheckins).length} habits`);
+                } catch (e) {
+                    console.log('[CHECKINS] Failed:', e.message);
+                    allCheckins = {};
+                }
+
+                const cacheTime = getCacheTime();
+                const fetchTime = window.__HABITS_FETCH_TIME__ || cacheTime;
+                const src = fetchTime ? `Data from: ${new Date(fetchTime).toLocaleString()}` : `Updated: ${new Date().toLocaleTimeString()}`;
+                document.getElementById('lastUpdated').textContent = src;
+                render();
+            } catch (e) {
+                console.error('Load error:', e);
+                showPasteUI();
+            }
+        }
+
+        function clearCache() {
+            localStorage.removeItem('habits_cache');
+            localStorage.removeItem('habits_cache_time');
+            localStorage.removeItem('checkins_cache');
+            showPasteUI();
+        }
+
+        // Boot
+        initMobileView();
+        refreshData();
+        
+        // Handle resize (rotation, etc)
+        window.addEventListener('resize', () => {
+            const leftPanel = document.querySelector('.left-panel');
+            const rightPanel = document.querySelector('.right-panel');
+            
+            if (window.innerWidth > 768) {
+                // Desktop: show both panels
+                leftPanel.classList.remove('hidden');
+                rightPanel.classList.remove('hidden');
+            } else {
+                // Mobile: respect current toggle state
+                if (mobileShowingDetail) {
+                    leftPanel.classList.add('hidden');
+                    rightPanel.classList.remove('hidden');
+                } else {
+                    leftPanel.classList.remove('hidden');
+                    rightPanel.classList.add('hidden');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
