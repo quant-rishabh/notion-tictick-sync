@@ -220,7 +220,26 @@ async function findProjectByName(listName) {
     console.log(`[LIST] ✓ Exact match: "${listName}" → "${exact.name}" (ID: ${exact.id})`);
     return exact;
   }
-  console.log(`[LIST-DEBUG] findProjectByName: No exact match, trying fuzzy...`);
+  console.log(`[LIST-DEBUG] findProjectByName: No exact match, trying contains...`);
+  
+  // 2. Try contains match (project name contains search term, or search term contains project name)
+  const containsMatches = projects.filter(p => {
+    const pName = p.name.toLowerCase();
+    return pName.includes(normalized) || normalized.includes(pName);
+  });
+  
+  if (containsMatches.length === 1) {
+    // Only 1 match — safe to use
+    console.log(`[LIST] ✓ Contains match: "${listName}" found in "${containsMatches[0].name}" (ID: ${containsMatches[0].id})`);
+    return containsMatches[0];
+  } else if (containsMatches.length > 1) {
+    // Multiple matches — pick the shortest name (most specific)
+    containsMatches.sort((a, b) => a.name.length - b.name.length);
+    console.log(`[LIST] ✓ Contains match (best of ${containsMatches.length}): "${listName}" → "${containsMatches[0].name}" (ID: ${containsMatches[0].id})`);
+    console.log(`[LIST-DEBUG]   Other matches: [${containsMatches.slice(1).map(p => `"${p.name}"`).join(', ')}]`);
+    return containsMatches[0];
+  }
+  console.log(`[LIST-DEBUG] findProjectByName: No contains match, trying fuzzy...`);
   
   // 2. Try fuzzy match (70% threshold)
   let bestMatch = null;
