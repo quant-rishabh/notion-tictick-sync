@@ -128,6 +128,17 @@ function extractListDirective(text) {
 }
 
 /**
+ * Extract goal name from page title
+ * Matches: "Goal : Buy XUV", "goal: fitness", "GOAL: anything"
+ * Colon is required. Case-insensitive.
+ * Returns goal name or null
+ */
+function extractGoalName(title) {
+  const match = title.match(/^goal\s*:\s*(.+)/i);
+  return match ? match[1].trim() : null;
+}
+
+/**
  * Get first few blocks of a Notion page
  */
 async function getPageFirstBlocks(pageId, limit = 5) {
@@ -1154,13 +1165,26 @@ export default async function handler(req, res) {
     // If directive was not in updated_blocks, check the page's first blocks for existing directive
     
     if (!migrationTriggered && taskPageId) {
-      console.log(`\n[LIST] ========================================`);
-      console.log(`[LIST] STEP 2: Checking page for existing list directive`);
-      console.log(`[LIST] Page ID: ${taskPageId}`);
-      console.log(`[LIST] ========================================`);
-      targetProjectId = await getTargetProjectId(taskPageId);
-      console.log(`[LIST] RESULT: Target project = ${targetProjectId}`);
-      console.log(`[LIST] ========================================\n`);
+      // Check if current page is a Goal page (title starts with "Goal:")
+      const goalName = extractGoalName(pageName);
+      if (goalName) {
+        console.log(`\n[GOAL] ========================================`);
+        console.log(`[GOAL] Current page is a Goal page: "${goalName}"`);
+        const goalProjectId = await getOrCreateProject(goalName);
+        if (goalProjectId) {
+          targetProjectId = goalProjectId;
+          console.log(`[GOAL] ✓ Target project set to: ${targetProjectId}`);
+        }
+        console.log(`[GOAL] ========================================\n`);
+      } else {
+        console.log(`\n[LIST] ========================================`);
+        console.log(`[LIST] STEP 2: Checking page for existing list directive`);
+        console.log(`[LIST] Page ID: ${taskPageId}`);
+        console.log(`[LIST] ========================================`);
+        targetProjectId = await getTargetProjectId(taskPageId);
+        console.log(`[LIST] RESULT: Target project = ${targetProjectId}`);
+        console.log(`[LIST] ========================================\n`);
+      }
     } else if (migrationTriggered) {
       console.log(`[LIST] STEP 2: Skipped - targetProjectId already set by migration`);
     } else {
@@ -1173,10 +1197,60 @@ export default async function handler(req, res) {
     for (const blockInfo of updatedBlocks) {
       const blockId = blockInfo.id;
       
-      // Skip child pages immediately - webhook tells us the type, no need to fetch
+      // Check if child page is a Goal page
       if (blockInfo.type === 'page') {
-        console.log(`[SKIP] Block ${blockId} is a child page (type=page in webhook)`);
-        results.skipped++;
+        try {
+          const childPageTitle = await getPageTitle(blockId);
+          const childGoalName = extractGoalName(childPageTitle);
+          if (childGoalName) {
+            console.log(`[GOAL] 🎯 Goal page detected: "${childPageTitle}"`);
+            
+            // Check if task already exists for this goal
+            const existingGoalTask = await findTickTickTaskByNotionId(blockId);
+            if (existingGoalTask) {
+              console.log(`[GOAL] Task already exists: "${existingGoalTask.title}" - skipping`);
+              results.skipped++;
+            } else {
+              const goalProjectId = await getOrCreateProject(childGoalName);
+              if (goalProjectId) {
+                // Parse through AI for date, priority, tags extraction
+                console.log(`[GOAL] Parsing goal with AI: "${childGoalName}"`);
+                const parsed = await parseTask(childGoalName);
+                
+                // Always add #goal tag
+                const goalTags = parsed.tags || [];
+                if (!goalTags.includes('goal')) goalTags.push('goal');
+                
+                const goalContent = `notion:${blockId}\n\n📎 Open in Notion:\nhttps://notion.so/${blockId.replace(/-/g, '')}`;
+                const goalTask = await createTask({
+                  title: parsed.title,
+                  content: goalContent,
+                  tags: goalTags,
+                  priority: parsed.priority || 0,
+                  dueDate: parsed.dueDate,
+                  startDate: parsed.startDate,
+                  isAllDay: parsed.isAllDay,
+                  repeatFlag: parsed.repeatFlag,
+                  isRecurring: parsed.isRecurring,
+                  reminders: parsed.reminders || []
+                }, goalProjectId);
+                console.log(`[GOAL] ✓ Created project + task "${childGoalName}" (ID: ${goalTask?.id})`);
+                results.created++;
+                
+                // Set targetProjectId for any other todos in this webhook
+                if (!migrationTriggered) {
+                  targetProjectId = goalProjectId;
+                }
+              }
+            }
+          } else {
+            console.log(`[SKIP] Block ${blockId} is a child page (not a goal page)`);
+            results.skipped++;
+          }
+        } catch (e) {
+          console.log(`[GOAL] Error processing child page ${blockId}: ${e.message}`);
+          results.errors.push({ blockId, error: e.message });
+        }
         results.processed++;
         continue;
       }
