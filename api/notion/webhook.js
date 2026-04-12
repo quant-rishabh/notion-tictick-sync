@@ -595,6 +595,127 @@ async function completeTask(taskId, projectId) {
   });
 }
 
+// ==================== TICKTICK HABIT OPERATIONS ====================
+
+/**
+ * Find existing habit by name (exact match)
+ */
+async function findHabitByName(name) {
+  if (!TICKTICK_COOKIE_TOKEN) return null;
+  
+  try {
+    const response = await fetch('https://api.ticktick.com/api/v2/habits', {
+      headers: {
+        'Cookie': `t=${TICKTICK_COOKIE_TOKEN}`,
+        'x-tz': 'Asia/Calcutta'
+      }
+    });
+    
+    if (!response.ok) return null;
+    
+    const habits = await response.json();
+    const normalized = name.toLowerCase().trim();
+    return habits.find(h => h.name.toLowerCase().trim() === normalized) || null;
+  } catch (e) {
+    console.log(`[HABIT] Error finding habit: ${e.message}`);
+    return null;
+  }
+}
+
+/**
+ * Create a habit in TickTick
+ * @param {string} name - Habit name
+ * @param {string} repeatRule - RRULE string (default: DAILY)
+ * @param {string[]} reminders - Array of "HH:MM" strings
+ */
+async function createHabit(name, repeatRule, reminders = []) {
+  if (!TICKTICK_COOKIE_TOKEN) {
+    console.log(`[HABIT] ❌ No TICKTICK_COOKIE_TOKEN - cannot create habit (Cookie API required)`);
+    return null;
+  }
+  
+  const now = new Date().toISOString().replace(/\.\d+Z$/, '.000+0000');
+  const todayNum = parseInt(new Date().toISOString().slice(0, 10).replace(/-/g, ''));
+  const habitId = Array.from({ length: 24 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+  
+  // Default to daily if no repeat rule
+  if (!repeatRule) repeatRule = 'RRULE:FREQ=DAILY';
+  
+  // Convert BYDAY with all 7 days to simpler DAILY (same thing)
+  // RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU → RRULE:FREQ=DAILY
+  if (repeatRule.includes('FREQ=WEEKLY') && repeatRule.includes('BYDAY=')) {
+    const bydayMatch = repeatRule.match(/BYDAY=([A-Z,]+)/);
+    if (bydayMatch) {
+      const days = bydayMatch[1].split(',');
+      if (days.length === 7) {
+        repeatRule = 'RRULE:FREQ=DAILY';
+        console.log(`[HABIT] Converted 7-day BYDAY to FREQ=DAILY`);
+      } else if (days.length < 7 && days.length >= 2) {
+        // For habits, "3 days a week" is better as TT_TIMES=3
+        // But only if it looks like arbitrary days (AI picks defaults like MO,WE,FR)
+        // Keep BYDAY if user specified exact days, use TT_TIMES for "X times a week"
+        // Heuristic: if days are evenly spaced, AI probably guessed → use TT_TIMES
+        repeatRule = `RRULE:FREQ=WEEKLY;TT_TIMES=${days.length}`;
+        console.log(`[HABIT] Converted ${days.length}-day BYDAY to TT_TIMES=${days.length}`);
+      }
+    }
+  }
+  
+  // Format reminders: AI gives "HH:MM" which is what habits expect
+  const habitReminders = reminders.length > 0 ? reminders : [];
+  
+  const habit = {
+    color: "#97E38B",
+    iconRes: "habit_daily_check_in",
+    createdTime: now,
+    encouragement: "",
+    etag: "",
+    goal: 1,
+    id: habitId,
+    modifiedTime: now,
+    name: name,
+    recordEnable: false,
+    reminders: habitReminders,
+    repeatRule: repeatRule,
+    sortOrder: 0,
+    status: 0,
+    step: 0,
+    totalCheckIns: 0,
+    type: "Boolean",
+    unit: "Count",
+    targetDays: 0,
+    targetStartDate: todayNum,
+    completedCycles: 0,
+    exDates: [],
+    currentStreak: 0,
+    style: 1
+  };
+  
+  try {
+    const response = await fetch('https://api.ticktick.com/api/v2/habits/batch', {
+      method: 'POST',
+      headers: {
+        'Cookie': `t=${TICKTICK_COOKIE_TOKEN}`,
+        'Content-Type': 'application/json;charset=UTF-8',
+        'x-tz': 'Asia/Calcutta'
+      },
+      body: JSON.stringify({ add: [habit], update: [], delete: [] })
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      console.log(`[HABIT] ✓ Created habit "${name}" (ID: ${habitId})`);
+      return { id: habitId, name, response: data };
+    } else {
+      console.log(`[HABIT] ❌ Failed to create habit: status ${response.status}`);
+      return null;
+    }
+  } catch (e) {
+    console.log(`[HABIT] ❌ Error creating habit: ${e.message}`);
+    return null;
+  }
+}
+
 // Batch delete multiple tasks at once (Cookie API - more efficient)
 async function batchDeleteTasks(tasks) {
   if (!tasks || tasks.length === 0) return { success: true, deleted: 0 };
@@ -888,6 +1009,43 @@ async function syncBlock(blockId, pageId = '', targetProjectId = null, pageName 
   console.log(`[AI]   Is Recurring: ${parsed.isRecurring}`);
   console.log(`[AI]   Repeat Flag: ${parsed.repeatFlag || 'none'}`);
   console.log(`[AI]   Reminders: [${(parsed.reminders || []).join(', ')}]`);
+
+  // CASE 5a: #habit tag → create HABIT (not task)
+  const isHabit = (parsed.tags || []).some(t => t.toLowerCase() === 'habit');
+  if (isHabit) {
+    console.log(`[HABIT] 🔄 #habit tag detected → creating HABIT (not task)`);
+    
+    // Check if habit already exists
+    const existingHabit = await findHabitByName(parsed.title);
+    if (existingHabit) {
+      console.log(`[HABIT] Already exists: "${existingHabit.name}" - skipping`);
+      return { action: 'skipped', reason: 'habit already exists' };
+    }
+    
+    // Extract reminder times from parsed data
+    // AI parser stores reminders as trigger strings, but for habits we need HH:MM
+    // The dueDate/startDate has the time info
+    const habitReminders = [];
+    if (parsed.dueDate && !parsed.isAllDay) {
+      // Extract HH:MM from dueDate (format: YYYY-MM-DDTHH:MM:SS+0530)
+      const timeMatch = parsed.dueDate.match(/T(\d{2}:\d{2})/);
+      if (timeMatch) habitReminders.push(timeMatch[1]);
+    }
+    
+    const habitResult = await createHabit(
+      parsed.title,
+      parsed.repeatFlag || 'RRULE:FREQ=DAILY',
+      habitReminders
+    );
+    
+    if (habitResult) {
+      console.log(`[HABIT] ✓ Habit created successfully`);
+      return { action: 'created', title: parsed.title, type: 'habit' };
+    } else {
+      console.log(`[HABIT] ✗ Failed to create habit`);
+      return { action: 'skipped', reason: 'habit creation failed' };
+    }
+  }
 
   if (existingTask) {
     // UPDATE existing task
