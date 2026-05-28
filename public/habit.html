@@ -6,114 +6,130 @@
     <title>Habits</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:system-ui,sans-serif;background:#111;color:#ccc;font-size:12px;padding:40px 0 0;overflow:hidden;height:100vh}
-        .nav{position:fixed;top:0;left:0;right:0;background:#1a1a1a;border-bottom:1px solid #333;padding:8px 12px;z-index:100;display:flex;justify-content:space-between;align-items:center}
-        .nav-title{font-size:13px;font-weight:600;color:#fff}
+        body{font-family:system-ui,sans-serif;background:#f5f5f5;color:#333;font-size:12px;padding:40px 0 0;overflow:hidden;height:100vh}
+        .nav{position:fixed;top:0;left:0;right:0;background:#fff;border-bottom:1px solid #e0e0e0;padding:8px 12px;z-index:100;display:flex;justify-content:space-between;align-items:center}
+        .nav-title{font-size:13px;font-weight:600;color:#111}
         .nav-links{display:flex;gap:6px}
-        .nav-link{padding:4px 10px;background:#252525;color:#888;border:1px solid #333;border-radius:4px;text-decoration:none;font-size:11px;cursor:pointer}
-        .nav-link:hover{background:#333;color:#fff}
+        .nav-link{padding:4px 10px;background:#f0f0f0;color:#666;border:1px solid #ddd;border-radius:4px;text-decoration:none;font-size:11px;cursor:pointer}
+        .nav-link:hover{background:#e0e0e0;color:#111}
         .nav-link.active{background:#6366f1;color:#fff;border-color:#6366f1}
 
         /* Master-detail layout */
         .container{display:flex;height:calc(100vh - 40px);max-width:100%;margin:0}
-        .left-panel{width:45%;min-width:340px;border-right:1px solid #333;display:flex;flex-direction:column;overflow:hidden}
-        .right-panel{flex:1;overflow-y:auto;padding:16px 20px;background:#0d0d0d}
+        .left-panel{width:45%;min-width:340px;border-right:1px solid #e0e0e0;display:flex;flex-direction:column;overflow:hidden;background:#fafafa}
+        .right-panel{flex:1;overflow-y:auto;padding:16px 20px;background:#fff}
 
         /* Left panel sections */
         .left-header{padding:10px 12px 0;flex-shrink:0}
         .stats{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
-        .stat{flex:1;min-width:70px;background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:6px;text-align:center}
-        .stat-val{font-size:16px;font-weight:700;color:#fff}
-        .stat-lbl{font-size:8px;color:#666;text-transform:uppercase;margin-top:1px}
+        .stat{flex:1;min-width:70px;background:#fff;border:1px solid #e0e0e0;border-radius:6px;padding:6px;text-align:center}
+        .stat-val{font-size:16px;font-weight:700;color:#111}
+        .stat-lbl{font-size:8px;color:#999;text-transform:uppercase;margin-top:1px}
         .filters{display:flex;gap:6px;margin-bottom:10px;align-items:center;flex-wrap:wrap}
-        .filter-btn{padding:4px 10px;background:#252525;color:#888;border:1px solid #333;border-radius:4px;font-size:10px;cursor:pointer}
-        .filter-btn:hover{background:#333;color:#fff}
+        .filter-btn{padding:4px 10px;background:#f0f0f0;color:#666;border:1px solid #ddd;border-radius:4px;font-size:10px;cursor:pointer}
+        .filter-btn:hover{background:#e0e0e0;color:#111}
         .filter-btn.active{background:#6366f1;color:#fff;border-color:#6366f1}
 
         /* Habit list */
         .habit-list{flex:1;overflow-y:auto;padding:0 12px 12px}
-        .habit-item{background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:10px 12px;margin-bottom:6px;cursor:pointer;border-left:4px solid #333;transition:background 0.15s}
-        .habit-item:hover{background:#222}
-        .habit-item.selected{background:#1e1e3a;border-color:#6366f1}
+        .habit-item{background:#fff;border:1px solid #e0e0e0;border-radius:6px;padding:10px 12px;margin-bottom:6px;cursor:pointer;border-left:4px solid #ddd;transition:background 0.15s}
+        .habit-item:hover{background:#f0f4ff}
+        .habit-item.selected{background:#eef0ff;border-color:#6366f1}
         .habit-item.active{border-left-color:#10b981}
         .habit-item.slipping{border-left-color:#f59e0b}
         .habit-item.dying{border-left-color:#ef4444}
-        .habit-item.archived{opacity:0.5;border-left-color:#555}
+        .habit-item.archived{opacity:0.5;border-left-color:#bbb}
         .habit-item-header{display:flex;justify-content:space-between;align-items:center}
-        .habit-item-name{font-size:12px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%}
+        .habit-item-name{font-size:12px;font-weight:600;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%}
         .habit-item-right{display:flex;align-items:center;gap:8px}
         .habit-item-neglect{font-size:10px;font-weight:600}
         .habit-badge{font-size:8px;padding:2px 5px;border-radius:3px}
-        .habit-badge.active{background:#153d1f;color:#6ee7b7}
-        .habit-badge.slipping{background:#3d3515;color:#fcd34d}
-        .habit-badge.dying{background:#3d1515;color:#fca5a5}
-        .habit-badge.archived{background:#333;color:#888}
-        .habit-item-meta{display:flex;gap:10px;font-size:9px;color:#666;margin-top:4px}
-        .habit-item-bar{margin-top:5px;height:3px;background:#252525;border-radius:2px;overflow:hidden}
+        .habit-badge.active{background:#d1fae5;color:#059669}
+        .habit-badge.slipping{background:#fef3c7;color:#d97706}
+        .habit-badge.dying{background:#fee2e2;color:#dc2626}
+        .habit-badge.archived{background:#f0f0f0;color:#999}
+        .habit-item-meta{display:flex;gap:10px;font-size:9px;color:#888;margin-top:4px}
+        .habit-item-bar{margin-top:5px;height:3px;background:#e8e8e8;border-radius:2px;overflow:hidden}
         .habit-item-bar-fill{height:100%;border-radius:2px}
+        .cycle-dots{display:flex;gap:3px;margin-top:6px;align-items:center}
+        .cycle-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+        .cycle-dot.done{background:#10b981}
+        .cycle-dot.missed{background:#fca5a5}
+        .cycle-dot.future{background:#e8e8e8}
+
+        /* Timer progress */
+        .timer-progress{margin-top:6px}
+        .timer-progress-header{display:flex;justify-content:space-between;font-size:10px;color:#555;margin-bottom:2px}
+        .timer-progress-bar{height:5px;background:#e5e7eb;border-radius:3px;overflow:hidden}
+        .timer-progress-fill{height:100%;border-radius:3px;transition:width 0.3s ease}
+
+        /* Habit type badges */
+        .habit-type-badge{font-size:9px;padding:1px 5px;border-radius:3px;font-weight:600;margin-right:4px}
+        .habit-type-badge.timer{background:#dbeafe;color:#2563eb}
+        .habit-type-badge.checkin{background:#d1fae5;color:#059669}
 
         /* Right panel detail */
-        .detail-empty{display:flex;align-items:center;justify-content:center;height:100%;color:#555;font-size:14px;text-align:center}
+        .detail-empty{display:flex;align-items:center;justify-content:center;height:100%;color:#aaa;font-size:14px;text-align:center}
         .detail-header{margin-bottom:16px}
-        .detail-title{font-size:22px;font-weight:700;color:#fff;margin-bottom:4px}
+        .detail-title{font-size:22px;font-weight:700;color:#111;margin-bottom:4px}
         .detail-subtitle{font-size:11px;color:#888;display:flex;gap:12px;flex-wrap:wrap}
         .detail-actions{margin-top:10px;display:flex;gap:8px;align-items:center}
-        .checkin-btn{padding:6px 16px;background:#252525;color:#888;border:1px solid #333;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600}
-        .checkin-btn:hover{background:#333;color:#fff}
-        .checkin-btn.checked{background:#153d1f;color:#6ee7b7;border-color:#10b981}
+        .checkin-btn{padding:6px 16px;background:#f0f0f0;color:#666;border:1px solid #ddd;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600}
+        .checkin-btn:hover{background:#e0e0e0;color:#111}
+        .checkin-btn.checked{background:#d1fae5;color:#059669;border-color:#10b981}
 
         /* Analysis cards */
         .analysis-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));gap:10px;margin-bottom:16px}
-        .a-card{background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:14px;text-align:center}
+        .a-card{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:14px;text-align:center}
         .a-card-val{font-size:24px;font-weight:700;margin-bottom:2px}
-        .a-card-lbl{font-size:9px;color:#666;text-transform:uppercase}
+        .a-card-lbl{font-size:9px;color:#999;text-transform:uppercase}
 
         /* Checkin heatmap */
         .detail-section{margin-bottom:18px}
-        .detail-section-title{font-size:12px;font-weight:600;color:#aaa;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px}
+        .detail-section-title{font-size:12px;font-weight:600;color:#666;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px}
         .checkin-grid{display:flex;gap:3px;flex-wrap:wrap}
-        .checkin-day{width:18px;height:18px;border-radius:3px;background:#252525;position:relative;cursor:default;font-size:7px;display:flex;align-items:center;justify-content:center;color:transparent}
+        .checkin-day{width:18px;height:18px;border-radius:3px;background:#e8e8e8;position:relative;cursor:default;font-size:7px;display:flex;align-items:center;justify-content:center;color:transparent}
         .checkin-day.done{background:#10b981}
         .checkin-day.partial{background:#f59e0b}
-        .checkin-day.missed{background:#3d1515}
-        .checkin-day.future{background:#1a1a1a;border:1px solid #333}
+        .checkin-day.missed{background:#fee2e2}
+        .checkin-day.future{background:#f5f5f5;border:1px solid #e0e0e0}
         .checkin-day.today{outline:2px solid #6366f1;outline-offset:1px}
-        .checkin-day:hover{color:#fff}
+        .checkin-day:hover{color:#333}
         .checkin-tooltip{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:3px 6px;border-radius:3px;font-size:9px;white-space:nowrap;display:none;z-index:10}
         .checkin-day:hover .checkin-tooltip{display:block}
 
         /* Weekly breakdown */
         .week-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:11px}
         .week-label{width:80px;color:#888;text-align:right}
-        .week-bar{flex:1;height:8px;background:#252525;border-radius:4px;overflow:hidden}
+        .week-bar{flex:1;height:8px;background:#e8e8e8;border-radius:4px;overflow:hidden}
         .week-bar-fill{height:100%;border-radius:4px}
-        .week-val{width:40px;color:#aaa;font-size:10px}
+        .week-val{width:40px;color:#666;font-size:10px}
 
         /* Encouragement */
-        .detail-encourage{background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:14px;margin-bottom:16px;font-style:italic;color:#888;font-size:12px;border-left:3px solid #6366f1}
+        .detail-encourage{background:#f8f9ff;border:1px solid #e0e0e0;border-radius:8px;padding:14px;margin-bottom:16px;font-style:italic;color:#666;font-size:12px;border-left:3px solid #6366f1}
 
         /* Nudge banner */
-        .nudge{background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid #4f46e5;border-radius:8px;padding:14px 16px;margin-bottom:16px;font-size:13px;color:#c4b5fd;line-height:1.5}
-        .nudge strong{color:#fff}
-        .coach-tip{background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:14px 16px;margin-top:16px;font-size:12px;color:#9ca3af;line-height:1.5;border-left:3px solid #f59e0b}
-        .coach-tip strong{color:#fcd34d}
+        .nudge{background:linear-gradient(135deg,#eef0ff,#e8ebff);border:1px solid #c7d2fe;border-radius:8px;padding:14px 16px;margin-bottom:16px;font-size:13px;color:#4338ca;line-height:1.5}
+        .nudge strong{color:#111}
+        .coach-tip{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:14px 16px;margin-top:16px;font-size:12px;color:#92400e;line-height:1.5;border-left:3px solid #f59e0b}
+        .coach-tip strong{color:#78350f}
         .grade-badge{font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;display:inline-block;min-width:18px;text-align:center}
-        .grade-A{background:#153d1f;color:#6ee7b7}
-        .grade-B{background:#1a3d2f;color:#6ee7b7}
-        .grade-C{background:#3d3515;color:#fcd34d}
-        .grade-D{background:#3d2515;color:#fdba74}
-        .grade-F{background:#3d1515;color:#fca5a5}
+        .grade-A{background:#d1fae5;color:#059669}
+        .grade-B{background:#d1fae5;color:#059669}
+        .grade-C{background:#fef3c7;color:#d97706}
+        .grade-D{background:#fed7aa;color:#c2410c}
+        .grade-F{background:#fee2e2;color:#dc2626}
         .urgency-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;min-width:28px;text-align:center;display:inline-block}
-        .urgency-badge.low{background:#1a3d15;color:#6ee7b7}
-        .urgency-badge.med{background:#3d3515;color:#fcd34d}
-        .urgency-badge.high{background:#3d1515;color:#fca5a5}
+        .urgency-badge.low{background:#d1fae5;color:#059669}
+        .urgency-badge.med{background:#fef3c7;color:#d97706}
+        .urgency-badge.high{background:#fee2e2;color:#dc2626}
 
-        .section-title{font-size:11px;font-weight:600;color:#fff;margin:12px 0 6px;padding-bottom:4px;border-bottom:1px solid #333}
-        .section-badge{font-size:9px;padding:2px 6px;border-radius:10px;background:#252525;color:#888}
-        .loading{text-align:center;padding:40px;color:#666}
-        .no-data{text-align:center;padding:40px;color:#555;font-size:13px}
+        .section-title{font-size:11px;font-weight:600;color:#111;margin:12px 0 6px;padding-bottom:4px;border-bottom:1px solid #e0e0e0}
+        .section-badge{font-size:9px;padding:2px 6px;border-radius:10px;background:#f0f0f0;color:#888}
+        .loading{text-align:center;padding:40px;color:#999}
+        .no-data{text-align:center;padding:40px;color:#aaa;font-size:13px}
 
-        .progress-bar{flex:1;height:4px;background:#252525;border-radius:2px;overflow:hidden}
+        .progress-bar{flex:1;height:4px;background:#e8e8e8;border-radius:2px;overflow:hidden}
         .progress-fill{height:100%;border-radius:2px}
 
         /* ========== MOBILE RESPONSIVE ========== */
@@ -126,7 +142,7 @@
             .nav-link{padding:8px 12px;font-size:12px;min-height:36px}
             
             .container{flex-direction:column;height:auto;min-height:calc(100vh - 50px)}
-            .left-panel{width:100%;min-width:100%;border-right:none;border-bottom:1px solid #333;max-height:none}
+            .left-panel{width:100%;min-width:100%;border-right:none;border-bottom:1px solid #e0e0e0;max-height:none}
             .right-panel{min-height:100vh;padding:16px 12px}
             
             .left-header{padding:12px}
@@ -195,7 +211,7 @@
         /* Landscape mode on mobile */
         @media (max-width: 768px) and (orientation: landscape) {
             .container{flex-direction:row}
-            .left-panel{width:50%;max-height:none;border-right:1px solid #333;border-bottom:none}
+            .left-panel{width:50%;max-height:none;border-right:1px solid #e0e0e0;border-bottom:none}
             .right-panel{width:50%}
             .habit-list{max-height:calc(100vh - 180px)}
         }
@@ -208,7 +224,7 @@
         }
 
         /* Mobile panel toggle */
-        .mobile-toggle{display:none;position:fixed;bottom:20px;right:20px;z-index:200;padding:14px 20px;background:#6366f1;color:#fff;border:none;border-radius:50px;font-size:14px;font-weight:600;box-shadow:0 4px 20px rgba(99,102,241,0.4);cursor:pointer}
+        .mobile-toggle{display:none;position:fixed;bottom:20px;right:20px;z-index:200;padding:14px 20px;background:#6366f1;color:#fff;border:none;border-radius:50px;font-size:14px;font-weight:600;box-shadow:0 4px 20px rgba(99,102,241,0.3);cursor:pointer}
         .mobile-toggle:active{transform:scale(0.95)}
         
         @media (max-width: 768px) {
@@ -222,6 +238,82 @@
         
         /* Smooth scrolling for iOS */
         .habit-list,.right-panel{-webkit-overflow-scrolling:touch}
+
+        /* Status tags */
+        .status-tag{font-size:10px;font-weight:600;padding:3px 8px;border-radius:4px;white-space:nowrap}
+
+        /* Hero cards */
+        .hero-cards{display:flex;gap:10px;margin-bottom:16px}
+        .hero-card{flex:1;background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:16px;text-align:center}
+        .hero-card-val{font-size:28px;font-weight:700;line-height:1.2}
+        .hero-card-label{font-size:10px;color:#999;text-transform:uppercase;margin-top:4px}
+        .hero-card-sub{font-size:11px;margin-top:6px}
+
+        /* Progress rows */
+        .progress-section{background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:18px 20px;margin-bottom:16px}
+        .progress-row{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+        .progress-row:last-child{margin-bottom:0}
+        .progress-label{width:100px;font-size:12px;color:#666;text-align:right;flex-shrink:0;font-weight:500}
+        .progress-bar-wrap{flex:1;height:18px;background:#e8e8e8;border-radius:9px;overflow:hidden;position:relative}
+        .progress-bar-fill-inner{height:100%;border-radius:9px;transition:width 0.3s}
+        .progress-bar-text{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.3)}
+        .progress-val{width:90px;font-size:13px;color:#111;text-align:right;flex-shrink:0;font-weight:600}
+        .progress-pct{font-size:11px;color:#888;font-weight:400}
+
+        /* View tabs (heatmap/history) */
+        .view-tabs{display:flex;gap:4px}
+        .view-tab{padding:4px 12px;background:#f0f0f0;color:#666;border:1px solid #ddd;border-radius:4px;font-size:10px;cursor:pointer}
+        .view-tab:hover{background:#e0e0e0;color:#111}
+        .view-tab.active{background:#6366f1;color:#fff;border-color:#6366f1}
+
+        /* GitHub-style day heatmap → linear strip */
+        .gh-heatmap{display:flex;gap:2px;flex-wrap:wrap;overflow-x:auto;padding-bottom:4px}
+        .gh-cell{width:14px;height:14px;border-radius:2px;cursor:default;position:relative}
+        .gh-cell.empty{background:#f5f5f5}
+        .gh-cell.missed{background:#fee2e2}
+        .gh-cell.done{background:#10b981}
+        .gh-cell.today{outline:2px solid #6366f1;outline-offset:1px}
+        .gh-cell:hover .gh-tip{display:block}
+        .gh-tip{display:none;position:absolute;bottom:18px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:2px 6px;border-radius:3px;font-size:9px;white-space:nowrap;z-index:10}
+
+        /* Cycle rows (week/month view) */
+        .cycle-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+        .cycle-row:last-child{margin-bottom:0}
+        .cycle-label{width:80px;font-size:10px;color:#888;text-align:right;flex-shrink:0}
+        .cycle-bar{flex:1;height:10px;background:#e8e8e8;border-radius:5px;overflow:hidden}
+        .cycle-bar-fill{height:100%;border-radius:5px}
+        .cycle-val{width:50px;font-size:10px;color:#666}
+        .cycle-check{font-size:10px;width:20px;text-align:center}
+
+        /* History bar chart */
+        .history-bars{display:flex;align-items:flex-end;gap:3px;height:80px;padding:4px 0}
+        .h-bar{flex:1;min-width:4px;max-width:20px;border-radius:2px 2px 0 0;position:relative;cursor:default;transition:opacity 0.15s}
+        .h-bar:hover{opacity:0.7}
+        .h-bar:hover .h-tip{display:block}
+        .h-tip{display:none;position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:2px 6px;border-radius:3px;font-size:9px;white-space:nowrap;z-index:10}
+
+        /* Focus summary */
+        .focus-summary{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
+        .focus-chip{font-size:11px;padding:4px 10px;background:#fff;border:1px solid #e0e0e0;border-radius:6px;color:#666}
+        .focus-chip strong{color:#111}
+        .focus-chip.alert{border-color:#ef4444;color:#dc2626}
+        .focus-chip.warn{border-color:#f59e0b;color:#d97706}
+
+        /* Trend line */
+        .trend-line{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#fff;border:1px solid #e0e0e0;border-radius:8px;margin-bottom:16px;font-size:12px}
+        .trend-arrow{font-size:18px;font-weight:700}
+
+        @media (max-width: 768px) {
+            .hero-cards{gap:8px}
+            .hero-card{padding:12px}
+            .hero-card-val{font-size:24px}
+            .progress-label{width:70px;font-size:10px}
+            .gh-heatmap{gap:2px}
+            .gh-cell{width:12px;height:12px}
+            .history-bars{height:60px}
+            .focus-summary{gap:4px}
+            .focus-chip{font-size:10px;padding:3px 8px}
+        }
     </style>
 </head>
 <body>
@@ -240,13 +332,8 @@
     <div class="container">
         <div class="left-panel">
             <div class="left-header">
-                <div class="stats">
-                    <div class="stat"><div class="stat-val" style="color:#fff" id="totalHabits">-</div><div class="stat-lbl">Total</div></div>
-                    <div class="stat"><div class="stat-val" style="color:#10b981" id="activeCount">-</div><div class="stat-lbl">Active</div></div>
-                    <div class="stat"><div class="stat-val" style="color:#f59e0b" id="slippingCount">-</div><div class="stat-lbl">Slipping</div></div>
-                    <div class="stat"><div class="stat-val" style="color:#ef4444" id="dyingCount">-</div><div class="stat-lbl">Dying</div></div>
-                    <div class="stat"><div class="stat-val" style="color:#6366f1" id="todayScore">-</div><div class="stat-lbl">Today</div></div>
-                    <div class="stat"><div class="stat-val" style="color:#a78bfa" id="bestStreak">-</div><div class="stat-lbl">Best</div></div>
+                <div class="focus-summary" id="focusSummary">
+                    <div class="focus-chip"><strong>-</strong> done today</div>
                 </div>
 
                 <div class="filters">
@@ -281,6 +368,7 @@
         let allHabits = [];
         let allCheckins = {};
         let allProjects = [];
+        let pomodoroStats = {}; // { habitName: minutes } from today's pomodoro/timer
         let currentFilter = 'all';
         let selectedHabitId = null;
         let renderedHabits = []; // cached after render for detail lookup
@@ -403,8 +491,8 @@
 
             const promises = [];
             if (shortIds.length > 0) {
-                console.log(`[CHECKINS] Short batch: ${shortIds.length} habits, 30d lookback`);
-                promises.push(fetchCheckinsBatch(shortIds, 30));
+                console.log(`[CHECKINS] Short batch: ${shortIds.length} habits, 365d lookback`);
+                promises.push(fetchCheckinsBatch(shortIds, 365));
             }
             if (longIds.length > 0) {
                 const maxLookback = Math.max(...longHabits.map(h => Math.min(Math.round(getIntervalDays(h) * 3), 365)));
@@ -448,6 +536,40 @@
             return text ? JSON.parse(text) : {};
         }
 
+        // Auto-complete timer habits via server endpoint
+        async function triggerAutoComplete() {
+            const cookieT = getCookieT();
+            const csrf = getCsrf();
+            if (!cookieT || !csrf) return;
+
+            const res = await fetch('/api/habits/auto-complete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ticktick_cookie_t: cookieT, ticktick_csrf: csrf })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.completed && data.completed.length > 0) {
+                    console.log(`[AUTO-COMPLETE] ✓ Completed ${data.completed.length} habits:`, data.completed.map(h => h.name));
+                    // Refresh checkins to reflect new status
+                    allCheckins = await fetchCheckinsGrouped(allHabits);
+                }
+            }
+        }
+
+        // Fetch pomodoro statistics for a date range
+        async function fetchPomodoroStats(startDate, endDate) {
+            const cookieT = getCookieT();
+            const csrf = getCsrf();
+            if (!cookieT || !csrf) return null;
+
+            try {
+                const res = await fetch(`/api/ticktick/pomodoros?t=${encodeURIComponent(cookieT)}&csrf=${encodeURIComponent(csrf)}&start=${startDate}&end=${endDate}`);
+                if (res.ok) return await res.json();
+            } catch (e) { console.log('[POMODORO] Failed:', e.message); }
+            return null;
+        }
+
         async function fetchProjects() {
             const token = getToken();
             if (!token) return [];
@@ -465,19 +587,19 @@
             const container = document.getElementById('habitContainer');
             container.innerHTML = `
                 <div style="max-width:600px;margin:20px auto;text-align:center">
-                    <div style="font-size:16px;color:#fff;margin-bottom:8px">📋 Paste Habits JSON</div>
+                    <div style="font-size:16px;color:#111;margin-bottom:8px">📋 Paste Habits JSON</div>
                     <div style="font-size:11px;color:#888;margin-bottom:12px">
                         Open TickTick in Chrome → DevTools (F12) → Console → run this:
                     </div>
-                    <div style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:10px;text-align:left;margin-bottom:12px">
-                        <code style="font-size:11px;color:#6ee7b7;word-break:break-all;user-select:all">
+                    <div style="background:#f0f0f0;border:1px solid #ddd;border-radius:6px;padding:10px;text-align:left;margin-bottom:12px">
+                        <code style="font-size:11px;color:#059669;word-break:break-all;user-select:all">
                             fetch('https://api.ticktick.com/api/v2/habits').then(r=>r.json()).then(d=>{copy(JSON.stringify(d));console.log('✅ Copied '+d.length+' habits!')})
                         </code>
                     </div>
                     <div style="font-size:11px;color:#888;margin-bottom:8px">
                         OR run the curl command. Then paste the JSON array below:
                     </div>
-                    <textarea id="pasteArea" style="width:100%;height:120px;background:#0d0d0d;color:#ccc;border:1px solid #333;border-radius:6px;padding:8px;font-family:monospace;font-size:11px;resize:vertical" placeholder='Paste JSON array here... [ { "id": "...", "name": "..." }, ... ]'></textarea>
+                    <textarea id="pasteArea" style="width:100%;height:120px;background:#fff;color:#333;border:1px solid #ddd;border-radius:6px;padding:8px;font-family:monospace;font-size:11px;resize:vertical" placeholder='Paste JSON array here... [ { "id": "...", "name": "..." }, ... ]'></textarea>
                     <div style="margin-top:8px;display:flex;gap:8px;justify-content:center">
                         <button onclick="loadPastedData()" style="padding:8px 20px;background:#6366f1;color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer">Load Habits</button>
                     </div>
@@ -726,8 +848,9 @@
             });
         }
 
-        // Calculate urgency score (higher = more neglected, no cap = no starvation)
-        // urgency = recentRatio (0-1) + recencyCycles (0→∞)
+        // Calculate urgency score (higher = more neglected)
+        // urgency = (1 - done/7) + daysSinceLast/interval
+        // All habits measured over last 7 cycles for fair comparison
         function calcUrgency(habit) {
             if (habit.status === 1) return 0;
             const checkins = allCheckins[habit.id] || [];
@@ -735,12 +858,10 @@
             const ageDays = getHabitAge(habit);
             const intervalDays = getIntervalDays(habit);
 
-            // Lookback used when fetching: short=30d, long=intervalDays*3 (capped 365)
-            const fetchedLookback = intervalDays > 7 ? Math.min(Math.round(intervalDays * 3), 365) : 30;
-
-            // Window: full fetched lookback, capped to habit age (new habits use only their age)
-            const windowDays = Math.min(ageDays, fetchedLookback);
-            const expected = windowDays / intervalDays;
+            // Last 7 cycles window (capped to habit age)
+            const numCycles = 7;
+            const windowDays = Math.min(Math.round(intervalDays * numCycles), ageDays);
+            const expected = Math.min(numCycles, Math.floor(ageDays / intervalDays));
 
             // Count done in window
             const windowStamps = [];
@@ -751,16 +872,16 @@
             const done = checkins.filter(c => c.status === 2 && windowStamps.includes(c.checkinStamp)).length;
             const doneStamps = checkins.filter(c => c.status === 2).map(c => c.checkinStamp).sort((a, b) => b - a);
 
-            // consistency: how far behind your own plan, 0=perfect 1=completely missing
-            const consistency = Math.max(0, expected - done) / Math.max(expected, 1);
+            // consistency: 1 - done/expected (0=perfect, 1=completely missing)
+            const consistency = expected > 0 ? Math.max(0, 1 - done / expected) : 0;
 
             // BYDAY habits (exact scheduled days, not "Nx per week"): use slot-based counting
             const scheduledDays = getByDaySchedule(habit);
             if (scheduledDays) {
                 const slots = getByDaySlots(scheduledDays, windowDays);
+                const slotsExpected = Math.max(1, slots.length);
                 const slotsDone = checkins.filter(c => c.status === 2 && slots.includes(c.checkinStamp)).length;
-                const slotsExpected = slots.length;
-                const byConsistency = Math.max(0, slotsExpected - slotsDone) / Math.max(slotsExpected, 1);
+                const byConsistency = Math.max(0, 1 - slotsDone / slotsExpected);
                 const slotsSinceLast = doneStamps.length > 0
                     ? slots.filter(s => s > doneStamps[0]).length
                     : slotsExpected;
@@ -776,20 +897,14 @@
                 return byUrgency;
             }
 
-            // starvation: how many full cycles since you last did it (unbounded = anti-starvation)
-            // If no checkins in window but habit has lifetime checkins → done before window → cap at fetchedLookback
+            // starvation: how many full cycles since you last did it (unbounded)
             let daysSinceLast;
             if (doneStamps.length > 0) {
                 const lastDate = stampToDate(doneStamps[0]);
                 daysSinceLast = Math.max(0, Math.floor((now - lastDate) / 86400000));
-            } else if (habit.totalCheckIns > 0) {
-                // Has historical checkins outside our fetch window — cap at fetchedLookback
-                daysSinceLast = fetchedLookback;
             } else {
-                // Truly never done — use habit age
-                daysSinceLast = ageDays;
+                daysSinceLast = ageDays; // no stamps → assume never done in known history
             }
-            // Bug fix: TickTick can store checkins before createdTime (clock drift/reset)
             daysSinceLast = Math.min(daysSinceLast, ageDays);
             const starvation = daysSinceLast / intervalDays;
 
@@ -798,7 +913,7 @@
             const tag = urgency >= 10 ? '🔴' : urgency >= 3 ? '🟡' : '🟢';
             console.log(
                 `${tag} %-40s  urgency=%s  |${bar}|\n` +
-                `   age=${ageDays}d  cycle=${intervalDays.toFixed(1)}d  window=${windowDays}d  done=${done}/${expected.toFixed(1)}` +
+                `   age=${ageDays}d  cycle=${intervalDays.toFixed(1)}d  7cycles=${windowDays}d  done=${done}/${expected}` +
                 `  last=${daysSinceLast === 0 ? 'today' : daysSinceLast + 'd ago'}` +
                 `  consistency=${consistency.toFixed(2)}  starvation=${starvation.toFixed(2)}`,
                 habit.name.slice(0, 40), urgency.toFixed(2)
@@ -822,6 +937,269 @@
             return { done, expected, pct, windowDays };
         }
 
+        // ============ STATUS & DISPLAY HELPERS ============
+
+        // Human-readable status tag for a habit
+        function getStatusTag(habit) {
+            const checkins = allCheckins[habit.id] || [];
+            const today = todayStamp();
+            const todayDone = checkins.some(c => c.checkinStamp === today && c.status === 2);
+            if (todayDone) return { text: 'Done ✅', cls: 'done', color: '#10b981' };
+            if (habit._status === 'archived') return { text: 'Archived', cls: 'on-track', color: '#666' };
+
+            const intervalDays = habit._intervalDays || getIntervalDays(habit);
+            const daysSince = habit._daysSinceLast || 0;
+            const streak = habit._streak || 0;
+
+            if (daysSince > intervalDays * 1.5) {
+                const overdueDays = Math.round(daysSince - intervalDays);
+                return { text: `${overdueDays}d overdue`, cls: 'overdue', color: '#ef4444' };
+            }
+            if (streak >= 3 && daysSince >= intervalDays * 0.8) {
+                return { text: 'Streak at risk!', cls: 'streak-risk', color: '#f59e0b' };
+            }
+            if (daysSince > intervalDays) {
+                return { text: 'Falling behind', cls: 'overdue', color: '#f59e0b' };
+            }
+            if (daysSince >= intervalDays * 0.8) {
+                return { text: 'Due today', cls: 'due', color: '#fcd34d' };
+            }
+            if (intervalDays > 7 && daysSince < intervalDays * 0.5) {
+                const daysLeft = Math.round(intervalDays - daysSince);
+                return { text: `Due in ${daysLeft}d`, cls: 'on-track', color: '#10b981' };
+            }
+            return { text: 'On track', cls: 'on-track', color: '#10b981' };
+        }
+
+        // Get streak with frequency-appropriate unit
+        function getStreakWithUnit(habit) {
+            const streak = habit._streak || 0;
+            const interval = habit._intervalDays || getIntervalDays(habit);
+            if (interval <= 1.5) return { count: streak, unit: streak === 1 ? 'day' : 'days' };
+            if (interval <= 10) return { count: streak, unit: streak === 1 ? 'day' : 'days' };
+            if (interval <= 45) {
+                const months = Math.floor(streak / 30);
+                if (months > 0) return { count: months, unit: months === 1 ? 'month' : 'months' };
+                return { count: streak, unit: streak === 1 ? 'day' : 'days' };
+            }
+            return { count: streak, unit: streak === 1 ? 'day' : 'days' };
+        }
+
+        // Get progress for N cycles back
+        function getCycleProgress(habit, numCycles) {
+            const checkins = allCheckins[habit.id] || [];
+            const interval = habit._intervalDays || getIntervalDays(habit);
+            const windowDays = Math.round(interval * numCycles);
+            const now = new Date();
+            const stamps = [];
+            for (let i = 0; i < windowDays; i++) {
+                const d = new Date(now); d.setDate(d.getDate() - i);
+                stamps.push(getStamp(d));
+            }
+            const done = checkins.filter(c => c.status === 2 && stamps.includes(c.checkinStamp)).length;
+            const pct = numCycles > 0 ? Math.min(100, Math.round((done / numCycles) * 100)) : 0;
+            return { done, expected: numCycles, pct, windowDays };
+        }
+
+        // Get adaptive progress windows based on frequency
+        function getAdaptiveWindows(habit) {
+            const interval = habit._intervalDays || getIntervalDays(habit);
+            const ageDays = getHabitAge(habit);
+            const fetchedLookback = interval > 7 ? Math.min(Math.round(interval * 3), 365) : 30;
+            const maxCycles = Math.floor(Math.min(ageDays, fetchedLookback) / interval);
+
+            if (interval <= 1.5) {
+                return [
+                    { label: 'Today', cycles: 1 },
+                    { label: 'Last 7 days', cycles: Math.min(7, maxCycles) },
+                    { label: 'Last 30 days', cycles: Math.min(30, maxCycles) },
+                ].filter(w => w.cycles >= 1);
+            }
+            if (interval <= 5) {
+                return [
+                    { label: 'This week', cycles: Math.min(Math.round(7 / interval), maxCycles) },
+                    { label: 'Last 4 weeks', cycles: Math.min(Math.round(28 / interval), maxCycles) },
+                    { label: 'Last 7 weeks', cycles: Math.min(Math.round(49 / interval), maxCycles) },
+                ].filter(w => w.cycles >= 1);
+            }
+            if (interval <= 10) {
+                return [
+                    { label: 'This week', cycles: 1 },
+                    { label: 'Last 7 weeks', cycles: Math.min(7, maxCycles) },
+                    { label: 'Last 12 weeks', cycles: Math.min(12, maxCycles) },
+                ].filter(w => w.cycles >= 1);
+            }
+            if (interval <= 45) {
+                return [
+                    { label: 'This month', cycles: 1 },
+                    { label: 'Last 3 months', cycles: Math.min(3, maxCycles) },
+                    { label: 'Last 7 months', cycles: Math.min(7, maxCycles) },
+                ].filter(w => w.cycles >= 1);
+            }
+            return [
+                { label: 'This cycle', cycles: 1 },
+                { label: 'Last 4 cycles', cycles: Math.min(4, maxCycles) },
+                { label: 'Last 7 cycles', cycles: Math.min(7, maxCycles) },
+            ].filter(w => w.cycles >= 1);
+        }
+
+        // Build GitHub-style day heatmap
+        function buildDayHeatmap(habit, numWeeks) {
+            const checkins = allCheckins[habit.id] || [];
+            const doneStamps = new Set(checkins.filter(c => c.status === 2).map(c => c.checkinStamp));
+            const today = new Date();
+            const todayS = todayStamp();
+            const totalDays = numWeeks * 7;
+
+            let html = '<div class="gh-heatmap">';
+            for (let i = totalDays - 1; i >= 0; i--) {
+                const d = new Date(today);
+                d.setDate(today.getDate() - i);
+                const stamp = getStamp(d);
+                const isToday = stamp === todayS;
+                const isBeforeCreation = d < new Date(habit.createdTime);
+
+                if (isBeforeCreation) {
+                    html += '<div class="gh-cell empty"></div>';
+                } else {
+                    const done = doneStamps.has(stamp);
+                    html += `<div class="gh-cell ${done ? 'done' : 'missed'}${isToday ? ' today' : ''}"><div class="gh-tip">${formatDate(d)}${done ? ' ✅' : ''}</div></div>`;
+                }
+            }
+            html += '</div>';
+            return html;
+        }
+
+        // Build cycle-based view (week or month rows)
+        function buildCycleView(habit, mode, count) {
+            const checkins = allCheckins[habit.id] || [];
+            const doneStamps = checkins.filter(c => c.status === 2).map(c => c.checkinStamp);
+            const now = new Date();
+            let html = '';
+
+            if (mode === 'week') {
+                const weekExpected = Math.max(1, Math.ceil(getExpectedWeeklyFreq(habit)));
+                for (let w = 0; w < count; w++) {
+                    const stamps = [];
+                    for (let d = 0; d < 7; d++) {
+                        const dt = new Date(now); dt.setDate(dt.getDate() - (w * 7 + d));
+                        stamps.push(getStamp(dt));
+                    }
+                    const done = doneStamps.filter(s => stamps.includes(s)).length;
+                    const pct = Math.min(100, Math.round((done / weekExpected) * 100));
+                    const color = pct >= 100 ? '#10b981' : pct >= 50 ? '#f59e0b' : (done === 0 ? '#e0e0e0' : '#ef4444');
+                    const label = w === 0 ? 'This week' : w === 1 ? 'Last week' : `${w}w ago`;
+                    html += `<div class="cycle-row">
+                        <div class="cycle-label">${label}</div>
+                        <div class="cycle-bar"><div class="cycle-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+                        <div class="cycle-val">${done}/${weekExpected}</div>
+                        <div class="cycle-check">${pct >= 100 ? '✅' : ''}</div>
+                    </div>`;
+                }
+            } else if (mode === 'month') {
+                for (let m = 0; m < count; m++) {
+                    const monthDate = new Date(now.getFullYear(), now.getMonth() - m, 1);
+                    const monthEnd = new Date(now.getFullYear(), now.getMonth() - m + 1, 0);
+                    const monthStamps = [];
+                    for (let d = 1; d <= monthEnd.getDate(); d++) {
+                        const dt = new Date(monthDate.getFullYear(), monthDate.getMonth(), d);
+                        if (dt <= now) monthStamps.push(getStamp(dt));
+                    }
+                    const done = doneStamps.filter(s => monthStamps.includes(s)).length;
+                    const monthExpected = Math.max(1, Math.round(getExpectedWeeklyFreq(habit) * monthStamps.length / 7));
+                    const pct = Math.min(100, Math.round((done / monthExpected) * 100));
+                    const color = pct >= 80 ? '#10b981' : pct >= 50 ? '#f59e0b' : (done === 0 ? '#e0e0e0' : '#ef4444');
+                    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                    const label = m === 0 ? 'This month' : `${months[monthDate.getMonth()]} '${String(monthDate.getFullYear()).slice(2)}`;
+                    html += `<div class="cycle-row">
+                        <div class="cycle-label">${label}</div>
+                        <div class="cycle-bar"><div class="cycle-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+                        <div class="cycle-val">${done}/${monthExpected}</div>
+                        <div class="cycle-check">${pct >= 80 ? '✅' : ''}</div>
+                    </div>`;
+                }
+            }
+            return html;
+        }
+
+        // Build history bar chart
+        function buildHistoryChart(habit, mode) {
+            const checkins = allCheckins[habit.id] || [];
+            const doneStamps = checkins.filter(c => c.status === 2).map(c => c.checkinStamp);
+            const now = new Date();
+            const bars = [];
+
+            const ageDays = getHabitAge(habit);
+
+            if (mode === 'day') {
+                const dayCount = Math.min(ageDays, 365);
+                for (let i = dayCount - 1; i >= 0; i--) {
+                    const d = new Date(now); d.setDate(d.getDate() - i);
+                    const stamp = getStamp(d);
+                    const done = doneStamps.includes(stamp) ? 1 : 0;
+                    bars.push({ value: done, max: 1, label: formatDate(d) });
+                }
+            } else if (mode === 'week') {
+                const weekExp = Math.max(1, Math.ceil(getExpectedWeeklyFreq(habit)));
+                const weekCount = Math.min(52, Math.ceil(ageDays / 7));
+                for (let w = weekCount - 1; w >= 0; w--) {
+                    const stamps = [];
+                    for (let d = 0; d < 7; d++) {
+                        const dt = new Date(now); dt.setDate(dt.getDate() - (w * 7 + d));
+                        stamps.push(getStamp(dt));
+                    }
+                    const done = doneStamps.filter(s => stamps.includes(s)).length;
+                    bars.push({ value: done, max: weekExp, label: w === 0 ? 'This week' : w === 1 ? 'Last week' : `${w}w ago` });
+                }
+            } else if (mode === 'month') {
+                const monthCount = Math.min(12, Math.ceil(ageDays / 30));
+                for (let m = monthCount - 1; m >= 0; m--) {
+                    const monthDate = new Date(now.getFullYear(), now.getMonth() - m, 1);
+                    const monthEnd = new Date(now.getFullYear(), now.getMonth() - m + 1, 0);
+                    const monthStamps = [];
+                    for (let d = 1; d <= monthEnd.getDate(); d++) {
+                        const dt = new Date(monthDate.getFullYear(), monthDate.getMonth(), d);
+                        if (dt <= now) monthStamps.push(getStamp(dt));
+                    }
+                    const done = doneStamps.filter(s => monthStamps.includes(s)).length;
+                    const monthExp = Math.max(1, Math.round(getExpectedWeeklyFreq(habit) * monthStamps.length / 7));
+                    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                    bars.push({ value: done, max: monthExp, label: months[monthDate.getMonth()] });
+                }
+            }
+
+            const maxVal = Math.max(1, ...bars.map(b => b.value));
+            let html = '<div class="history-bars">';
+            for (const bar of bars) {
+                const heightPct = Math.max(3, (bar.value / maxVal) * 100);
+                const pct = bar.max > 0 ? Math.round((bar.value / bar.max) * 100) : 0;
+                const color = bar.value === 0 ? '#e8e8e8' : (pct >= 80 ? '#10b981' : pct >= 50 ? '#f59e0b' : '#ef4444');
+                html += `<div class="h-bar" style="height:${heightPct}%;background:${color}"><div class="h-tip">${bar.label}: ${bar.value}${bar.max > 1 ? '/' + bar.max : ''}</div></div>`;
+            }
+            html += '</div>';
+            return html;
+        }
+
+        // Heatmap tab switching
+        function switchHeatmap(view) {
+            document.querySelectorAll('.heatmap-tabs .view-tab').forEach(t => t.classList.remove('active'));
+            if (event && event.target) event.target.classList.add('active');
+            ['Day','Week','Month'].forEach(v => {
+                const el = document.getElementById('heatmap' + v);
+                if (el) el.style.display = v.toLowerCase() === view ? 'block' : 'none';
+            });
+        }
+
+        // History tab switching
+        function switchHistory(view) {
+            document.querySelectorAll('.history-tabs .view-tab').forEach(t => t.classList.remove('active'));
+            if (event && event.target) event.target.classList.add('active');
+            const habit = renderedHabits.find(h => h.id === selectedHabitId);
+            if (habit) {
+                document.getElementById('historyContainer').innerHTML = buildHistoryChart(habit, view);
+            }
+        }
+
         function showError(msg) {
             document.getElementById('habitContainer').innerHTML = `<div class="no-data">⚠️ ${msg}</div>`;
         }
@@ -842,18 +1220,18 @@
                 };
                 mapped._urgency = calcUrgency(h);
                 const dStamps = (allCheckins[h.id] || []).filter(c => c.status === 2).map(c => c.checkinStamp).sort((a,b)=>b-a);
-                const hInterval = getIntervalDays(h);
-                const hLookback = hInterval > 7 ? Math.min(Math.round(hInterval * 3), 365) : 30;
                 let rawDaysSince;
                 if (dStamps.length > 0) {
                     rawDaysSince = Math.max(0, Math.floor((new Date() - stampToDate(dStamps[0])) / 86400000));
-                } else if (h.totalCheckIns > 0) {
-                    rawDaysSince = hLookback; // done before our fetch window
                 } else {
-                    rawDaysSince = getHabitAge(h); // truly never done
+                    rawDaysSince = getHabitAge(h); // no stamps → use habit age
                 }
                 mapped._daysSinceLast = Math.min(rawDaysSince, getHabitAge(h));
                 mapped._outsideWindow = dStamps.length === 0 && h.totalCheckIns > 0;
+                mapped._overdueDays = Math.max(0, mapped._daysSinceLast - mapped._intervalDays);
+                // Consistency: 1 = never done, 0 = perfect (done/expected from last 7 cycles)
+                const cp = getCycleProgress(mapped, 7);
+                mapped._consistency = cp.expected > 0 ? Math.max(0, 1 - cp.done / cp.expected) : 0;
                 return mapped;
             });
 
@@ -869,12 +1247,22 @@
 
             const bestStreak = Math.max(0, ...habits.map(h => h._streak));
 
-            document.getElementById('totalHabits').textContent = activeHabits.length;
-            document.getElementById('activeCount').textContent = statusCounts.active;
-            document.getElementById('slippingCount').textContent = statusCounts.slipping;
-            document.getElementById('dyingCount').textContent = statusCounts.dying;
-            document.getElementById('todayScore').textContent = `${todaysDone}/${activeHabits.length}`;
-            document.getElementById('bestStreak').textContent = bestStreak;
+            // Focus summary
+            const overdueCount = activeHabits.filter(h => h._daysSinceLast > h._intervalDays * 1.5).length;
+            const dueTodayCount = activeHabits.filter(h => {
+                const done = (allCheckins[h.id]||[]).some(c => c.checkinStamp === todayStamp() && c.status === 2);
+                return !done && h._daysSinceLast >= h._intervalDays * 0.8;
+            }).length;
+            const streaksAtRisk = activeHabits.filter(h => {
+                const done = (allCheckins[h.id]||[]).some(c => c.checkinStamp === todayStamp() && c.status === 2);
+                return !done && h._streak >= 3 && h._daysSinceLast >= h._intervalDays * 0.8;
+            }).length;
+
+            let summaryHtml = `<div class="focus-chip"><strong>${todaysDone}/${activeHabits.length}</strong> done today</div>`;
+            if (overdueCount > 0) summaryHtml += `<div class="focus-chip alert">⚠️ <strong>${overdueCount}</strong> overdue</div>`;
+            if (dueTodayCount > 0) summaryHtml += `<div class="focus-chip warn">📅 <strong>${dueTodayCount}</strong> due today</div>`;
+            if (streaksAtRisk > 0) summaryHtml += `<div class="focus-chip warn">🔥 <strong>${streaksAtRisk}</strong> streak${streaksAtRisk > 1 ? 's' : ''} at risk</div>`;
+            document.getElementById('focusSummary').innerHTML = summaryHtml;
 
             // Filter
             let filtered = habits;
@@ -885,11 +1273,12 @@
             else if (currentFilter === 'challenge') filtered = habits.filter(h => h._project && h._status !== 'archived');
             else filtered = habits.filter(h => h._status !== 'archived');
 
-            // Sort by urgency DESC (highest neglect first), archived always last
+            // Sort: tier 1 = overdue days DESC, tier 2 = consistency DESC (worst first)
             filtered.sort((a, b) => {
                 if (a._status === 'archived' && b._status !== 'archived') return 1;
                 if (b._status === 'archived' && a._status !== 'archived') return -1;
-                if (Math.abs(b._urgency - a._urgency) > 0.001) return b._urgency - a._urgency;
+                if (Math.abs(b._overdueDays - a._overdueDays) > 0.5) return b._overdueDays - a._overdueDays;
+                if (Math.abs(b._consistency - a._consistency) > 0.01) return b._consistency - a._consistency;
                 return b._daysSinceLast - a._daysSinceLast;
             });
 
@@ -910,43 +1299,97 @@
             }
         }
 
+        // Detect if a unit is time-based (hour/hours/Hour/min/minute/minutes etc.)
+        function isTimerUnit(unit) {
+            if (!unit) return false;
+            return /^(hour|hours|hr|hrs|minute|minutes|min|mins)$/i.test(unit.trim());
+        }
+        function isHourUnit(unit) {
+            if (!unit) return false;
+            return /^(hour|hours|hr|hrs)$/i.test(unit.trim());
+        }
+
+        // Timer progress bar for habits with time-based units
+        // Uses pomodoro stats (actual timer minutes today) not checkin value
+        function renderTimerProgress(habit, todayCheckin) {
+            if (!isTimerUnit(habit.unit)) return '';
+            const goal = habit.goal || 1;
+            const timerMinutes = pomodoroStats[habit.name] || 0;
+            const goalMinutes = isHourUnit(habit.unit) ? goal * 60 : goal;
+            const pct = Math.min(100, Math.round((timerMinutes / goalMinutes) * 100));
+            const isComplete = timerMinutes >= goalMinutes;
+
+            // Format display
+            const displayValue = timerMinutes >= 60 ? `${Math.floor(timerMinutes/60)}h ${timerMinutes%60}m` : `${timerMinutes}m`;
+            const displayGoal = goalMinutes >= 60 ? `${Math.floor(goalMinutes/60)}h${goalMinutes%60 > 0 ? ' ' + goalMinutes%60 + 'm' : ''}` : `${goalMinutes}m`;
+
+            const barColor = isComplete ? '#10b981' : pct >= 50 ? '#f59e0b' : '#3b82f6';
+            return `
+                <div class="timer-progress">
+                    <div class="timer-progress-header">
+                        <span>⏱️ ${displayValue} / ${displayGoal}</span>
+                        <span style="color:${barColor};font-weight:600">${isComplete ? '✓ Done' : pct + '%'}</span>
+                    </div>
+                    <div class="timer-progress-bar">
+                        <div class="timer-progress-fill" style="width:${pct}%;background:${barColor}"></div>
+                    </div>
+                </div>`;
+        }
+
         function renderHabitItem(habit) {
             const checkins = allCheckins[habit.id] || [];
             const today = todayStamp();
-            const todayDone = checkins.some(c => c.checkinStamp === today && c.status === 2);
+            const todayCheckin = checkins.find(c => c.checkinStamp === today);
+            const todayDone = todayCheckin && todayCheckin.status === 2;
+            const status = getStatusTag(habit);
+            const streakInfo = getStreakWithUnit(habit);
 
-            // Weekly progress
-            const weekCheckins = checkins.filter(c => {
-                const d = stampToDate(c.checkinStamp);
-                const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
-                return c.status === 2 && d >= weekAgo;
-            }).length;
-            const weeklyPct = habit._weeklyExpected > 0 ? Math.min(100, Math.round((weekCheckins / habit._weeklyExpected) * 100)) : 0;
-            let barColor = '#ef4444';
-            if (weeklyPct >= 80) barColor = '#10b981';
-            else if (weeklyPct >= 50) barColor = '#f59e0b';
+            // Build 7 cycle dots (most recent on right)
+            const interval = habit._intervalDays || 1;
+            const doneStamps = new Set(checkins.filter(c => c.status === 2).map(c => c.checkinStamp));
+            const now = new Date();
+            const ageDays = getHabitAge(habit);
+            let dotsHtml = '';
+            let doneCount = 0;
+            for (let i = 6; i >= 0; i--) {
+                // Each cycle: check if any checkin exists in that cycle's window
+                const cycleStart = Math.round(i * interval);
+                const cycleEnd = Math.round((i + 1) * interval);
+                if (cycleStart >= ageDays) {
+                    dotsHtml += '<div class="cycle-dot future"></div>';
+                    continue;
+                }
+                let hasDone = false;
+                for (let d = cycleStart; d < cycleEnd; d++) {
+                    const dt = new Date(now); dt.setDate(dt.getDate() - d);
+                    if (doneStamps.has(getStamp(dt))) { hasDone = true; break; }
+                }
+                if (hasDone) doneCount++;
+                dotsHtml += `<div class="cycle-dot ${hasDone ? 'done' : 'missed'}"></div>`;
+            }
 
-            const monthly = getMonthlyScore(habit);
-            const grade = getGrade(monthly.pct);
             const isSelected = habit.id === selectedHabitId;
+            const isTimer = isTimerUnit(habit.unit);
+            const typeBadge = isTimer ? '<span class="habit-type-badge timer">⏱️ Timer</span>' : '<span class="habit-type-badge checkin">✓ Check-in</span>';
 
             return `
             <div class="habit-item ${habit._status} ${isSelected ? 'selected' : ''}" onclick="selectHabit('${habit.id}')">
                 <div class="habit-item-header">
                     <div class="habit-item-name">${todayDone ? '✅' : '⬜'} ${habit.name}</div>
                     <div class="habit-item-right">
-                        <span class="grade-badge grade-${grade}">${grade}</span>
-                        <span class="urgency-badge urgency-${habit._urgency >= 3 ? 'high' : habit._urgency >= 1 ? 'med' : 'low'}" title="Urgency score">${habit._urgency.toFixed(1)}</span>
+                        ${typeBadge}
+                        <span class="status-tag" style="background:${status.color}22;color:${status.color}">${status.text}</span>
                     </div>
                 </div>
                 <div class="habit-item-meta">
                     <span>🔄 ${parseRepeatRule(habit.repeatRule)}</span>
-                    <span>🔥 ${habit._streak} streak</span>
-                    <span>${weekCheckins}/${Math.ceil(habit._weeklyExpected)} this week</span>
+                    <span>🔥 ${streakInfo.count} ${streakInfo.unit}</span>
                 </div>
-                <div class="habit-item-bar">
-                    <div class="habit-item-bar-fill" style="width:${weeklyPct}%;background:${barColor}"></div>
+                <div class="cycle-dots">
+                    ${dotsHtml}
+                    <span style="font-size:9px;color:#666;margin-left:4px">${doneCount}/7</span>
                 </div>
+                ${renderTimerProgress(habit, todayCheckin)}
             </div>`;
         }
 
@@ -974,197 +1417,122 @@
             const today = todayStamp();
             const todayDone = checkins.some(c => c.checkinStamp === today && c.status === 2);
             const ageDays = getHabitAge(habit);
+            const intervalDays = habit._intervalDays;
+            const status = getStatusTag(habit);
+            const streakInfo = getStreakWithUnit(habit);
+            const bestStreak = calcBestStreak(habit.id);
+            const streakGap = bestStreak - habit._streak;
+            const streakColor = habit._streak >= 7 ? '#10b981' : habit._streak >= 3 ? '#f59e0b' : '#ef4444';
 
-            // Weekly done
+            // ── Weekly stats (for nudge/trend) ──
             const weekWindow = Math.min(ageDays, 7);
             const weekCutoff = new Date(); weekCutoff.setDate(weekCutoff.getDate() - weekWindow);
             const weekCheckins = checkins.filter(c => {
                 const d = stampToDate(c.checkinStamp);
                 return c.status === 2 && d >= weekCutoff;
             }).length;
-            const weekExpected = Math.max(1, Math.ceil(habit._weeklyExpected * weekWindow / 7));
-            const youOwe = Math.max(0, weekExpected - weekCheckins);
+            const weekExpected = Math.max(1, Math.ceil(getExpectedWeeklyFreq(habit) * weekWindow / 7));
 
-            // Monthly score (age-aware)
-            const monthly = getMonthlyScore(habit);
-            const grade = getGrade(monthly.pct);
-            const gradeColor = {A:'#10b981',B:'#6ee7b7',C:'#fcd34d',D:'#fdba74',F:'#ef4444'}[grade];
-
-            // Streaks
-            const bestStreak = calcBestStreak(habit.id);
-            const streakColor = habit._streak >= 7 ? '#10b981' : habit._streak >= 3 ? '#f59e0b' : '#ef4444';
-            const streakGap = bestStreak - habit._streak;
-
-            // Last done
-            const doneStamps = checkins.filter(c => c.status === 2).map(c => c.checkinStamp).sort((a, b) => b - a);
-            let daysSinceLast = '-';
-            if (doneStamps.length > 0) {
-                daysSinceLast = Math.max(0, Math.floor((new Date() - stampToDate(doneStamps[0])) / 86400000));
-            }
-
-            // ── Urgency Breakdown ──
-            const intervalDays = habit._intervalDays;
-            const fetchedLookback = intervalDays > 7 ? Math.min(Math.round(intervalDays * 3), 365) : 30;
-
-            const detailScheduledDays = getByDaySchedule(habit);
-            let doneCnt, urgencyExpected, uWindowDays, consistency, starvation, starvationLabel, opportunitiesLabel;
-
-            if (detailScheduledDays) {
-                // BYDAY-aware: count actual scheduled slots
-                uWindowDays = Math.min(ageDays, fetchedLookback);
-                const detailSlots = getByDaySlots(detailScheduledDays, uWindowDays);
-                urgencyExpected = detailSlots.length;
-                doneCnt = checkins.filter(c => c.status === 2 && detailSlots.includes(c.checkinStamp)).length;
-                consistency = Math.max(0, urgencyExpected - doneCnt) / Math.max(urgencyExpected, 1);
-                const doneStampsDetail = checkins.filter(c => c.status === 2).map(c => c.checkinStamp).sort((a,b) => b-a);
-                starvation = doneStampsDetail.length > 0
-                    ? detailSlots.filter(s => s > doneStampsDetail[0]).length
-                    : urgencyExpected;
-                const schedLabel = detailScheduledDays.length === 7 ? 'daily' : detailScheduledDays.map(d => ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d]).join('+');
-                starvationLabel = `${starvation} missed slot${starvation !== 1 ? 's' : ''}`;
-                opportunitiesLabel = `<strong style="color:#777">${urgencyExpected} slots</strong> <span style="color:#333">(${schedLabel})</span>`;
+            // ── Nudge ──
+            let nudge = '';
+            if (todayDone) {
+                nudge = `✅ <strong>Done today!</strong> `;
+                if (habit._streak >= 3) nudge += `You're on a ${streakInfo.count}-${streakInfo.unit} streak — keep it going!`;
+                else nudge += `Great start. Come back tomorrow to build your streak!`;
+                if (habit._streak > 0 && habit._streak >= bestStreak) nudge += ` 🏆 <strong>New record!</strong>`;
+            } else if (habit._streak >= 3 && streakGap <= 3 && streakGap > 0) {
+                nudge = `🔥 Your <strong>${streakInfo.count}-${streakInfo.unit} streak</strong> is at risk! Do it now — only <strong>${streakGap} more</strong> to beat your best of ${bestStreak}!`;
+            } else if (habit._streak >= 3) {
+                nudge = `🔥 You have a <strong>${streakInfo.count}-${streakInfo.unit} streak</strong> going. Don't break it — check in today!`;
+            } else if (habit._streak === 0 && habit._daysSinceLast > intervalDays * 2) {
+                nudge = `💡 <strong>Start fresh today.</strong> One check-in is all it takes to begin a new streak.`;
             } else {
-                // Use full lookback window (30d for daily/weekly, more for monthly)
-                uWindowDays = Math.min(ageDays, fetchedLookback);
-                urgencyExpected = uWindowDays / intervalDays;
-                const uWindowStamps = [];
-                for (let i = 0; i < uWindowDays; i++) { const d = new Date(); d.setDate(d.getDate() - i); uWindowStamps.push(getStamp(d)); }
-                doneCnt = checkins.filter(c => c.status === 2 && uWindowStamps.includes(c.checkinStamp)).length;
-                consistency = Math.max(0, urgencyExpected - doneCnt) / Math.max(urgencyExpected, 1);
-                starvation = habit._daysSinceLast / intervalDays;
-                // Friendly label based on interval
-                const freqLabel = intervalDays === 1 ? 'daily' : intervalDays <= 7 ? `every ${Math.round(intervalDays)}d` : `${Math.round(intervalDays)}d cycle`;
-                starvationLabel = `${starvation.toFixed(1)} missed cycles`;
-                if (urgencyExpected < 1) {
-                    opportunitiesLabel = `<strong style="color:#777">first cycle</strong> <span style="color:#333">(${uWindowDays}d old · due every ${Math.round(intervalDays)}d)</span>`;
-                } else {
-                    opportunitiesLabel = `<strong style="color:#777">${Math.round(urgencyExpected)} slots</strong> <span style="color:#333">(${freqLabel})</span>`;
-                }
+                const newStreak = habit._streak + 1;
+                nudge = `💡 <strong>Do it now</strong> → streak goes to <strong>${newStreak}</strong>.`;
+                if (newStreak >= bestStreak && bestStreak > 0) nudge += ` 🏆 That ties your record!`;
+                else if (streakGap > 0 && streakGap <= 5) nudge += ` Only ${streakGap} more to beat your best!`;
             }
 
-            const daysSinceLastNum = habit._daysSinceLast;
-            const urgencyNow = habit._urgency;
-            const urgColor = urgencyNow >= 10 ? '#ef4444' : urgencyNow >= 3 ? '#fcd34d' : '#10b981';
-            // When habit is younger than one full cycle, clamp display expected to 1
-            // (avoids showing "1 / 0.0" for e.g. monthly habit on day 1)
-            const isFirstCycle = ageDays < intervalDays && !detailScheduledDays;
-            const urgExpDisplay = isFirstCycle ? '1' : (urgencyExpected < 1 ? urgencyExpected.toFixed(1) : urgencyExpected.toFixed(0));
-            const displayConsistency = isFirstCycle ? (doneCnt >= 1 ? 0 : 1) : consistency;
-            const behindCount = (urgencyExpected - doneCnt);
+            // ── Progress bars ──
+            const windows = getAdaptiveWindows(habit);
+            let progressHtml = '';
+            for (const w of windows) {
+                const prog = getCycleProgress(habit, w.cycles);
+                const color = prog.pct >= 80 ? '#10b981' : prog.pct >= 50 ? '#f59e0b' : '#ef4444';
+                const doneText = prog.done > 0 && w.cycles === 1 ? `${prog.done}/${prog.expected} ✅` : `${prog.done}/${prog.expected}`;
+                const pctText = w.cycles > 1 ? `${prog.pct}%` : '';
+                const barText = prog.pct > 15 ? `${prog.pct}%` : '';
+                progressHtml += `
+                    <div class="progress-row">
+                        <div class="progress-label">${w.label}</div>
+                        <div class="progress-bar-wrap">
+                            <div class="progress-bar-fill-inner" style="width:${prog.pct}%;background:${color}"></div>
+                            <div class="progress-bar-text">${barText}</div>
+                        </div>
+                        <div class="progress-val">${doneText} ${pctText ? '<span class="progress-pct">' + pctText + '</span>' : ''}</div>
+                    </div>`;
+            }
 
             // ── Trend ──
-            const lastWeekStampsArr = [];
-            for (let i = 7; i < Math.min(14, 7 + ageDays); i++) { const d = new Date(); d.setDate(d.getDate() - i); lastWeekStampsArr.push(getStamp(d)); }
-            const lastWeekDoneCount = checkins.filter(c => c.status === 2 && lastWeekStampsArr.includes(c.checkinStamp)).length;
-            const lastWeekExp = Math.max(1, Math.ceil(habit._weeklyExpected * lastWeekStampsArr.length / 7));
+            const lastWeekStamps = [];
+            for (let i = 7; i < Math.min(14, 7 + ageDays); i++) { const d = new Date(); d.setDate(d.getDate() - i); lastWeekStamps.push(getStamp(d)); }
+            const lastWeekDone = checkins.filter(c => c.status === 2 && lastWeekStamps.includes(c.checkinStamp)).length;
+            const lastWeekExp = Math.max(1, Math.ceil(getExpectedWeeklyFreq(habit) * lastWeekStamps.length / 7));
             const thisWeekPct = Math.round((weekCheckins / weekExpected) * 100);
-            const lastWeekPct = Math.round((lastWeekDoneCount / lastWeekExp) * 100);
+            const lastWeekPct = Math.round((lastWeekDone / lastWeekExp) * 100);
             const trendDiff = thisWeekPct - lastWeekPct;
             const trendIcon = trendDiff > 5 ? '↑' : trendDiff < -5 ? '↓' : '→';
             const trendColor = trendDiff > 5 ? '#10b981' : trendDiff < -5 ? '#ef4444' : '#f59e0b';
             const trendText = (trendDiff > 0 ? '+' : '') + trendDiff + '% vs last week';
+            let milestone = '';
+            if (habit._streak > 0 && habit._streak >= bestStreak) milestone = '🏆 Longest streak ever!';
 
-            // ── Impact Simulator ──
-            const urgencyIfToday = (() => {
-                if (todayDone) return urgencyNow;
-                const nd = doneCnt + 1;
-                const nc = Math.max(0, urgencyExpected - nd) / Math.max(urgencyExpected, 1);
-                return Math.max(0, nc); // starvation=0: done today
-            })();
-            const urgencyAfter7 = (() => {
-                const extra = Math.round(7 / intervalDays);
-                const nd = doneCnt + extra + (todayDone ? 0 : 1);
-                const nc = Math.max(0, urgencyExpected - nd) / Math.max(urgencyExpected, 1);
-                return Math.max(0, nc);
-            })();
+            // ── Heatmap ── (show full history up to 1 year)
+            const defaultView = intervalDays <= 1.5 ? 'day' : intervalDays <= 10 ? 'week' : 'month';
+            const heatmapWeeks = Math.min(52, Math.ceil(Math.min(ageDays, 365) / 7));
+            const dayHeatmapHtml = buildDayHeatmap(habit, heatmapWeeks);
+            const weekViewHtml = buildCycleView(habit, 'week', Math.min(52, Math.ceil(ageDays / 7)));
+            const monthViewHtml = buildCycleView(habit, 'month', Math.min(12, Math.ceil(ageDays / 30)));
 
-            // ── Dynamic Nudge ──
-            let nudge = '';
-            if (todayDone) {
-                nudge = `✅ <strong>Done today!</strong> `;
-                if (habit._streak >= 3) nudge += `You're on a ${habit._streak}-day streak — keep it going!`;
-                else nudge += `Great start. Come back tomorrow to build your streak to ${habit._streak + 1}!`;
-            } else {
-                const newWeekDone = weekCheckins + 1;
-                const newWeekPct = Math.min(100, Math.round((newWeekDone / weekExpected) * 100));
-                const newStreak = habit._streak + 1;
-                nudge = `💡 <strong>Do it now</strong> → week: ${weekCheckins}/${weekExpected} → <strong>${newWeekDone}/${weekExpected} (${newWeekPct}%)</strong>`;
-                nudge += ` · streak: ${habit._streak} → <strong>${newStreak}</strong>`;
-                if (newStreak > bestStreak) nudge += ` 🏆 <strong>New record!</strong>`;
-                else if (streakGap <= 3 && streakGap > 0) nudge += ` · only <strong>${streakGap} more</strong> to beat your best!`;
-            }
+            // ── History chart ──
+            const historyHtml = buildHistoryChart(habit, defaultView);
 
-            // ── Coach Tip ──
-            const dayOfWeekCounts = [0,0,0,0,0,0,0];
-            checkins.filter(c => c.status === 2).forEach(c => {
-                dayOfWeekCounts[stampToDate(c.checkinStamp).getDay()]++;
-            });
-            const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-            const maxDayCount = Math.max(1, ...dayOfWeekCounts);
-            const strongDays = dayNames.filter((_, i) => dayOfWeekCounts[i] >= maxDayCount * 0.6);
-            const weakDays = dayNames.filter((_, i) => dayOfWeekCounts[i] === 0 || dayOfWeekCounts[i] < maxDayCount * 0.2);
-
+            // ── Coach tip ──
+            const monthly = getMonthlyScore(habit);
             let coachTip = '';
-            if (grade === 'F' || grade === 'D') {
-                if (ageDays <= 7) {
-                    coachTip = `🌱 This habit is <strong>only ${ageDays} day${ageDays === 1 ? '' : 's'} old</strong>. Focus on doing it just ${Math.ceil(habit._weeklyExpected)} times this week — small wins build momentum.`;
-                } else {
-                    coachTip = `⚠️ You did <strong>${monthly.done} of ${monthly.expected}</strong> in the last ${monthly.windowDays} days. Start with a <strong>3-day streak</strong> — that alone will move you from ${grade} to at least D.`;
-                    if (strongDays.length > 0) coachTip += ` You're strongest on <strong>${strongDays.join(', ')}</strong> — schedule it on those days first.`;
-                }
-            } else if (grade === 'C') {
-                coachTip = `📈 You're almost there — <strong>${monthly.done}/${monthly.expected}</strong>. `;
-                if (weakDays.length > 0 && weakDays.length <= 4) coachTip += `Add <strong>${weakDays.slice(0,2).join(' & ')}</strong> to your routine and you'll hit B grade.`;
-                else coachTip += `Just ${Math.ceil(monthly.expected * 0.6) - monthly.done} more check-ins in the next week would push you to <strong>B</strong>.`;
-            } else if (grade === 'B') {
-                coachTip = `🔥 Solid work — <strong>${monthly.done}/${monthly.expected} (${monthly.pct}%)</strong>. A few more and you'll be grade <strong>A</strong>! ${habit._streak >= 3 ? `Your ${habit._streak}-day streak is 💪.` : 'Try building a 5+ day streak.'}`;
+            if (habit._streak > 0 && streakGap > 0 && streakGap <= 3) {
+                coachTip = `🔥 You're <strong>${streakGap} ${streakInfo.unit}</strong> away from beating your all-time record of ${bestStreak}!`;
+            } else if (trendDiff < -10) {
+                coachTip = `📉 You dropped ${Math.abs(trendDiff)}% from last week. Pick just one day to get back on track.`;
+            } else if (trendDiff > 10) {
+                coachTip = `📈 Up ${trendDiff}% this week — you're building real momentum!`;
+            } else if (monthly.pct >= 80) {
+                coachTip = `🏆 <strong>${monthly.done}/${monthly.expected}</strong> this month — crushing it! ${habit._streak >= 7 ? "Don't break the chain!" : 'Push for a 7+ day streak!'}`;
+            } else if (monthly.pct < 30 && ageDays > 14) {
+                coachTip = `💡 Start small — just do it today. One day starts a streak. That streak builds the habit.`;
             } else {
-                coachTip = `🏆 <strong>Crushing it!</strong> ${monthly.done}/${monthly.expected} (${monthly.pct}%). ${habit._streak >= 7 ? `${habit._streak}-day streak is amazing — don't break the chain!` : 'Now try pushing your streak to 7+ days!'}`;
-            }
-
-            // ── Heatmap (age-aware, max 60 days) ──
-            const heatmapDays = Math.min(ageDays, 60);
-            let heatmapHtml = '';
-            const checkinStamps = new Set(checkins.filter(c => c.status === 2).map(c => c.checkinStamp));
-            const partialStamps = new Set(checkins.filter(c => c.status === 0 && c.value > 0).map(c => c.checkinStamp));
-            for (let i = heatmapDays - 1; i >= 0; i--) {
-                const d = new Date(); d.setDate(d.getDate() - i);
-                const stamp = getStamp(d);
-                const dateStr = formatDate(d);
-                let cls = 'checkin-day';
-                if (stamp === today) cls += ' today';
-                else if (checkinStamps.has(stamp)) cls += ' done';
-                else if (partialStamps.has(stamp)) cls += ' partial';
-                else cls += ' missed';
-                heatmapHtml += `<div class="${cls}"><div class="checkin-tooltip">${dateStr}</div></div>`;
-            }
-
-            // ── Weekly breakdown (age-aware, max 4 weeks) ──
-            const maxWeeks = Math.min(4, Math.ceil(ageDays / 7));
-            const weeklyBreakdown = [];
-            for (let w = 0; w < maxWeeks; w++) {
-                const stamps = [];
-                for (let d = 0; d < 7; d++) {
-                    const dt = new Date(); dt.setDate(dt.getDate() - (w * 7 + d));
-                    if ((w * 7 + d) < ageDays) stamps.push(getStamp(dt));
+                const dayOfWeekCounts = [0,0,0,0,0,0,0];
+                checkins.filter(c => c.status === 2).forEach(c => { dayOfWeekCounts[stampToDate(c.checkinStamp).getDay()]++; });
+                const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+                const maxDayCount = Math.max(1, ...dayOfWeekCounts);
+                const strongDays = dayNames.filter((_, i) => dayOfWeekCounts[i] >= maxDayCount * 0.6);
+                if (strongDays.length > 0 && strongDays.length < 5) {
+                    coachTip = `💪 You're strongest on <strong>${strongDays.join(' & ')}</strong>. Use that momentum on other days too.`;
+                } else {
+                    coachTip = `💡 Consistency beats intensity. Show up today, even if it's less than your target.`;
                 }
-                const done = checkins.filter(c => c.status === 2 && stamps.includes(c.checkinStamp)).length;
-                const exp = Math.max(1, Math.ceil(habit._weeklyExpected * stamps.length / 7));
-                const pct = Math.min(100, Math.round((done / exp) * 100));
-                const label = w === 0 ? 'This week' : w === 1 ? 'Last week' : `${w} wks ago`;
-                weeklyBreakdown.push({ label, done, expected: exp, pct });
             }
 
-            // Challenge link
-            let challengeHtml = '';
-            if (habit._project) {
-                challengeHtml = `<div style="margin-bottom:12px;padding:8px 12px;background:#1a1a2a;border:1px solid #4f46e5;border-radius:6px;font-size:11px;color:#a78bfa">⚔️ Linked to project: <strong>${habit._project.name}</strong></div>`;
-            }
-
-            // Goal info
+            // ── Goal info ──
             let goalInfo = '';
             if (habit.type === 'Real' && habit.goal > 1) goalInfo = `🎯 ${habit.goal} ${habit.unit || ''} per day`;
             if (habit.targetDays > 0) goalInfo += (goalInfo ? ' · ' : '') + `📅 ${habit.targetDays}-day target`;
+
+            // ── Challenge link ──
+            let challengeHtml = '';
+            if (habit._project) {
+                challengeHtml = `<div style="margin-bottom:12px;padding:8px 12px;background:#eef0ff;border:1px solid #c7d2fe;border-radius:6px;font-size:11px;color:#4338ca">⚔️ Linked to project: <strong>${habit._project.name}</strong></div>`;
+            }
 
             panel.innerHTML = `
                 <div class="detail-header">
@@ -1172,148 +1540,73 @@
                     <div class="detail-subtitle">
                         <span>🔄 ${parseRepeatRule(habit.repeatRule)}</span>
                         ${goalInfo ? `<span>${goalInfo}</span>` : ''}
+                        <span style="color:${status.color}">${status.text}</span>
                     </div>
                     <div class="detail-actions">
-                        <button class="checkin-btn ${todayDone ? 'checked' : ''}" onclick="toggleCheckin('${habit.id}')">
+                        <button class="checkin-btn ${todayDone ? 'checked' : ''}" onclick="toggleCheckin('${habit.id}')" style="flex:1;font-size:14px;padding:12px 20px">
                             ${todayDone ? '✅ Done today' : '⬜ Check in today'}
                         </button>
-                        <span class="habit-badge ${habit._status}" style="font-size:10px;padding:4px 10px">${habit._status.toUpperCase()}</span>
                     </div>
                 </div>
 
                 <div class="nudge">${nudge}</div>
 
-                <div style="background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:16px;margin-bottom:14px">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #252525">
-                        <div>
-                            <div style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Schedule</div>
-                            <div style="font-size:18px;font-weight:700;color:#fff">${parseRepeatRule(habit.repeatRule)}</div>
-                        </div>
-                        <div style="text-align:right">
-                            <div style="font-size:14px;font-weight:700;color:${trendColor}">${trendIcon} ${trendText}</div>
-                            <div style="font-size:9px;color:#555;margin-top:3px">Last week ${lastWeekPct}% → This week ${thisWeekPct}%</div>
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom:6px;font-size:11px;color:#555">Last ${opportunitiesLabel}</div>
-                    <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:4px">
-                        <span style="font-size:52px;font-weight:800;color:${doneCnt >= urgencyExpected ? '#10b981' : '#ef4444'};line-height:1">${doneCnt}</span>
-                        <span style="font-size:26px;color:#333;font-weight:300">/ ${urgExpDisplay}</span>
-                        <span style="font-size:24px;font-weight:700;color:${displayConsistency <= 0.2 ? '#10b981' : displayConsistency <= 0.5 ? '#fcd34d' : '#ef4444'}">${Math.round((1-displayConsistency)*100)}%</span>
-                    </div>
-                    <div style="font-size:11px;color:#555;margin-bottom:10px">slots completed &nbsp;·&nbsp; ${isFirstCycle ? (doneCnt >= 1 ? 'first cycle done ✅' : 'within first cycle 🌱') : doneCnt >= urgencyExpected ? 'on track ✅' : behindCount.toFixed(0) + ' behind target'}</div>
-                    <div style="height:8px;background:#252525;border-radius:4px;overflow:hidden">
-                        <div style="width:${Math.min(100,(1-displayConsistency)*100).toFixed(1)}%;height:100%;background:linear-gradient(90deg,#ef4444,#10b981);border-radius:4px"></div>
-                    </div>
-
-                    <div style="margin-top:14px;padding-top:12px;border-top:1px solid #252525">
-                        <div style="font-size:9px;color:#555;text-transform:uppercase;margin-bottom:4px">Starvation (cycles missed)</div>
-                        <div style="display:flex;align-items:baseline;gap:8px">
-                            <span style="font-size:28px;font-weight:700;color:${starvation === 0 ? '#10b981' : starvation >= 3 ? '#ef4444' : '#fcd34d'}">${starvation.toFixed(1)}</span>
-                            <span style="font-size:12px;color:#666">${daysSinceLastNum === 0 ? '✅ done today' : detailScheduledDays ? `(${Math.round(starvation)} slot${Math.round(starvation) !== 1 ? 's' : ''} missed)` : `(${daysSinceLastNum}d / ${intervalDays.toFixed(1)}d cycle)`}</span>
-                        </div>
-                    </div>
-                </div>
-
-                ${habit.encouragement ? `<div class="detail-encourage">"${habit.encouragement}"</div>` : ''}
                 ${challengeHtml}
+                ${habit.encouragement ? `<div class="detail-encourage">"${habit.encouragement}"</div>` : ''}
 
-                <div class="analysis-grid">
-                    <div class="a-card">
-                        <div class="a-card-val" style="color:${youOwe > 0 ? '#ef4444' : '#10b981'}">${weekCheckins} / ${weekExpected}</div>
-                        <div class="a-card-lbl">This Week${youOwe > 0 ? ` (${youOwe} left)` : ''}</div>
+                <div class="hero-cards">
+                    <div class="hero-card">
+                        <div class="hero-card-val" style="color:${streakColor}">🔥 ${streakInfo.count}</div>
+                        <div class="hero-card-label">${streakInfo.unit} streak</div>
+                        ${habit._streak > 0 && habit._streak >= bestStreak ? '<div class="hero-card-sub" style="color:#fcd34d">🏆 New record!</div>' : ''}
                     </div>
-                    <div class="a-card">
-                        <div class="a-card-val" style="color:${streakColor}">🔥 ${habit._streak}</div>
-                        <div class="a-card-lbl">Streak</div>
-                    </div>
-                    <div class="a-card">
-                        <div class="a-card-val" style="color:#a78bfa">${streakGap > 0 ? streakGap + ' to go' : '🏆 Record!'}</div>
-                        <div class="a-card-lbl">Beat Best (${bestStreak})</div>
+                    <div class="hero-card">
+                        <div class="hero-card-val" style="color:#a78bfa">🏆 ${bestStreak}</div>
+                        <div class="hero-card-label">best ever</div>
+                        <div class="hero-card-sub" style="color:${streakGap > 0 ? '#888' : '#10b981'}">${streakGap > 0 ? streakGap + ' to beat' : "You're the best!"}</div>
                     </div>
                 </div>
 
-                <div style="background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:14px;margin-bottom:18px">
-                    <div style="font-size:11px;font-weight:600;color:#aaa;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">💡 Impact of Action</div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;text-align:center">
-                        <div style="padding:8px">
-                            <div style="font-size:9px;color:#555;text-transform:uppercase;margin-bottom:6px">Right Now</div>
-                            <div style="font-size:26px;font-weight:700;color:${urgColor}">${urgencyNow.toFixed(1)}</div>
-                            <div style="font-size:9px;color:#555;margin-top:3px">urgency</div>
+                <div class="progress-section">
+                    <div style="font-size:11px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">📊 Progress</div>
+                    ${progressHtml}
+                </div>
+
+                <div class="trend-line">
+                    <span class="trend-arrow" style="color:${trendColor}">${trendIcon}</span>
+                    <span style="color:${trendColor}">${trendText}</span>
+                    ${milestone ? `<span style="margin-left:auto;font-size:11px">${milestone}</span>` : ''}
+                </div>
+
+                <div class="detail-section">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                        <div class="detail-section-title" style="margin-bottom:0">📅 Calendar</div>
+                        <div class="view-tabs heatmap-tabs">
+                            <button class="view-tab ${defaultView === 'day' ? 'active' : ''}" onclick="switchHeatmap('day')">Day</button>
+                            <button class="view-tab ${defaultView === 'week' ? 'active' : ''}" onclick="switchHeatmap('week')">Week</button>
+                            <button class="view-tab ${defaultView === 'month' ? 'active' : ''}" onclick="switchHeatmap('month')">Month</button>
                         </div>
-                        <div style="padding:8px;border-left:1px solid #333;border-right:1px solid #333">
-                            <div style="font-size:9px;color:#555;text-transform:uppercase;margin-bottom:6px">${todayDone ? 'Done! ✅' : 'Do It Today'}</div>
-                            <div style="font-size:26px;font-weight:700;color:#10b981">${urgencyIfToday.toFixed(1)}</div>
-                            <div style="font-size:9px;color:#10b981;margin-top:3px">${urgencyNow > urgencyIfToday ? '−' + (urgencyNow - urgencyIfToday).toFixed(1) + ' drop' : 'no change'}</div>
-                        </div>
-                        <div style="padding:8px">
-                            <div style="font-size:9px;color:#555;text-transform:uppercase;margin-bottom:6px">7-Day Streak</div>
-                            <div style="font-size:26px;font-weight:700;color:#6366f1">${urgencyAfter7.toFixed(1)}</div>
-                            <div style="font-size:9px;color:#6366f1;margin-top:3px">${urgencyNow > urgencyAfter7 ? '−' + (urgencyNow - urgencyAfter7).toFixed(1) + ' drop' : 'no change'}</div>
-                        </div>
+                    </div>
+                    <div>
+                        <div id="heatmapDay" style="display:${defaultView === 'day' ? 'block' : 'none'}">${dayHeatmapHtml}</div>
+                        <div id="heatmapWeek" style="display:${defaultView === 'week' ? 'block' : 'none'}">${weekViewHtml}</div>
+                        <div id="heatmapMonth" style="display:${defaultView === 'month' ? 'block' : 'none'}">${monthViewHtml}</div>
                     </div>
                 </div>
 
                 <div class="detail-section">
-                    <div class="detail-section-title">📅 Last ${heatmapDays} Days</div>
-                    <div class="checkin-grid">${heatmapHtml}</div>
-                </div>
-
-                <div class="detail-section">
-                    <div class="detail-section-title">📊 Weekly Consistency</div>
-                    ${weeklyBreakdown.map(w => {
-                        const wColor = w.pct >= 80 ? '#10b981' : w.pct >= 50 ? '#f59e0b' : '#ef4444';
-                        return `<div class="week-row">
-                            <div class="week-label">${w.label}</div>
-                            <div class="week-bar"><div class="week-bar-fill" style="width:${w.pct}%;background:${wColor}"></div></div>
-                            <div class="week-val">${w.done}/${w.expected}</div>
-                        </div>`;
-                    }).join('')}
-                </div>
-
-                <div class="detail-section">
-                    <div class="detail-section-title">📈 Best Days</div>
-                    ${dayNames.map((name, i) => {
-                        const pct = Math.round((dayOfWeekCounts[i] / maxDayCount) * 100);
-                        const c = dayOfWeekCounts[i];
-                        return `<div class="week-row">
-                            <div class="week-label">${name}</div>
-                            <div class="week-bar"><div class="week-bar-fill" style="width:${pct}%;background:#6366f1"></div></div>
-                            <div class="week-val">${c}x</div>
-                        </div>`;
-                    }).join('')}
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                        <div class="detail-section-title" style="margin-bottom:0">📊 History</div>
+                        <div class="view-tabs history-tabs">
+                            <button class="view-tab ${defaultView === 'day' ? 'active' : ''}" onclick="switchHistory('day')">Day</button>
+                            <button class="view-tab ${defaultView === 'week' ? 'active' : ''}" onclick="switchHistory('week')">Week</button>
+                            <button class="view-tab ${defaultView === 'month' ? 'active' : ''}" onclick="switchHistory('month')">Month</button>
+                        </div>
+                    </div>
+                    <div id="historyContainer">${historyHtml}</div>
                 </div>
 
                 <div class="coach-tip">💬 ${coachTip}</div>
-
-                <div style="background:#0d0d0d;border:1px solid #252525;border-radius:8px;padding:14px;margin-top:16px;font-family:monospace;font-size:11px;color:#666">
-                    <div style="font-size:10px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">📐 Score Breakdown</div>
-                    <div style="color:#888;line-height:1.8">
-                        <div style="color:#a78bfa;margin-bottom:8px"><strong>urgency = consistency + starvation</strong></div>
-                        
-                        <div style="border-left:2px solid #333;padding-left:10px;margin-bottom:10px">
-                            <div style="color:#6ee7b7">// Consistency: how far behind schedule</div>
-                            <div>windowDays = <span style="color:#fff">${uWindowDays}</span></div>
-                            <div>intervalDays = <span style="color:#fff">${intervalDays.toFixed(1)}</span></div>
-                            <div>expected = windowDays / intervalDays = ${uWindowDays} / ${intervalDays.toFixed(1)} = <span style="color:#fff">${urgencyExpected.toFixed(1)}</span></div>
-                            <div>done = <span style="color:#fff">${doneCnt}</span></div>
-                            <div>consistency = max(0, ${urgencyExpected.toFixed(1)} - ${doneCnt}) / max(${urgencyExpected.toFixed(1)}, 1)</div>
-                            <div style="padding-left:20px">= max(0, ${(urgencyExpected - doneCnt).toFixed(1)}) / ${Math.max(urgencyExpected, 1).toFixed(1)}</div>
-                            <div style="padding-left:20px">= <span style="color:#fcd34d;font-weight:bold">${consistency.toFixed(2)}</span></div>
-                        </div>
-                        
-                        <div style="border-left:2px solid #333;padding-left:10px;margin-bottom:10px">
-                            <div style="color:#6ee7b7">// Starvation: cycles since last done</div>
-                            <div>daysSinceLast = <span style="color:#fff">${daysSinceLastNum}</span></div>
-                            <div>starvation = daysSinceLast / intervalDays = ${daysSinceLastNum} / ${intervalDays.toFixed(1)}</div>
-                            <div style="padding-left:20px">= <span style="color:#fcd34d;font-weight:bold">${starvation.toFixed(2)}</span></div>
-                        </div>
-                        
-                        <div style="border-top:1px solid #333;padding-top:8px;margin-top:8px">
-                            <div style="color:#a78bfa">urgency = ${consistency.toFixed(2)} + ${starvation.toFixed(2)} = <span style="color:#fff;font-size:14px;font-weight:bold">${urgencyNow.toFixed(2)}</span></div>
-                        </div>
-                    </div>
-                </div>
             `;
         }
 
@@ -1382,6 +1675,21 @@
                     console.log('[CHECKINS] Failed:', e.message);
                     allCheckins = {};
                 }
+
+                // Fetch today's pomodoro/timer stats for timer-based habits
+                try {
+                    const today = new Date();
+                    const todayStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
+                    const pData = await fetchPomodoroStats(todayStr, todayStr);
+                    pomodoroStats = pData?.taskDurations || {};
+                    console.log(`[POMODORO] Timer stats:`, pomodoroStats);
+                } catch (e) {
+                    console.log('[POMODORO] Skip:', e.message);
+                    pomodoroStats = {};
+                }
+
+                // Auto-complete timer habits if timer >= goal
+                try { await triggerAutoComplete(); } catch (e) { console.log('[AUTO-COMPLETE] Skip:', e.message); }
 
                 const cacheTime = getCacheTime();
                 const fetchTime = window.__HABITS_FETCH_TIME__ || cacheTime;
