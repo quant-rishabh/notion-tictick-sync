@@ -1074,6 +1074,27 @@
             transform: scale(0.95);
         }
 
+        /* Right panel drawer for small screens */
+        .right-panel-toggle {
+            display: none;
+            padding: 6px 10px;
+            font-size: 12px;
+            background: linear-gradient(135deg, #374151, #1f2937);
+            border: 1px solid #555;
+            border-radius: 4px;
+            color: #e0e0e0;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .right-panel-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1998;
+        }
+
         /* Tablet: Hide right panel */
         @media (max-width: 1200px) {
             .main-layout {
@@ -1081,6 +1102,20 @@
             }
             .right-panel {
                 display: none;
+                position: fixed;
+                top: 45px;
+                right: 0;
+                bottom: 0;
+                width: 300px;
+                z-index: 1999;
+                overflow-y: auto;
+                box-shadow: -4px 0 20px rgba(0,0,0,0.5);
+            }
+            .right-panel.open {
+                display: flex;
+            }
+            .right-panel-toggle {
+                display: inline-block;
             }
         }
 
@@ -1121,6 +1156,17 @@
             
             .right-panel {
                 display: none;
+                position: fixed;
+                top: 45px;
+                right: 0;
+                bottom: 0;
+                width: 280px;
+                z-index: 1999;
+                overflow-y: auto;
+                box-shadow: -4px 0 20px rgba(0,0,0,0.5);
+            }
+            .right-panel.open {
+                display: flex;
             }
             
             .nav-bar {
@@ -2565,8 +2611,10 @@
             <a href="focus-dashboard.html" class="nav-link" style="padding: 6px 12px; font-size: 12px; background: linear-gradient(135deg, #667eea, #764ba2);">🎯 Focus</a>
             <a href="habit.html" class="nav-link" style="padding: 6px 12px; font-size: 12px; background: linear-gradient(135deg, #10b981, #059669);">🎯 Habit</a>
             <a href="tree.html" class="nav-link" style="padding: 6px 12px; font-size: 12px;">🌳 Tree</a>
+            <button class="right-panel-toggle" onclick="toggleRightPanel()" id="rightPanelToggleBtn">⚡ Workflow</button>
         </div>
     </div>
+    <div class="right-panel-overlay" id="rightPanelOverlay" onclick="closeRightPanel()"></div>
 
     <!-- Selection Info Bar (hidden) -->
     <div class="selection-info" id="selectionInfo" style="display: none !important;">
@@ -6812,6 +6860,27 @@
         function toggleConfig() {
             const configSection = document.getElementById('configSection');
             configSection.style.display = configSection.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Right panel drawer toggle for small screens
+        function toggleRightPanel() {
+            const panel = document.querySelector('.right-panel');
+            const overlay = document.getElementById('rightPanelOverlay');
+            const isOpen = panel.classList.contains('open');
+            if (isOpen) {
+                panel.classList.remove('open');
+                overlay.style.display = 'none';
+            } else {
+                panel.classList.add('open');
+                overlay.style.display = 'block';
+            }
+        }
+
+        function closeRightPanel() {
+            const panel = document.querySelector('.right-panel');
+            const overlay = document.getElementById('rightPanelOverlay');
+            panel.classList.remove('open');
+            overlay.style.display = 'none';
         }
 
         // Save configuration to localStorage
