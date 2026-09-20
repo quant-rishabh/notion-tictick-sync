@@ -1032,6 +1032,34 @@
             background: #1a73e8;
         }
 
+        #savedAISearchList {
+            max-height: min(42vh, 360px);
+            overflow-y: scroll;
+            overscroll-behavior: contain;
+            padding-right: 3px;
+            scrollbar-width: auto;
+            scrollbar-color: #6b7280 #1a1a1a;
+        }
+
+        #savedAISearchList::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        #savedAISearchList::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 5px;
+        }
+
+        #savedAISearchList::-webkit-scrollbar-thumb {
+            background: #6b7280;
+            border-radius: 5px;
+            border: 2px solid #1a1a1a;
+        }
+
+        #savedAISearchList::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+
         .saved-ai-search-button {
             display: flex;
             align-items: center;
@@ -3882,10 +3910,27 @@
             }
         }
 
-        function getSavedAIResult(searchId) {
+        function getAISearchFilterKey() {
+            const selectedProjects = Array.from(document.querySelectorAll('.project-filter-checkbox:checked'))
+                .map(checkbox => checkbox.value)
+                .sort();
+            return JSON.stringify({
+                date: document.getElementById('dateFilter')?.value || 'all',
+                priority: document.getElementById('priorityFilter')?.value || 'all',
+                project: document.getElementById('projectFilter')?.value || 'all',
+                projects: selectedProjects,
+                context: document.getElementById('contextFilter')?.value || 'all',
+                duration: document.getElementById('durationFilter')?.value || 'all',
+                sort: document.getElementById('sortFilter')?.value || 'all',
+                excludedProjects: JSON.parse(localStorage.getItem('excluded_projects') || '[]').sort()
+            });
+        }
+
+        function getSavedAIResult(searchId, filterKey) {
             try {
                 const results = JSON.parse(localStorage.getItem(AI_SEARCH_RESULTS_KEY) || '{}');
-                return results[searchId] || null;
+                const result = results[searchId] || null;
+                return result && result.filterKey === filterKey ? result : null;
             } catch (error) {
                 return null;
             }
@@ -3941,7 +3986,13 @@
             const search = aiSearches.find(item => item.id === searchId);
             if (!search) return;
 
-            const savedResult = getSavedAIResult(searchId);
+            // Every new search starts from the normal filters, never another AI result.
+            activeAISearch = null;
+            activeAIResult = null;
+            applyPreFiltersInternal();
+            const filterKey = getAISearchFilterKey();
+
+            const savedResult = getSavedAIResult(searchId, filterKey);
             console.log('AI cache lookup:', {
                 searchId,
                 cacheFound: !!savedResult,
@@ -4037,6 +4088,7 @@
                 const taskMap = new Map(filteredTasks.map(task => [task.id, task]));
                 const cachedResult = {
                     searchId: search.id,
+                    filterKey,
                     generatedAt: new Date().toISOString(),
                     summary: result.summary || '',
                     results: (Array.isArray(result.results) ? result.results : [])
