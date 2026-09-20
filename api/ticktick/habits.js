@@ -15,11 +15,19 @@ export default async function handler(req, res) {
     let cookieT = req.query.t || '';
     let csrf = req.query.csrf || '';
     let body = req.body || {};
+    const bearerToken = body.ticktick_token || process.env.TICKTICK_BEARER_TOKEN || '';
 
     if (body.ticktick_cookie_t) cookieT = body.ticktick_cookie_t;
     if (body.ticktick_csrf) csrf = body.ticktick_csrf;
 
-    if (!cookieT || !csrf) {
+    if (body.action === 'checkin' && !bearerToken) {
+        return res.status(401).json({
+            error: 'Missing TickTick API token',
+            help: 'Sign in through the task page first so ticktick_token is available'
+        });
+    }
+
+    if (body.action !== 'checkin' && (!cookieT || !csrf)) {
         return res.status(400).json({
             error: 'Missing credentials',
             help: 'Pass t and csrf in query params or body'
@@ -46,15 +54,20 @@ export default async function handler(req, res) {
                 afterStamp: body.afterStamp
             });
         } else if (body.action === 'checkin') {
-            apiUrl = 'https://api.ticktick.com/api/v2/habitCheckins';
+            apiUrl = `https://api.ticktick.com/open/v1/habit/${encodeURIComponent(body.habitId)}/checkin`;
             method = 'POST';
             requestBody = JSON.stringify({
-                habitId: body.habitId,
-                checkinStamp: body.stamp,
+                stamp: Number(body.stamp),
                 value: body.value,
-                status: body.status,
-                goal: body.goal
+                goal: body.goal || 1,
+                status: body.status
             });
+        }
+
+        if (body.action === 'checkin') {
+            headers['Authorization'] = `Bearer ${bearerToken}`;
+            delete headers['Cookie'];
+            delete headers['x-csrf-token'];
         }
 
         console.log(`[HABITS API] ${method} ${apiUrl}`);

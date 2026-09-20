@@ -299,6 +299,20 @@
         .focus-chip.alert{border-color:#ef4444;color:#dc2626}
         .focus-chip.warn{border-color:#f59e0b;color:#d97706}
 
+        /* Today's mission */
+        .mission{background:#111827;color:#fff;border-radius:10px;padding:14px;margin:0 0 12px}
+        .mission-header{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:10px}
+        .mission-title{font-size:13px;font-weight:700;letter-spacing:.3px}
+        .mission-count{font-size:10px;color:#cbd5e1}
+        .mission-complete{padding:10px 0 2px;color:#a7f3d0;font-size:12px}
+        .mission-item{display:flex;align-items:center;gap:8px;background:#1f2937;border:1px solid #374151;border-radius:7px;padding:9px;margin-top:6px}
+        .mission-rank{font-size:11px;font-weight:700;color:#fbbf24;width:14px;text-align:center;flex-shrink:0}
+        .mission-info{min-width:0;flex:1;cursor:pointer}
+        .mission-name{font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .mission-reason{font-size:9px;color:#cbd5e1;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .mission-action{border:0;border-radius:5px;background:#10b981;color:#052e16;font-size:10px;font-weight:700;padding:7px 9px;cursor:pointer;white-space:nowrap}
+        .mission-action:hover{background:#34d399}
+
         /* Trend line */
         .trend-line{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#fff;border:1px solid #e0e0e0;border-radius:8px;margin-bottom:16px;font-size:12px}
         .trend-arrow{font-size:18px;font-weight:700}
@@ -313,6 +327,8 @@
             .history-bars{height:60px}
             .focus-summary{gap:4px}
             .focus-chip{font-size:10px;padding:3px 8px}
+            .mission{margin-bottom:14px;padding:14px}
+            .mission-action{padding:10px 11px;min-height:40px}
         }
     </style>
 </head>
@@ -335,6 +351,7 @@
                 <div class="focus-summary" id="focusSummary">
                     <div class="focus-chip"><strong>-</strong> done today</div>
                 </div>
+                <div id="todayMission"></div>
 
                 <div class="filters">
                     <button class="filter-btn active" onclick="setFilter('all')">All</button>
@@ -523,6 +540,7 @@
                     value, 
                     status: value === 0 ? 0 : 2, 
                     goal: habit.goal || 1,
+                    ticktick_token: getToken(),
                     ticktick_cookie_t: cookieT,
                     ticktick_csrf: csrf
                 })
@@ -1206,6 +1224,44 @@
 
         // ============ RENDER ============
 
+        function buildMissionHtml(activeHabits) {
+            const today = todayStamp();
+            const unfinished = activeHabits.filter(h => {
+                return !(allCheckins[h.id] || []).some(c => c.checkinStamp === today && c.status === 2);
+            }).map(h => {
+                const overdueRatio = h._intervalDays > 0 ? h._daysSinceLast / h._intervalDays : 0;
+                const streakRisk = h._streak >= 3 && overdueRatio >= 0.8 ? 40 : 0;
+                const overdueScore = Math.max(0, overdueRatio - 0.8) * 30;
+                const missScore = (h._consistency || 0) * 25;
+                const neglectScore = Math.min(20, h._daysSinceLast / Math.max(1, h._intervalDays) * 10);
+                h._missionScore = streakRisk + overdueScore + missScore + neglectScore;
+
+                if (streakRisk > 0) {
+                    return { habit: h, reason: `${h._streak}-day streak is at risk`, action: 'Protect streak' };
+                }
+                if (h._overdueDays > 0) {
+                    return { habit: h, reason: `${Math.round(h._overdueDays)} day${Math.round(h._overdueDays) === 1 ? '' : 's'} overdue`, action: 'Check in' };
+                }
+                if ((h._consistency || 0) >= 0.45) {
+                    return { habit: h, reason: 'Missed too many recent sessions', action: 'Restart momentum' };
+                }
+                return { habit: h, reason: 'Due today', action: 'Check in' };
+            }).sort((a, b) => b.habit._missionScore - a.habit._missionScore).slice(0, 3);
+
+            if (unfinished.length === 0) {
+                return `<div class="mission"><div class="mission-header"><div class="mission-title">TODAY'S MISSION</div><div class="mission-count">${activeHabits.length}/${activeHabits.length} complete</div></div><div class="mission-complete">✓ Everything is done for today. Keep the streak alive.</div></div>`;
+            }
+
+            return `<div class="mission">
+                <div class="mission-header"><div class="mission-title">TODAY'S MISSION</div><div class="mission-count">${unfinished.length} next action${unfinished.length === 1 ? '' : 's'}</div></div>
+                ${unfinished.map((item, index) => `<div class="mission-item">
+                    <div class="mission-rank">${index + 1}</div>
+                    <div class="mission-info" onclick="selectHabit('${item.habit.id}')"><div class="mission-name">${item.habit.name}</div><div class="mission-reason">${item.reason}</div></div>
+                    <button class="mission-action" onclick="toggleCheckin('${item.habit.id}')">${item.action}</button>
+                </div>`).join('')}
+            </div>`;
+        }
+
         function render() {
             const container = document.getElementById('habitContainer');
             
@@ -1257,6 +1313,8 @@
                 const done = (allCheckins[h.id]||[]).some(c => c.checkinStamp === todayStamp() && c.status === 2);
                 return !done && h._streak >= 3 && h._daysSinceLast >= h._intervalDays * 0.8;
             }).length;
+
+            document.getElementById('todayMission').innerHTML = buildMissionHtml(activeHabits);
 
             let summaryHtml = `<div class="focus-chip"><strong>${todaysDone}/${activeHabits.length}</strong> done today</div>`;
             if (overdueCount > 0) summaryHtml += `<div class="focus-chip alert">⚠️ <strong>${overdueCount}</strong> overdue</div>`;
