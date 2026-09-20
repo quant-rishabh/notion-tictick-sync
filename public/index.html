@@ -1007,6 +1007,280 @@
             color: #fbbf24;
         }
 
+        .saved-ai-searches {
+            padding: 12px;
+            border-bottom: 1px solid #e8eaed;
+        }
+
+        .saved-ai-searches-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .saved-ai-searches-header h3 {
+            color: #5f6368;
+            font-size: 12px;
+            margin: 0;
+        }
+
+        .saved-ai-searches-add {
+            padding: 4px 8px;
+            margin: 0;
+            font-size: 10px;
+            background: #1a73e8;
+        }
+
+        .saved-ai-search-button {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 7px 8px;
+            margin: 0 0 5px;
+            text-align: left;
+            font-size: 11px;
+            background: #f8f9fa;
+            color: #202124;
+            border: 1px solid #dadce0;
+        }
+
+        .saved-ai-search-button:hover {
+            background: #e8f0fe;
+            border-color: #1a73e8;
+        }
+
+        .saved-ai-search-row {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 5px;
+            align-items: stretch;
+        }
+
+        .saved-ai-search-row.dragging {
+            opacity: 0.5;
+        }
+
+        .saved-ai-search-order {
+            width: 28px;
+            padding: 0 3px;
+            border: 1px solid #dadce0;
+            background: #f8f9fa;
+            color: #5f6368;
+            font-size: 11px;
+            text-align: center;
+        }
+
+        .saved-ai-search-row .saved-ai-search-button {
+            flex: 1;
+            width: auto;
+            margin: 0;
+        }
+
+        .saved-ai-search-action {
+            width: 28px;
+            padding: 0;
+            margin: 0;
+            border: 1px solid #dadce0;
+            background: #f8f9fa;
+            color: #5f6368;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .saved-ai-search-action:hover {
+            background: #e8f0fe;
+            border-color: #1a73e8;
+            color: #1a73e8;
+        }
+
+        .saved-ai-search-action.delete:hover {
+            background: #fce8e6;
+            border-color: #d93025;
+            color: #d93025;
+        }
+
+        .saved-ai-search-empty {
+            color: #80868b;
+            font-size: 10px;
+            line-height: 1.4;
+        }
+
+        .ai-search-modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 26000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .ai-search-modal {
+            width: 420px;
+            max-width: calc(100vw - 28px);
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #dadce0;
+            border-radius: 10px;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.2);
+        }
+
+        .ai-search-modal h2 {
+            margin-bottom: 16px;
+            color: #202124;
+            font-size: 18px;
+        }
+
+        .ai-search-modal label {
+            color: #5f6368;
+            font-size: 12px;
+        }
+
+        .ai-search-modal textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .ai-search-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .ai-search-modal-actions button {
+            margin: 0;
+            padding: 8px 14px;
+            font-size: 12px;
+        }
+
+        .ai-search-cancel {
+            background: #e8eaed !important;
+            color: #202124 !important;
+        }
+
+        .ai-result-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            background: #e8f0fe;
+            border: 1px solid #aecbfa;
+            border-radius: 8px;
+            color: #174ea6;
+            font-size: 12px;
+        }
+
+        .ai-result-banner button {
+            flex-shrink: 0;
+            padding: 5px 9px;
+            margin: 0;
+            background: #1a73e8;
+            font-size: 10px;
+        }
+
+        .task-details-modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 27000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .task-details-modal {
+            width: 560px;
+            max-width: calc(100vw - 28px);
+            max-height: calc(100vh - 32px);
+            overflow-y: auto;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #dadce0;
+            border-radius: 10px;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.2);
+        }
+
+        .task-details-modal h2 {
+            margin-bottom: 16px;
+            color: #202124;
+            font-size: 18px;
+        }
+
+        .task-details-modal label {
+            display: block;
+            margin: 10px 0 4px;
+            color: #5f6368;
+            font-size: 12px;
+        }
+
+        .task-details-modal input,
+        .task-details-modal textarea,
+        .task-details-modal select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px;
+            background: #f8f9fa;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            color: #202124;
+            font: inherit;
+            font-size: 12px;
+        }
+
+        .task-details-modal textarea {
+            min-height: 76px;
+            resize: vertical;
+        }
+
+        .task-details-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+        }
+
+        .task-details-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .task-details-modal-actions button {
+            margin: 0;
+            padding: 8px 14px;
+            font-size: 12px;
+        }
+
+        .task-details-cancel {
+            background: #e8eaed !important;
+            color: #202124 !important;
+        }
+
+        .task-edit-button {
+            margin-left: 6px;
+            padding: 1px 4px;
+            border: 0;
+            background: transparent;
+            color: #5f6368;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .task-edit-button:hover {
+            color: #1a73e8;
+        }
+
+        @media (max-width: 600px) {
+            .task-details-meta {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .task-expand-icon {
             cursor: pointer;
             user-select: none;
@@ -2616,6 +2890,57 @@
     </div>
     <div class="right-panel-overlay" id="rightPanelOverlay" onclick="closeRightPanel()"></div>
 
+    <div class="ai-search-modal-overlay" id="aiSearchModalOverlay" style="display: none;" onclick="if(event.target === this) closeAISearchModal()">
+        <div class="ai-search-modal">
+            <h2 id="aiSearchModalTitle">Add AI Search</h2>
+            <label for="aiSearchName">Search title</label>
+            <input type="text" id="aiSearchName" placeholder="What can I do in 5 minutes?">
+            <label for="aiSearchInstruction">What should Gemini find?</label>
+            <textarea id="aiSearchInstruction" placeholder="Find tasks I can realistically complete within 5 minutes. Prefer high priority and nearest due dates."></textarea>
+            <div class="ai-search-modal-actions">
+                <button class="ai-search-cancel" onclick="closeAISearchModal()">Cancel</button>
+                <button onclick="saveAISearch()">Save Search</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="task-details-modal-overlay" id="taskDetailsModalOverlay" style="display: none;" onclick="if(event.target === this) closeTaskDetailsModal()">
+        <div class="task-details-modal">
+            <h2>Edit Task</h2>
+            <label for="taskDetailsTitle">Title</label>
+            <input type="text" id="taskDetailsTitle">
+            <label for="taskDetailsDesc">Description</label>
+            <textarea id="taskDetailsDesc" placeholder="Checklist description"></textarea>
+            <label for="taskDetailsContent">Content</label>
+            <textarea id="taskDetailsContent" placeholder="Task notes or details"></textarea>
+            <label for="taskDetailsItems">Items</label>
+            <textarea id="taskDetailsItems" placeholder="One checklist item per line"></textarea>
+            <div class="task-details-meta">
+                <div>
+                    <label for="taskDetailsTags">Tags</label>
+                    <input type="text" id="taskDetailsTags" placeholder="work, urgent">
+                </div>
+                <div>
+                    <label for="taskDetailsPriority">Priority</label>
+                    <select id="taskDetailsPriority">
+                        <option value="0">None</option>
+                        <option value="1">Low</option>
+                        <option value="3">Medium</option>
+                        <option value="5">High</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="taskDetailsDueDate">Due date</label>
+                    <input type="datetime-local" id="taskDetailsDueDate">
+                </div>
+            </div>
+            <div class="task-details-modal-actions">
+                <button class="task-details-cancel" onclick="closeTaskDetailsModal()">Cancel</button>
+                <button onclick="saveTaskDetails()">Save to TickTick</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Selection Info Bar (hidden) -->
     <div class="selection-info" id="selectionInfo" style="display: none !important;">
         <span id="selectionCount">0</span> tasks selected
@@ -3049,6 +3374,7 @@
             <div class="filter-item">
                 <label>⭐ Priority</label>
                 <select id="priorityFilter" onchange="onFilterDropdownChange()">
+                    <option value="high_medium_none">🔴🟡⚪ High + Medium + No Priority</option>
                     <option value="all">All</option>
                     <option value="high">🔴 High</option>
                     <option value="medium">🟡 Medium</option>
@@ -3153,57 +3479,67 @@
                     </select>
                 </div>
                 
-                <!-- Step 1: Assign Time -->
-                <div class="workflow-step" style="margin-bottom: 8px;">
-                    <button onclick="openWorkflowStep('time')" style="width: 100%; padding: 8px; font-size: 11px; background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 4px; color: #fff; cursor: pointer; text-align: left; position: relative;">
-                        <span style="font-weight: bold;">1.</span> ⏱️ Assign Time
-                        <span id="wfTimeBadge" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #fff; color: #000; padding: 2px 6px; border-radius: 10px; font-size: 10px;">0</span>
-                    </button>
-                </div>
-                
-                <!-- Step 2: Goal Start/Later -->
-                <div class="workflow-step" style="margin-bottom: 8px;">
-                    <button onclick="openWorkflowStep('goal')" style="width: 100%; padding: 8px; font-size: 11px; background: linear-gradient(135deg, #8b5cf6, #7c3aed); border: none; border-radius: 4px; color: #fff; cursor: pointer; text-align: left; position: relative;">
-                        <span style="font-weight: bold;">2.</span> 🎯 Goal: Start or Later
-                        <span id="wfGoalBadge" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #fff; color: #000; padding: 2px 6px; border-radius: 10px; font-size: 10px;">0</span>
-                    </button>
-                </div>
-                
-                <!-- Step 3: Assign Priority -->
+                <!-- Step 1: Assign Priority -->
                 <div class="workflow-step" style="margin-bottom: 8px;">
                     <button onclick="openWorkflowStep('priority')" style="width: 100%; padding: 8px; font-size: 11px; background: linear-gradient(135deg, #f59e0b, #d97706); border: none; border-radius: 4px; color: #fff; cursor: pointer; text-align: left; position: relative;">
-                        <span style="font-weight: bold;">3.</span> ⭐ Assign Priority
+                        <span style="font-weight: bold;">1.</span> ⭐ Assign Priority
                         <span id="wfPriBadge" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #fff; color: #000; padding: 2px 6px; border-radius: 10px; font-size: 10px;">0</span>
                     </button>
                 </div>
                 
-                <!-- Step 4: Schedule High -->
+                <!-- Step 2: Schedule High -->
                 <div class="workflow-step" style="margin-bottom: 8px;">
                     <button onclick="openWorkflowStep('schedHigh')" style="width: 100%; padding: 8px; font-size: 11px; background: linear-gradient(135deg, #ef4444, #dc2626); border: none; border-radius: 4px; color: #fff; cursor: pointer; text-align: left; position: relative;">
-                        <span style="font-weight: bold;">4.</span> 🔴 Schedule High
+                        <span style="font-weight: bold;">2.</span> 🔴 Schedule High
                         <span id="wfSchedHighBadge" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #fff; color: #000; padding: 2px 6px; border-radius: 10px; font-size: 10px;">0</span>
                     </button>
                 </div>
                 
-                <!-- Step 5: Schedule Med -->
+                <!-- Step 3: Schedule Med -->
                 <div class="workflow-step" style="margin-bottom: 8px;">
                     <button onclick="openWorkflowStep('schedMed')" style="width: 100%; padding: 8px; font-size: 11px; background: linear-gradient(135deg, #f59e0b, #b45309); border: none; border-radius: 4px; color: #fff; cursor: pointer; text-align: left; position: relative;">
-                        <span style="font-weight: bold;">5.</span> 🟡 Schedule Med
+                        <span style="font-weight: bold;">3.</span> 🟡 Schedule Med
                         <span id="wfSchedMedBadge" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #fff; color: #000; padding: 2px 6px; border-radius: 10px; font-size: 10px;">0</span>
                     </button>
                 </div>
                 
-                <!-- Step 6: Schedule Low -->
+                <!-- Step 4: Schedule Low -->
                 <div class="workflow-step" style="margin-bottom: 8px;">
                     <button onclick="openWorkflowStep('schedLow')" style="width: 100%; padding: 8px; font-size: 11px; background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; border-radius: 4px; color: #fff; cursor: pointer; text-align: left; position: relative;">
-                        <span style="font-weight: bold;">6.</span> 🔵 Schedule Low
+                        <span style="font-weight: bold;">4.</span> 🔵 Schedule Low
                         <span id="wfSchedLowBadge" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #fff; color: #000; padding: 2px 6px; border-radius: 10px; font-size: 10px;">0</span>
+                    </button>
+                </div>
+
+                <!-- Step 5: Assign Time -->
+                <div class="workflow-step" style="margin-bottom: 8px;">
+                    <button onclick="openWorkflowStep('time')" style="width: 100%; padding: 8px; font-size: 11px; background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 4px; color: #fff; cursor: pointer; text-align: left; position: relative;">
+                        <span style="font-weight: bold;">5.</span> ⏱️ Assign Time
+                        <span id="wfTimeBadge" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #fff; color: #000; padding: 2px 6px; border-radius: 10px; font-size: 10px;">0</span>
+                    </button>
+                </div>
+
+                <!-- Step 6: Goal Start/Later -->
+                <div class="workflow-step" style="margin-bottom: 8px;">
+                    <button onclick="openWorkflowStep('goal')" style="width: 100%; padding: 8px; font-size: 11px; background: linear-gradient(135deg, #8b5cf6, #7c3aed); border: none; border-radius: 4px; color: #fff; cursor: pointer; text-align: left; position: relative;">
+                        <span style="font-weight: bold;">6.</span> 🎯 Goal: Start or Later
+                        <span id="wfGoalBadge" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #fff; color: #000; padding: 2px 6px; border-radius: 10px; font-size: 10px;">0</span>
                     </button>
                 </div>
                 
                 <div style="border-top: 1px solid #444; margin: 12px 0; padding-top: 10px; display: flex; gap: 6px;">
                     <button onclick="resetFilters()" style="flex: 1; padding: 6px; font-size: 10px; background: #6b7280; border: none; border-radius: 4px; color: #fff; cursor: pointer;">🧹 Clear</button>
                     <button onclick="refreshFromTickTick()" style="flex: 1; padding: 6px; font-size: 10px; background: #ff9800; border: none; border-radius: 4px; color: #fff; cursor: pointer;">🔃 Sync</button>
+                </div>
+            </div>
+
+            <div class="saved-ai-searches">
+                <div class="saved-ai-searches-header">
+                    <h3>✨ AI Searches</h3>
+                    <button class="saved-ai-searches-add" onclick="openAISearchModal()">+ Add</button>
+                </div>
+                <div id="savedAISearchList">
+                    <div class="saved-ai-search-empty">Save a plain-language task search to run on the current filters.</div>
                 </div>
             </div>
             
@@ -3219,6 +3555,9 @@
                 
                 <label style="font-size: 11px;">OpenAI API Key:</label>
                 <input type="password" id="openaiKey" placeholder="Enter API key" style="font-size: 11px; padding: 6px; margin-bottom: 8px;">
+
+                <label style="font-size: 11px;">Gemini API Key:</label>
+                <input type="password" id="geminiKey" placeholder="Enter Gemini API key" style="font-size: 11px; padding: 6px; margin-bottom: 8px;">
                 
                 <details style="margin: 10px 0; font-size: 11px;">
                     <summary style="cursor: pointer; color: #60a5fa;">🔧 V2 API (Tags/Duration)</summary>
@@ -3262,6 +3601,476 @@
             for (let i = 0; i < allTasks.length; i++) {
                 taskById[allTasks[i].id] = allTasks[i];
             }
+        }
+
+        let aiSearches = [];
+        let activeAISearch = null;
+        let activeAIResult = null;
+        let editingAISearchId = null;
+
+        const AI_SEARCH_RESULTS_KEY = 'saved_ai_search_results';
+
+        function loadAISearches() {
+            try {
+                aiSearches = JSON.parse(localStorage.getItem('saved_ai_searches') || '[]');
+            } catch (error) {
+                aiSearches = [];
+            }
+            renderAISearches();
+        }
+
+        function renderAISearches() {
+            const container = document.getElementById('savedAISearchList');
+            if (!container) return;
+            if (aiSearches.length === 0) {
+                container.innerHTML = '<div class="saved-ai-search-empty">Save a plain-language task search to run on the current filters.</div>';
+                return;
+            }
+            container.innerHTML = aiSearches.map((search, index) => `
+                <div class="saved-ai-search-row" draggable="true" data-search-id="${escapeHtml(search.id)}" ondragstart="handleAISearchDragStart(event)" ondragover="handleAISearchDragOver(event)" ondrop="handleAISearchDrop(event)" ondragend="handleAISearchDragEnd(event)">
+                    <input class="saved-ai-search-order" type="number" min="1" max="${aiSearches.length}" value="${index + 1}" aria-label="Position for ${escapeHtml(search.title)}" title="Set workflow position" onchange="setAISearchPosition('${escapeHtml(search.id)}', this.value)">
+                    <button class="saved-ai-search-button" onclick="runAISearch('${escapeHtml(search.id)}')" title="${escapeHtml(search.instruction)}">
+                        ✨ ${escapeHtml(search.title)}
+                    </button>
+                    <button class="saved-ai-search-action" onclick="event.stopPropagation(); openAISearchModal('${escapeHtml(search.id)}')" title="Edit search">✎</button>
+                    <button class="saved-ai-search-action delete" onclick="event.stopPropagation(); deleteAISearch('${escapeHtml(search.id)}')" title="Delete search">×</button>
+                </div>
+            `).join('');
+        }
+
+        function saveAISearchOrder() {
+            localStorage.setItem('saved_ai_searches', JSON.stringify(aiSearches));
+        }
+
+        function moveAISearch(searchId, targetIndex) {
+            const sourceIndex = aiSearches.findIndex(search => search.id === searchId);
+            if (sourceIndex < 0) return;
+            const boundedIndex = Math.max(0, Math.min(targetIndex, aiSearches.length - 1));
+            const [search] = aiSearches.splice(sourceIndex, 1);
+            aiSearches.splice(boundedIndex, 0, search);
+            saveAISearchOrder();
+            renderAISearches();
+        }
+
+        function setAISearchPosition(searchId, position) {
+            const targetIndex = Number(position) - 1;
+            if (!Number.isInteger(targetIndex) || targetIndex < 0 || targetIndex >= aiSearches.length) {
+                renderAISearches();
+                return;
+            }
+            moveAISearch(searchId, targetIndex);
+        }
+
+        function handleAISearchDragStart(event) {
+            event.currentTarget.classList.add('dragging');
+            event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('text/plain', event.currentTarget.dataset.searchId);
+        }
+
+        function handleAISearchDragOver(event) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'move';
+        }
+
+        function handleAISearchDrop(event) {
+            event.preventDefault();
+            const sourceId = event.dataTransfer.getData('text/plain');
+            const targetIndex = aiSearches.findIndex(search => search.id === event.currentTarget.dataset.searchId);
+            if (sourceId && targetIndex >= 0) moveAISearch(sourceId, targetIndex);
+        }
+
+        function handleAISearchDragEnd(event) {
+            event.currentTarget.classList.remove('dragging');
+        }
+
+        function openAISearchModal(searchId = null) {
+            editingAISearchId = searchId;
+            const search = aiSearches.find(item => item.id === searchId);
+            document.getElementById('aiSearchModalTitle').textContent = search ? 'Edit AI Search' : 'Add AI Search';
+            document.getElementById('aiSearchName').value = search ? search.title : '';
+            document.getElementById('aiSearchInstruction').value = search ? search.instruction : '';
+            document.getElementById('aiSearchModalOverlay').style.display = 'flex';
+            document.getElementById('aiSearchName').focus();
+        }
+
+        function closeAISearchModal() {
+            document.getElementById('aiSearchModalOverlay').style.display = 'none';
+            editingAISearchId = null;
+        }
+
+        function saveAISearch() {
+            const title = document.getElementById('aiSearchName').value.trim();
+            const instruction = document.getElementById('aiSearchInstruction').value.trim();
+            if (!title || !instruction) {
+                showMessage('Enter a title and an instruction', 'error');
+                return;
+            }
+            if (editingAISearchId) {
+                const search = aiSearches.find(item => item.id === editingAISearchId);
+                if (search) {
+                    search.title = title;
+                    search.instruction = instruction;
+                }
+                const results = JSON.parse(localStorage.getItem(AI_SEARCH_RESULTS_KEY) || '{}');
+                delete results[editingAISearchId];
+                localStorage.setItem(AI_SEARCH_RESULTS_KEY, JSON.stringify(results));
+            } else {
+                aiSearches.push({ id: `ai-${Date.now()}`, title, instruction });
+            }
+            saveAISearchOrder();
+            renderAISearches();
+            closeAISearchModal();
+            showMessage('AI search saved', 'success');
+        }
+
+        function deleteAISearch(searchId) {
+            const search = aiSearches.find(item => item.id === searchId);
+            if (!search || !confirm(`Delete saved AI search "${search.title}"?`)) return;
+
+            aiSearches = aiSearches.filter(item => item.id !== searchId);
+            localStorage.setItem('saved_ai_searches', JSON.stringify(aiSearches));
+
+            const results = JSON.parse(localStorage.getItem(AI_SEARCH_RESULTS_KEY) || '{}');
+            delete results[searchId];
+            localStorage.setItem(AI_SEARCH_RESULTS_KEY, JSON.stringify(results));
+
+            if (activeAISearch?.id === searchId) {
+                activeAISearch = null;
+                activeAIResult = null;
+                applyPreFiltersInternal();
+            }
+
+            renderAISearches();
+            showMessage('AI search deleted', 'success');
+        }
+
+        function getCompactTaskForAI(task) {
+            const duration = getDisplayDuration(task.id);
+            const children = getTaskChildren(task.id);
+            return {
+                id: task.id,
+                title: task.title || '',
+                content: task.content || '',
+                dueDate: task.dueDate || null,
+                priority: task.priority || 0,
+                tags: Array.isArray(task.tags) ? task.tags : [],
+                duration: duration.label || null,
+                subtasks: children.map(item => ({
+                    title: item.title || '',
+                    status: item.status || 0
+                }))
+            };
+        }
+
+        function parseGeminiJSON(text) {
+            const cleaned = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+            return JSON.parse(cleaned);
+        }
+
+        let editingTaskId = null;
+
+        function formatTaskDateTimeInput(value) {
+            if (!value) return '';
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return '';
+            const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+            return local.toISOString().slice(0, 16);
+        }
+
+        function formatTaskDateTimeForAPI(value) {
+            if (!value) return null;
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return null;
+            return date.toISOString().replace('Z', '+0000');
+        }
+
+        function getEditableTaskItems(task) {
+            if (Array.isArray(task.items)) return task.items;
+            return getTaskChildren(task.id).map(child => ({
+                id: child.id,
+                title: child.title || '',
+                status: child.status || 0,
+                sortOrder: child.sortOrder || 0,
+                startDate: child.startDate || null,
+                isAllDay: child.isAllDay !== false,
+                timeZone: child.timeZone || null,
+                completedTime: child.completedTime || null
+            }));
+        }
+
+        function openTaskDetailsModal(taskId) {
+            const task = taskById[taskId] || allTasks.find(item => item.id === taskId);
+            if (!task) return;
+            editingTaskId = taskId;
+            const items = getEditableTaskItems(task);
+            document.getElementById('taskDetailsTitle').value = task.title || '';
+            document.getElementById('taskDetailsDesc').value = task.desc || '';
+            document.getElementById('taskDetailsContent').value = task.content || '';
+            document.getElementById('taskDetailsItems').value = items.map(item => item.title || '').join('\n');
+            document.getElementById('taskDetailsTags').value = Array.isArray(task.tags) ? task.tags.join(', ') : '';
+            document.getElementById('taskDetailsPriority').value = String(task.priority || 0);
+            document.getElementById('taskDetailsDueDate').value = formatTaskDateTimeInput(task.dueDate);
+            document.getElementById('taskDetailsModalOverlay').style.display = 'flex';
+            document.getElementById('taskDetailsTitle').focus();
+        }
+
+        function closeTaskDetailsModal() {
+            document.getElementById('taskDetailsModalOverlay').style.display = 'none';
+            editingTaskId = null;
+        }
+
+        async function saveTaskDetails() {
+            const task = editingTaskId ? (taskById[editingTaskId] || allTasks.find(item => item.id === editingTaskId)) : null;
+            if (!task) return;
+            const token = document.getElementById('accessToken').value || localStorage.getItem('ticktick_token');
+            if (!token) {
+                showMessage('Please configure your TickTick access token', 'error');
+                return;
+            }
+
+            const itemTitles = document.getElementById('taskDetailsItems').value
+                .split('\n')
+                .map(title => title.trim())
+                .filter(Boolean);
+            const existingItems = getEditableTaskItems(task);
+            const items = itemTitles.map((title, index) => ({
+                ...(existingItems[index] || {}),
+                title,
+                sortOrder: existingItems[index]?.sortOrder || index,
+                status: existingItems[index]?.status || 0
+            }));
+            const tags = document.getElementById('taskDetailsTags').value
+                .split(',')
+                .map(tag => tag.trim())
+                .filter(Boolean);
+            const dueDate = formatTaskDateTimeForAPI(document.getElementById('taskDetailsDueDate').value);
+            const payload = {
+                id: task.id,
+                projectId: task.projectId,
+                title: document.getElementById('taskDetailsTitle').value.trim(),
+                desc: document.getElementById('taskDetailsDesc').value.trim(),
+                content: document.getElementById('taskDetailsContent').value.trim(),
+                items,
+                tags,
+                priority: Number(document.getElementById('taskDetailsPriority').value),
+                dueDate,
+                isAllDay: task.isAllDay !== false,
+                startDate: task.startDate || null,
+                timeZone: task.timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone
+            };
+
+            try {
+                const response = await fetch(`https://api.ticktick.com/open/v1/task/${encodeURIComponent(task.id)}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) throw new Error(`TickTick update failed: ${response.status}`);
+
+                Object.assign(task, payload);
+                task.items = items;
+                localStorage.setItem('ticktick_tasks', JSON.stringify(allTasks));
+                closeTaskDetailsModal();
+                applyPreFilters();
+                showMessage('Task details saved to TickTick', 'success');
+            } catch (error) {
+                console.error('Task details update failed:', error);
+                showMessage(`Could not save task: ${error.message}`, 'error');
+            }
+        }
+
+        function getSavedAIResult(searchId) {
+            try {
+                const results = JSON.parse(localStorage.getItem(AI_SEARCH_RESULTS_KEY) || '{}');
+                return results[searchId] || null;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function saveAIResult(result) {
+            let results = {};
+            try {
+                results = JSON.parse(localStorage.getItem(AI_SEARCH_RESULTS_KEY) || '{}');
+            } catch (error) {
+                results = {};
+            }
+            results[result.searchId] = result;
+            localStorage.setItem(AI_SEARCH_RESULTS_KEY, JSON.stringify(results));
+            console.log('Saved Gemini result locally:', {
+                storageKey: AI_SEARCH_RESULTS_KEY,
+                searchId: result.searchId,
+                resultCount: result.results.length,
+                generatedAt: result.generatedAt,
+                origin: window.location.origin
+            });
+        }
+
+        function applyAIResultToTasks(tasks) {
+            if (!activeAIResult) return tasks;
+            const availableTasks = new Map(tasks.map(task => [task.id, task]));
+            return activeAIResult.results
+                .filter(item => availableTasks.has(item.id))
+                .map(item => availableTasks.get(item.id));
+        }
+
+        function showAIResultBanner(search, resultCount, totalCount, summary, fromCache = false) {
+            const taskList = document.getElementById('taskList');
+            const banner = document.createElement('div');
+            banner.className = 'ai-result-banner';
+            banner.innerHTML = `<span><strong>✨ ${escapeHtml(search.title)}</strong> · ${resultCount} recommended from ${totalCount} filtered tasks${fromCache ? ' · saved result' : ''}${summary ? ` · ${escapeHtml(summary)}` : ''}</span><span style="display: flex; gap: 6px;"><button onclick="refreshAISearch()" title="Ask Gemini again">↻ Refresh</button><button onclick="clearAIResult()">Clear</button></span>`;
+            taskList.prepend(banner);
+        }
+
+        function refreshAISearch() {
+            if (!activeAISearch) return;
+            const searchId = activeAISearch.id;
+            const results = JSON.parse(localStorage.getItem(AI_SEARCH_RESULTS_KEY) || '{}');
+            delete results[searchId];
+            localStorage.setItem(AI_SEARCH_RESULTS_KEY, JSON.stringify(results));
+            activeAISearch = null;
+            activeAIResult = null;
+            applyPreFiltersInternal();
+            runAISearch(searchId);
+        }
+
+        async function runAISearch(searchId) {
+            const search = aiSearches.find(item => item.id === searchId);
+            if (!search) return;
+
+            const savedResult = getSavedAIResult(searchId);
+            console.log('AI cache lookup:', {
+                searchId,
+                cacheFound: !!savedResult,
+                origin: window.location.origin,
+                storageKey: AI_SEARCH_RESULTS_KEY
+            });
+            if (savedResult) {
+                activeAISearch = search;
+                activeAIResult = savedResult;
+                localStorage.removeItem('ai_recommendation');
+                const totalCount = filteredTasks.length;
+                filteredTasks = applyAIResultToTasks(filteredTasks);
+                displayTasks(filteredTasks);
+                showAIResultBanner(search, filteredTasks.length, totalCount, savedResult.summary, true);
+                updateFilterInfo();
+                showMessage(`Loaded ${filteredTasks.length} saved AI result(s)`, 'success');
+                console.log('Loaded saved Gemini result:', {
+                    search: search.title,
+                    generatedAt: savedResult.generatedAt,
+                    cachedResults: savedResult.results.length,
+                    visibleResults: filteredTasks.length
+                });
+                return;
+            }
+
+            const geminiKey = document.getElementById('geminiKey').value || localStorage.getItem('gemini_api_key') || localStorage.getItem('gemini_key');
+            if (!geminiKey) {
+                showMessage('Add your Gemini API key in Settings first', 'error');
+                toggleRightPanel();
+                return;
+            }
+            if (filteredTasks.length === 0) {
+                showMessage('No tasks match the current filters', 'error');
+                return;
+            }
+
+            activeAISearch = search;
+            localStorage.removeItem('ai_recommendation');
+            const taskList = document.getElementById('taskList');
+            taskList.innerHTML = '<div class="loading">✨ Gemini is reviewing the current tasks...</div>';
+            const compactTasks = filteredTasks.map(getCompactTaskForAI);
+            const prompt = `You are selecting tasks for a personal task manager.\nUser request: ${search.instruction}\nToday: ${new Date().toISOString()}\n\nReview only these tasks. Missing dates, priorities, tags, or duration are unknown, not disqualifying. Use title and content to estimate suitability, but do not invent facts. Return JSON only in this shape: {"results":[{"id":"task id","score":0,"reason":"short reason"}],"summary":"one short sentence"}. Include only relevant tasks, rank best first, and use scores from 0 to 100.\n\nTasks:\n${JSON.stringify(compactTasks)}`;
+
+            const promptBytes = new Blob([prompt]).size;
+            const approximateTokens = Math.ceil(prompt.length / 4);
+            console.group('✨ Saved Gemini AI Search');
+            console.log('Search:', search.title);
+            console.log('Instruction:', search.instruction);
+            console.log('Filtered tasks sent:', compactTasks.length);
+            console.log('Fields per task: id, title, content, dueDate, priority, tags, duration, subtasks');
+            console.log('Prompt size:', `${promptBytes.toLocaleString()} bytes`);
+            console.log('Approximate input tokens:', approximateTokens.toLocaleString());
+            console.table(compactTasks.map(task => ({
+                id: task.id,
+                title: task.title,
+                contentCharacters: task.content.length,
+                dueDate: task.dueDate,
+                priority: task.priority,
+                tags: task.tags.join(', '),
+                duration: task.duration,
+                subtaskCount: task.subtasks.length
+            })));
+            console.log('Starting Gemini request...');
+            console.groupEnd();
+
+            try {
+                const requestStartedAt = performance.now();
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 90000);
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(geminiKey)}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    signal: controller.signal,
+                    body: JSON.stringify({
+                        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                        generationConfig: { responseMimeType: 'application/json', temperature: 0.2 }
+                    })
+                });
+                clearTimeout(timeoutId);
+                const data = await response.json();
+                console.log('Gemini response received:', {
+                    status: response.status,
+                    elapsedMs: Math.round(performance.now() - requestStartedAt),
+                    responseBytes: new Blob([JSON.stringify(data)]).size
+                });
+                console.log('Gemini token usage:', data.usageMetadata || 'Not provided by API');
+                if (!response.ok || data.error) {
+                    throw new Error(data.error?.message || `Gemini API error: ${response.status}`);
+                }
+                const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                if (!text) throw new Error('Gemini returned no response.');
+                const result = parseGeminiJSON(text);
+                const taskMap = new Map(filteredTasks.map(task => [task.id, task]));
+                const cachedResult = {
+                    searchId: search.id,
+                    generatedAt: new Date().toISOString(),
+                    summary: result.summary || '',
+                    results: (Array.isArray(result.results) ? result.results : [])
+                    .filter(item => taskMap.has(item.id))
+                    .sort((a, b) => (Number(b.score) || 0) - (Number(a.score) || 0))
+                    .map(item => ({
+                        id: item.id,
+                        score: Number(item.score) || 0,
+                        reason: item.reason || ''
+                    }))
+                };
+                saveAIResult(cachedResult);
+                activeAIResult = cachedResult;
+                const rankedTasks = applyAIResultToTasks(filteredTasks);
+
+                filteredTasks = rankedTasks;
+                displayTasks(filteredTasks);
+                showAIResultBanner(search, rankedTasks.length, compactTasks.length, cachedResult.summary);
+                updateFilterInfo();
+                showMessage(`Gemini found ${rankedTasks.length} matching task(s)`, 'success');
+            } catch (error) {
+                activeAISearch = null;
+                applyPreFiltersInternal();
+                const errorMessage = error.name === 'AbortError' ? 'Request timed out after 90 seconds' : error.message;
+                console.error('Gemini saved search failed:', errorMessage, error);
+                showMessage(`AI search failed: ${errorMessage}`, 'error');
+            }
+        }
+
+        function clearAIResult() {
+            activeAISearch = null;
+            activeAIResult = null;
+            localStorage.removeItem('ai_recommendation');
+            applyPreFiltersInternal();
         }
         
         // ============================================
@@ -6887,6 +7696,7 @@
         function saveConfig() {
             const accessToken = document.getElementById('accessToken').value;
             const openaiKey = document.getElementById('openaiKey').value;
+            const geminiKey = document.getElementById('geminiKey').value;
             const cookieT = document.getElementById('ticktickCookieT').value;
             const csrf = document.getElementById('ticktickCsrf').value;
             const userId = document.getElementById('ticktickUserId').value;
@@ -6896,6 +7706,10 @@
             }
             if (openaiKey) {
                 localStorage.setItem('openai_key', openaiKey);
+            }
+            if (geminiKey) {
+                localStorage.setItem('gemini_api_key', geminiKey);
+                localStorage.setItem('gemini_key', geminiKey);
             }
             if (cookieT) {
                 localStorage.setItem('ticktick_cookie_t', cookieT);
@@ -6947,6 +7761,7 @@
         function loadConfig() {
             const token = localStorage.getItem('ticktick_token');
             const openaiKey = localStorage.getItem('openai_key');
+            const geminiKey = localStorage.getItem('gemini_api_key') || localStorage.getItem('gemini_key');
             const cookieT = localStorage.getItem('ticktick_cookie_t');
             const csrf = localStorage.getItem('ticktick_csrf');
             const userId = localStorage.getItem('ticktick_user_id');
@@ -6956,6 +7771,9 @@
             }
             if (openaiKey) {
                 document.getElementById('openaiKey').value = openaiKey;
+            }
+            if (geminiKey) {
+                document.getElementById('geminiKey').value = geminiKey;
             }
             if (cookieT) {
                 document.getElementById('ticktickCookieT').value = cookieT;
@@ -7318,6 +8136,7 @@
                             ${escapeHtml(task.title)}
                             ${hasChildren ? `<span class="subtask-indicator" style="color:#888;font-size:11px;"> (${childCount})</span>` : ''}
                             ${recurringBadge}
+                            <button class="task-edit-button" onclick="event.stopPropagation(); openTaskDetailsModal('${task.id}')" title="Edit task details">✎</button>
                         </span>
                         <span class="task-time">${timeInfo}</span>
                         <span class="task-duration">${durationBadge}</span>
@@ -7771,7 +8590,8 @@
             
             switch(dateOption) {
                 case 'today':
-                    targetDate = today;
+                    targetDate = new Date(today);
+                    targetDate.setHours(11, 0, 0, 0);
                     break;
                 case 'tomorrow':
                     targetDate = new Date(today);
@@ -7803,7 +8623,10 @@
 
             const tasksToUpdate = Array.from(selectedTasks);
             const token = localStorage.getItem('ticktick_token');
-            const formattedDate = formatDateForAPI(targetDate);
+            const isTimedToday = dateOption === 'today';
+            const formattedDate = isTimedToday
+                ? targetDate.toISOString().replace('Z', '+0000')
+                : formatDateForAPI(targetDate);
             
             // Optimistic UI update - update local data immediately
             tasksToUpdate.forEach(taskId => {
@@ -7833,7 +8656,7 @@
                                 projectId: task.projectId,
                                 title: task.title,
                                 dueDate: formattedDate,
-                                isAllDay: true
+                                isAllDay: !isTimedToday
                             })
                         }).catch(error => {
                             console.error('Background date update failed:', error);
@@ -9151,7 +9974,7 @@
             });
         }
 
-        // Called when user changes a filter dropdown - clears custom filter
+        // Called when user changes a filter dropdown - keep AI results as a second filter layer
         function onFilterDropdownChange() {
             window.customFilterTaskIds = null;
             window.customFilterLabel = null;
@@ -9238,6 +10061,8 @@
             // Apply sorting
             const sortFilter = document.getElementById('sortFilter').value;
             filteredTasks = sortTasks(filteredTasks, sortFilter);
+            const normalFilteredTaskCount = filteredTasks.length;
+            filteredTasks = applyAIResultToTasks(filteredTasks);
 
             // Recreate tasksForAI with filtered data
             tasksForAI = filteredTasks.map((t, index) => {
@@ -9266,6 +10091,9 @@
             });
 
             displayTasks(filteredTasks);
+            if (activeAISearch && activeAIResult) {
+                showAIResultBanner(activeAISearch, filteredTasks.length, normalFilteredTaskCount, activeAIResult.summary, true);
+            }
             updateFilterInfo();
             updateInboxBadge(); // Update inbox count
             updatePriorityBadge(); // Update priority count
@@ -9456,6 +10284,8 @@
                     return task.priority === 1;
                 case 'none':
                     return !task.priority || task.priority === 0;
+                case 'high_medium_none':
+                    return [0, 3, 5].includes(task.priority || 0);
                 case 'high_medium':
                     return task.priority === 5 || task.priority === 3;
                 default:
@@ -9831,10 +10661,9 @@ Answer the question clearly. Only show relevant tasks.`;
 
             // Optimistic UI update - remove immediately
             allTasks = allTasks.filter(t => t.id !== taskId);
-            filteredTasks = filteredTasks.filter(t => t.id !== taskId);
+            rebuildTaskLookup();
             localStorage.setItem('ticktick_tasks', JSON.stringify(allTasks));
-            displayTasks(filteredTasks);
-            updateFilterInfo();
+            applyPreFilters();
             showMessage('✅ Task deleted!', 'success');
 
             // API call in background
@@ -10082,6 +10911,7 @@ Answer the question clearly. Only show relevant tasks.`;
         // Load config and cached tasks on page load
         window.onload = function() {
             loadConfig();
+            loadAISearches();
             
             // Initialize quick task date/time defaults
             initQuickTaskDateTime();
