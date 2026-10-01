@@ -129,6 +129,12 @@
             overflow: hidden;
         }
 
+        .workflow-section {
+            flex: 0 1 55%;
+            min-height: 0;
+            overflow-y: auto;
+        }
+
         .right-section {
             padding: 15px;
             border-bottom: 1px solid #333;
@@ -448,6 +454,52 @@
 
         .task-item.keyboard-focused .task-title {
             color: #fff;
+        }
+
+        .task-inline-details {
+            grid-column: 1 / -1;
+            margin: -2px 0 6px 28px;
+            padding: 8px 10px;
+            border-left: 2px solid #dadce0;
+            background: #f8f9fa;
+            color: #5f6368;
+            font-size: 11px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .task-inline-details[hidden] {
+            display: none;
+        }
+
+        .task-inline-details-label {
+            display: block;
+            margin-bottom: 2px;
+            color: #202124;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .task-details-toggle {
+            display: inline-flex;
+            width: 18px;
+            height: 18px;
+            align-items: center;
+            justify-content: center;
+            margin-left: 4px;
+            padding: 0;
+            background: transparent;
+            color: #5f6368;
+            border: 0;
+            font-size: 11px;
+            line-height: 1;
+            vertical-align: middle;
+        }
+
+        .task-details-toggle:hover {
+            background: #e8eaed;
+            color: #1a73e8;
         }
 
         /* Indent child tasks - each level gets more indent */
@@ -1008,6 +1060,11 @@
         }
 
         .saved-ai-searches {
+            display: flex;
+            flex: 1 1 auto;
+            flex-direction: column;
+            min-height: 0;
+            overflow: hidden;
             padding: 12px;
             border-bottom: 1px solid #e8eaed;
         }
@@ -1033,9 +1090,12 @@
         }
 
         #savedAISearchList {
-            max-height: min(42vh, 360px);
+            flex: 1 1 auto;
+            min-height: 0;
+            max-height: none;
             overflow-y: scroll;
             overscroll-behavior: contain;
+            scrollbar-gutter: stable;
             padding-right: 3px;
             scrollbar-width: auto;
             scrollbar-color: #6b7280 #1a1a1a;
@@ -1410,11 +1470,30 @@
                 bottom: 0;
                 width: 300px;
                 z-index: 1999;
-                overflow-y: auto;
+                min-height: 0;
+                overflow: hidden;
                 box-shadow: -4px 0 20px rgba(0,0,0,0.5);
             }
             .right-panel.open {
                 display: flex;
+            }
+            .workflow-section {
+                flex: 0 1 55%;
+                min-height: 0;
+                overflow-y: auto;
+            }
+            .saved-ai-searches {
+                display: flex;
+                flex: 1 1 auto;
+                flex-direction: column;
+                min-height: 0;
+                overflow: hidden;
+            }
+            #savedAISearchList {
+                flex: 1 1 auto;
+                min-height: 0;
+                max-height: none;
+                overflow-y: auto;
             }
             .right-panel-toggle {
                 display: inline-block;
@@ -1464,11 +1543,29 @@
                 bottom: 0;
                 width: 280px;
                 z-index: 1999;
-                overflow-y: auto;
+                height: calc(100vh - 45px);
+                max-height: calc(100vh - 45px);
+                overflow: hidden;
                 box-shadow: -4px 0 20px rgba(0,0,0,0.5);
             }
             .right-panel.open {
                 display: flex;
+            }
+
+            .saved-ai-searches {
+                flex: 1 1 0;
+                min-height: 0;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+
+            #savedAISearchList {
+                flex: 1 1 0;
+                height: auto;
+                min-height: 0;
+                max-height: none;
+                overflow-y: scroll;
             }
             
             .nav-bar {
@@ -1533,10 +1630,16 @@
                 display: flex !important;
                 flex-direction: row !important;
                 align-items: center !important;
-                flex-wrap: nowrap !important;
+                flex-wrap: wrap !important;
                 justify-content: space-between !important;
                 width: 100%;
                 gap: 6px;
+            }
+
+            .task-inline-details {
+                flex: 0 0 100%;
+                order: 10;
+                margin-left: 0;
             }
             
             .task-info {
@@ -2481,6 +2584,11 @@
             margin-bottom: 4px;
             box-shadow: 0 1px 2px rgba(0,0,0,0.04);
             color: #202124;
+        }
+
+        .task-children .task-item,
+        .task-children .task-children .task-item {
+            background: #ffffff;
         }
 
         .task-item:hover {
@@ -3796,6 +3904,7 @@
         }
 
         let editingTaskId = null;
+        const expandedTaskDetails = new Set();
 
         function formatTaskDateTimeInput(value) {
             if (!value) return '';
@@ -3845,6 +3954,23 @@
         function closeTaskDetailsModal() {
             document.getElementById('taskDetailsModalOverlay').style.display = 'none';
             editingTaskId = null;
+        }
+
+        function toggleTaskDetails(taskId) {
+            const taskElement = document.querySelector(`.task-item[data-task-id="${taskId}"]`);
+            const details = taskElement?.querySelector('.task-inline-details');
+            const toggle = taskElement?.querySelector('.task-details-toggle');
+            if (!details || !toggle) return;
+
+            const isExpanded = expandedTaskDetails.has(taskId);
+            if (isExpanded) {
+                expandedTaskDetails.delete(taskId);
+            } else {
+                expandedTaskDetails.add(taskId);
+            }
+            details.hidden = isExpanded;
+            toggle.textContent = isExpanded ? '▶' : '▼';
+            toggle.setAttribute('aria-expanded', String(!isExpanded));
         }
 
         async function saveTaskDetails() {
@@ -8131,6 +8257,22 @@
                                      task.priority === 1 ? 'priority-low' : '';
 
                 const projectName = project ? project.name : 'Unknown Project';
+                const taskItems = Array.isArray(task.items) ? task.items : [];
+                const hasDescription = Boolean(task.desc?.trim());
+                const hasContent = Boolean(task.content?.trim());
+                const hasChecklist = taskItems.some(item => item.title?.trim());
+                const hasDetails = hasDescription || hasContent || hasChecklist;
+                const detailsExpanded = expandedTaskDetails.has(task.id);
+                const detailsToggle = hasDetails
+                    ? `<button class="task-details-toggle" onclick="event.stopPropagation(); toggleTaskDetails('${task.id}')" aria-expanded="${detailsExpanded}" title="Show task details">${detailsExpanded ? '▼' : '▶'}</button>`
+                    : '';
+                const detailsHtml = hasDetails ? `
+                    <div class="task-inline-details" ${detailsExpanded ? '' : 'hidden'}>
+                        ${hasDescription ? `<span class="task-inline-details-label">Description</span><div>${escapeHtml(task.desc)}</div>` : ''}
+                        ${hasContent ? `<span class="task-inline-details-label">Content</span><div>${escapeHtml(task.content)}</div>` : ''}
+                        ${hasChecklist ? `<span class="task-inline-details-label">Checklist</span><div>${taskItems.filter(item => item.title?.trim()).map(item => `<div>${item.status ? '✓' : '○'} ${escapeHtml(item.title)}</div>`).join('')}</div>` : ''}
+                    </div>
+                ` : '';
                 
                 // Try both: childIds from task AND children from parentId lookup
                 const childIdsChildren = (task.childIds && task.childIds.length > 0) ? task.childIds.map(id => allTaskMap[id]).filter(c => c) : [];
@@ -8188,12 +8330,14 @@
                             ${escapeHtml(task.title)}
                             ${hasChildren ? `<span class="subtask-indicator" style="color:#888;font-size:11px;"> (${childCount})</span>` : ''}
                             ${recurringBadge}
+                            ${detailsToggle}
                             <button class="task-edit-button" onclick="event.stopPropagation(); openTaskDetailsModal('${task.id}')" title="Edit task details">✎</button>
                         </span>
                         <span class="task-time">${timeInfo}</span>
                         <span class="task-duration">${durationBadge}</span>
                         <span class="task-date">${dateInfo}</span>
                         <span class="project-name">${escapeHtml(projectName)}</span>
+                        ${detailsHtml}
                     </div>
                 `;
 
