@@ -421,7 +421,7 @@
             margin-bottom: 2px;
             border-radius: 4px;
             display: grid;
-            grid-template-columns: 20px 1fr 85px 70px 75px 80px;
+            grid-template-columns: 20px 1fr 85px 75px 80px;
             align-items: center;
             background: #2d2d2d;
             width: 100%;
@@ -514,7 +514,7 @@
             margin-bottom: 2px;
             border-radius: 4px;
             display: grid;
-            grid-template-columns: 20px 1fr 85px 70px 75px 80px;
+            grid-template-columns: 20px 1fr 85px 75px 80px;
             align-items: center;
             background: #1a1a1a;
             border: 2px solid #10b981;
@@ -1361,6 +1361,163 @@
 
         .task-edit-button:hover {
             color: #1a73e8;
+        }
+
+        .task-comment-button {
+            margin-left: 6px;
+            padding: 1px 5px;
+            border: 0;
+            border-radius: 4px;
+            background: transparent;
+            color: #5f6368;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .task-comment-button:hover {
+            background: #e8eaed;
+            color: #1a73e8;
+        }
+
+        .task-latest-comment {
+            grid-column: 2 / -1;
+            display: flex;
+            align-items: flex-start;
+            gap: 7px;
+            min-width: 0;
+            margin: -1px 0 5px;
+            padding: 5px 8px;
+            border: 1px solid #f6e3a1;
+            border-left: 3px solid #f4b400;
+            border-radius: 4px;
+            background: #fff8e1;
+            color: #5f4200;
+            font-size: 11px;
+            line-height: 1.4;
+            overflow-wrap: anywhere;
+        }
+
+        .task-latest-comment[hidden] {
+            display: none;
+        }
+
+        .task-latest-comment-label {
+            flex: 0 0 auto;
+            margin: 0;
+            color: #9a6700;
+            font-size: 10px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .task-latest-comment-text {
+            min-width: 0;
+            color: #5f4200;
+            white-space: pre-wrap;
+        }
+
+        .task-comments-modal {
+            width: 620px;
+            max-width: calc(100vw - 28px);
+            max-height: calc(100vh - 32px);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #dadce0;
+            border-radius: 10px;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.2);
+        }
+
+        .task-comments-modal h2 {
+            margin-bottom: 12px;
+            color: #202124;
+            font-size: 18px;
+        }
+
+        .task-comments-list {
+            max-height: 360px;
+            overflow-y: auto;
+            padding: 4px 2px;
+        }
+
+        .task-comment-entry {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #e8eaed;
+            border-radius: 6px;
+            background: #f8f9fa;
+        }
+
+        .task-comment-entry:last-child {
+            margin-bottom: 0;
+        }
+
+        .task-comment-entry-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 4px;
+            color: #80868b;
+            font-size: 10px;
+        }
+
+        .task-comment-entry-text {
+            color: #202124;
+            font-size: 12px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .task-comment-delete {
+            padding: 2px 6px;
+            margin: 0;
+            background: transparent;
+            border: 0;
+            color: #d93025;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        .task-comments-empty {
+            padding: 20px 8px;
+            color: #80868b;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .task-comments-input {
+            width: 100%;
+            min-height: 72px;
+            margin-top: 12px;
+            padding: 8px;
+            resize: vertical;
+            background: #f8f9fa;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            color: #202124;
+            font: inherit;
+            font-size: 12px;
+        }
+
+        .task-comments-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .task-comments-modal-actions button {
+            margin: 0;
+            padding: 8px 14px;
+            font-size: 12px;
+        }
+
+        .task-comments-cancel {
+            background: #e8eaed !important;
+            color: #202124 !important;
         }
 
         @media (max-width: 600px) {
@@ -3077,6 +3234,20 @@
         </div>
     </div>
 
+    <div class="task-details-modal-overlay" id="taskCommentsModalOverlay" style="display: none;" onclick="if(event.target === this) closeTaskCommentsModal()">
+        <div class="task-comments-modal">
+            <h2 id="taskCommentsModalTitle">Task comments</h2>
+            <div class="task-comments-list" id="taskCommentsList">
+                <div class="task-comments-empty">Loading comments...</div>
+            </div>
+            <textarea class="task-comments-input" id="taskCommentInput" placeholder="Add a comment..."></textarea>
+            <div class="task-comments-modal-actions">
+                <button class="task-comments-cancel" onclick="closeTaskCommentsModal()">Close</button>
+                <button onclick="addTaskComment()">Add comment</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Selection Info Bar (hidden) -->
     <div class="selection-info" id="selectionInfo" style="display: none !important;">
         <span id="selectionCount">0</span> tasks selected
@@ -3506,6 +3677,15 @@
                     <option value="none">❓ No Duration</option>
                 </select>
             </div>
+
+            <div class="filter-item">
+                <label>💬 Comments</label>
+                <select id="commentFilter" onchange="onFilterDropdownChange()">
+                    <option value="all" selected>All Tasks</option>
+                    <option value="with_comments">💬 Only with comments</option>
+                    <option value="without_comments">📝 Without comments</option>
+                </select>
+            </div>
             
             <div class="filter-item">
                 <label>⭐ Priority</label>
@@ -3905,6 +4085,278 @@
 
         let editingTaskId = null;
         const expandedTaskDetails = new Set();
+        const taskCommentsCache = {};
+        const taskCommentsLoading = new Set();
+        let openCommentsTaskId = null;
+        let commentFilterLoadPromise = null;
+
+        function getTaskCommentTimestamp(comment) {
+            const value = comment?.modifiedTime || comment?.createdTime;
+            if (typeof value === 'number') return value;
+            if (typeof value === 'string' && /^\d+$/.test(value)) return Number(value);
+            return Date.parse(value || '') || 0;
+        }
+
+        function getLatestTaskComment(comments) {
+            if (!Array.isArray(comments) || comments.length === 0) return null;
+            return [...comments].sort((a, b) => getTaskCommentTimestamp(b) - getTaskCommentTimestamp(a))[0];
+        }
+
+        function formatTaskCommentTime(comment) {
+            const timestamp = getTaskCommentTimestamp(comment);
+            if (!timestamp) return 'Unknown time';
+            return new Date(timestamp).toLocaleString([], {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit'
+            });
+        }
+
+        function formatTaskCommentAge(comment) {
+            const timestamp = getTaskCommentTimestamp(comment);
+            if (!timestamp) return 'unknown time';
+
+            const elapsedSeconds = Math.max(0, Math.floor((Date.now() - timestamp) / 1000));
+            if (elapsedSeconds < 60) return 'just now';
+
+            const elapsedMinutes = Math.floor(elapsedSeconds / 60);
+            if (elapsedMinutes < 60) return `${elapsedMinutes}m ago`;
+
+            const elapsedHours = Math.floor(elapsedMinutes / 60);
+            if (elapsedHours < 24) return `${elapsedHours}h ago`;
+
+            const elapsedDays = Math.floor(elapsedHours / 24);
+            if (elapsedDays < 7) return `${elapsedDays}d ago`;
+
+            const elapsedWeeks = Math.floor(elapsedDays / 7);
+            if (elapsedWeeks < 5) return `${elapsedWeeks}w ago`;
+
+            return formatTaskCommentTime(comment);
+        }
+
+        function getTaskCommentsUrl(task) {
+            return `https://api.ticktick.com/open/v1/project/${encodeURIComponent(task.projectId)}/task/${encodeURIComponent(task.id)}/comments`;
+        }
+
+        function getTaskCommentUrl(task, commentId = '') {
+            const baseUrl = `https://api.ticktick.com/open/v1/project/${encodeURIComponent(task.projectId)}/task/${encodeURIComponent(task.id)}/comment`;
+            return commentId ? `${baseUrl}/${encodeURIComponent(commentId)}` : baseUrl;
+        }
+
+        function getTaskCommentToken() {
+            const tokenInput = document.getElementById('accessToken');
+            return (tokenInput ? tokenInput.value : '') || localStorage.getItem('ticktick_token') || '';
+        }
+
+        function renderLatestTaskComment(taskId) {
+            const preview = document.querySelector(`[data-comment-preview="${taskId}"]`);
+            if (!preview) return;
+
+            const latestComment = getLatestTaskComment(taskCommentsCache[taskId]);
+            if (!latestComment) {
+                preview.hidden = true;
+                preview.innerHTML = '';
+                return;
+            }
+
+            preview.innerHTML = `
+                <span class="task-latest-comment-label">💬 ${escapeHtml(formatTaskCommentAge(latestComment))}</span>
+                <span class="task-latest-comment-text">${escapeHtml(latestComment.title || '')}</span>
+            `;
+            preview.hidden = false;
+        }
+
+        async function loadTaskComments(taskId, forceRefresh = false) {
+            const task = taskById[taskId] || allTasks.find(item => item.id === taskId);
+            const token = getTaskCommentToken();
+            if (!task || !token) {
+                if (!token) showMessage('Please configure your TickTick access token', 'error');
+                return [];
+            }
+
+            if (!forceRefresh && Object.prototype.hasOwnProperty.call(taskCommentsCache, taskId)) {
+                renderLatestTaskComment(taskId);
+                return taskCommentsCache[taskId];
+            }
+
+            if (taskCommentsLoading.has(taskId)) {
+                return taskCommentsCache[taskId] || [];
+            }
+
+            taskCommentsLoading.add(taskId);
+            try {
+                const response = await fetch(getTaskCommentsUrl(task), {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) {
+                    throw new Error(`Failed to load comments: ${response.status}`);
+                }
+                const comments = await response.json();
+                if (!Array.isArray(comments)) {
+                    throw new Error('TickTick returned an invalid comments response');
+                }
+                taskCommentsCache[taskId] = comments;
+                renderLatestTaskComment(taskId);
+                if (openCommentsTaskId === taskId) renderTaskComments(taskId);
+                return comments;
+            } catch (error) {
+                console.error('Task comments load failed:', error);
+                const preview = document.querySelector(`[data-comment-preview="${taskId}"]`);
+                if (preview) {
+                    preview.innerHTML = '<span class="task-latest-comment-label">💬 Comments</span><span class="task-latest-comment-text">Unable to load comments</span>';
+                    preview.hidden = false;
+                }
+                if (openCommentsTaskId === taskId) {
+                    document.getElementById('taskCommentsList').innerHTML = `<div class="task-comments-empty">${escapeHtml(error.message)}</div>`;
+                }
+                throw error;
+            } finally {
+                taskCommentsLoading.delete(taskId);
+            }
+        }
+
+        async function queueTaskCommentPreviews(tasks) {
+            const taskIds = [...new Set(tasks.map(task => task.id))];
+            const token = getTaskCommentToken();
+            if (!token || taskIds.length === 0) return;
+
+            let nextIndex = 0;
+            async function worker() {
+                while (nextIndex < taskIds.length) {
+                    const taskId = taskIds[nextIndex++];
+                    try {
+                        await loadTaskComments(taskId);
+                    } catch {
+                        // The individual preview displays the loading error.
+                    }
+                }
+            }
+
+            await Promise.all(Array.from({ length: Math.min(4, taskIds.length) }, worker));
+        }
+
+        function taskHasComments(taskId) {
+            return Array.isArray(taskCommentsCache[taskId]) && taskCommentsCache[taskId].length > 0;
+        }
+
+        function ensureCommentsLoadedForFilter() {
+            if (commentFilterLoadPromise || !getTaskCommentToken()) return;
+
+            const missingTasks = allTasks.filter(task => !Object.prototype.hasOwnProperty.call(taskCommentsCache, task.id));
+            if (missingTasks.length === 0) return;
+
+            commentFilterLoadPromise = queueTaskCommentPreviews(missingTasks)
+                .finally(() => {
+                    commentFilterLoadPromise = null;
+                    const commentFilter = document.getElementById('commentFilter')?.value || 'all';
+                    if (commentFilter !== 'all') {
+                        applyPreFiltersInternal();
+                    }
+                });
+        }
+
+        function renderTaskComments(taskId) {
+            const list = document.getElementById('taskCommentsList');
+            const comments = [...(taskCommentsCache[taskId] || [])]
+                .sort((a, b) => getTaskCommentTimestamp(b) - getTaskCommentTimestamp(a));
+
+            if (comments.length === 0) {
+                list.innerHTML = '<div class="task-comments-empty">No comments yet.</div>';
+                return;
+            }
+
+            list.innerHTML = comments.map(comment => `
+                <div class="task-comment-entry">
+                    <div class="task-comment-entry-meta">
+                        <span>${escapeHtml(formatTaskCommentTime(comment))}</span>
+                        <button class="task-comment-delete" onclick="deleteTaskComment('${escapeHtml(comment.id)}')">Delete</button>
+                    </div>
+                    <div class="task-comment-entry-text">${escapeHtml(comment.title || '')}</div>
+                </div>
+            `).join('');
+        }
+
+        async function openTaskComments(taskId) {
+            const task = taskById[taskId] || allTasks.find(item => item.id === taskId);
+            if (!task) return;
+            openCommentsTaskId = taskId;
+            document.getElementById('taskCommentsModalTitle').textContent = `Comments · ${task.title}`;
+            document.getElementById('taskCommentsModalOverlay').style.display = 'flex';
+            document.getElementById('taskCommentsList').innerHTML = '<div class="task-comments-empty">Loading comments...</div>';
+            document.getElementById('taskCommentInput').value = '';
+            try {
+                await loadTaskComments(taskId, true);
+                renderTaskComments(taskId);
+            } catch {
+                // The modal displays the API error.
+            }
+            document.getElementById('taskCommentInput').focus();
+        }
+
+        function closeTaskCommentsModal() {
+            document.getElementById('taskCommentsModalOverlay').style.display = 'none';
+            openCommentsTaskId = null;
+        }
+
+        async function addTaskComment() {
+            const taskId = openCommentsTaskId;
+            const task = taskId ? (taskById[taskId] || allTasks.find(item => item.id === taskId)) : null;
+            const token = getTaskCommentToken();
+            const input = document.getElementById('taskCommentInput');
+            const title = input.value.trim();
+
+            if (!task || !token) {
+                showMessage('Please configure your TickTick access token', 'error');
+                return;
+            }
+            if (!title) {
+                showMessage('Write a comment first', 'error');
+                input.focus();
+                return;
+            }
+
+            try {
+                const response = await fetch(getTaskCommentUrl(task), {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ title })
+                });
+                if (!response.ok) throw new Error(`Failed to add comment: ${response.status}`);
+                input.value = '';
+                await loadTaskComments(taskId, true);
+                renderTaskComments(taskId);
+                showMessage('Comment added', 'success');
+            } catch (error) {
+                console.error('Task comment add failed:', error);
+                showMessage(`Could not add comment: ${error.message}`, 'error');
+            }
+        }
+
+        async function deleteTaskComment(commentId) {
+            const taskId = openCommentsTaskId;
+            const task = taskId ? (taskById[taskId] || allTasks.find(item => item.id === taskId)) : null;
+            const token = getTaskCommentToken();
+            if (!task || !token || !confirm('Delete this comment?')) return;
+
+            try {
+                const response = await fetch(getTaskCommentUrl(task, commentId), {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error(`Failed to delete comment: ${response.status}`);
+                await loadTaskComments(taskId, true);
+                renderTaskComments(taskId);
+                showMessage('Comment deleted', 'success');
+            } catch (error) {
+                console.error('Task comment delete failed:', error);
+                showMessage(`Could not delete comment: ${error.message}`, 'error');
+            }
+        }
 
         function formatTaskDateTimeInput(value) {
             if (!value) return '';
@@ -4047,6 +4499,7 @@
                 projects: selectedProjects,
                 context: document.getElementById('contextFilter')?.value || 'all',
                 duration: document.getElementById('durationFilter')?.value || 'all',
+                comments: document.getElementById('commentFilter')?.value || 'all',
                 sort: document.getElementById('sortFilter')?.value || 'all',
                 excludedProjects: JSON.parse(localStorage.getItem('excluded_projects') || '[]').sort()
             });
@@ -4336,7 +4789,7 @@
                            autocomplete="off" style="flex: 1;">
                 </span>
                 <span style="font-size:9px;color:#6b7280;">↵ save │ ⇧↵ +sibling │ Tab +child</span>
-                <span></span><span></span><span></span>
+                <span></span><span></span>
             `;
             
             // Insert at the correct position
@@ -7926,6 +8379,7 @@
             localStorage.setItem('priorityFilter', document.getElementById('priorityFilter').value);
             localStorage.setItem('sortFilter', document.getElementById('sortFilter').value);
             localStorage.setItem('durationFilter', document.getElementById('durationFilter').value);
+            localStorage.setItem('commentFilter', document.getElementById('commentFilter').value);
             
             // Save selected projects from checkboxes
             const projectCheckboxes = document.querySelectorAll('.project-filter-checkbox:checked');
@@ -7988,8 +8442,10 @@
             
             try {
                 allTasks = JSON.parse(cachedTasks);
-                projects = JSON.parse(cachedProjects);
-                rebuildTaskLookup(); // PERF: Rebuild O(1) lookup map
+                const cachedProjectMap = JSON.parse(cachedProjects);
+                projects = Object.fromEntries(
+                    Object.entries(cachedProjectMap).filter(([, project]) => !isArchivedProject(project))
+                );
                 
                 // Ensure Inbox is always in projects (for Quick Add)
                 const userId = localStorage.getItem('ticktick_user_id') || '116952856';
@@ -7997,6 +8453,10 @@
                 if (!projects[specialInboxId]) {
                     projects[specialInboxId] = { id: specialInboxId, name: 'Inbox', color: '#4CAF50' };
                 }
+
+                const activeProjectIds = new Set(Object.keys(projects));
+                allTasks = allTasks.filter(task => activeProjectIds.has(task.projectId));
+                rebuildTaskLookup(); // PERF: Rebuild O(1) lookup map
                 
                 // COMPLETELY REBUILD durations from task tags (server is source of truth)
                 const durations = {};
@@ -8074,10 +8534,11 @@
                 }
 
                 const projectsList = await projectsResponse.json();
+                const activeProjectsList = projectsList.filter(project => !isArchivedProject(project));
                 
                 // Store projects by ID for quick lookup
                 projects = {};
-                projectsList.forEach(p => {
+                activeProjectsList.forEach(p => {
                     projects[p.id] = p;
                 });
 
@@ -8086,7 +8547,7 @@
                 // Fetch tasks from all projects
                 allTasks = [];
                 
-                for (const project of projectsList) {
+                for (const project of activeProjectsList) {
                     try {
                         const response = await fetch(`https://api.ticktick.com/open/v1/project/${project.id}/data`, {
                             headers: {
@@ -8331,12 +8792,13 @@
                             ${hasChildren ? `<span class="subtask-indicator" style="color:#888;font-size:11px;"> (${childCount})</span>` : ''}
                             ${recurringBadge}
                             ${detailsToggle}
+                            <button class="task-comment-button" onclick="event.stopPropagation(); openTaskComments('${task.id}')" title="Show comments">💬</button>
                             <button class="task-edit-button" onclick="event.stopPropagation(); openTaskDetailsModal('${task.id}')" title="Edit task details">✎</button>
                         </span>
                         <span class="task-time">${timeInfo}</span>
-                        <span class="task-duration">${durationBadge}</span>
                         <span class="task-date">${dateInfo}</span>
                         <span class="project-name">${escapeHtml(projectName)}</span>
+                        <div class="task-latest-comment" data-comment-preview="${task.id}" hidden></div>
                         ${detailsHtml}
                     </div>
                 `;
@@ -8358,11 +8820,10 @@
 
             // Table header
             const headerHTML = `
-                <div class="task-header" style="display: grid; grid-template-columns: 20px 1fr 85px 70px 75px 80px; gap: 8px; padding: 6px 10px; border-radius: 4px; margin-bottom: 4px; font-size: 10px; text-transform: uppercase; font-weight: 600;">
+                <div class="task-header" style="display: grid; grid-template-columns: 20px 1fr 85px 75px 80px; gap: 8px; padding: 6px 10px; border-radius: 4px; margin-bottom: 4px; font-size: 10px; text-transform: uppercase; font-weight: 600;">
                     <span></span>
                     <span>Task</span>
                     <span style="text-align: center;">Time</span>
-                    <span style="text-align: center;">Duration</span>
                     <span style="text-align: center;">Date</span>
                     <span style="text-align: center;">Project</span>
                 </div>
@@ -8379,6 +8840,8 @@
             } else {
                 taskList.innerHTML = headerHTML + tasksHTML;
             }
+
+            queueTaskCommentPreviews(tasks);
         }
 
         // Context menu state
@@ -9678,6 +10141,10 @@
             return div.innerHTML;
         }
 
+        function isArchivedProject(project) {
+            return project?.closed === true;
+        }
+
         // Populate project filter with checkboxes
         function populateProjectDropdown() {
             const projectContainer = document.getElementById('projectFilter');
@@ -9867,6 +10334,7 @@
             const savedContextFilter = localStorage.getItem('contextFilter');
             const savedSortFilter = localStorage.getItem('sortFilter');
             const savedDurationFilter = localStorage.getItem('durationFilter');
+            const savedCommentFilter = localStorage.getItem('commentFilter');
             
             if (savedDateFilter) {
                 document.getElementById('dateFilter').value = savedDateFilter;
@@ -9879,6 +10347,9 @@
             }
             if (savedDurationFilter) {
                 document.getElementById('durationFilter').value = savedDurationFilter;
+            }
+            if (savedCommentFilter) {
+                document.getElementById('commentFilter').value = savedCommentFilter;
             }
             if (savedProjectFilter) {
                 try {
@@ -10196,7 +10667,12 @@
             const projectFilter = document.getElementById('projectFilter').value;
             const contextFilter = document.getElementById('contextFilter').value;
             const durationFilter = document.getElementById('durationFilter').value;
+            const commentFilter = document.getElementById('commentFilter').value;
             const excludedProjects = JSON.parse(localStorage.getItem('excluded_projects') || '[]');
+
+            if (commentFilter !== 'all') {
+                ensureCommentsLoadedForFilter();
+            }
             
             // PERF: Convert to Set for O(1) lookup instead of O(n) .includes()
             const excludedProjectsSet = new Set(excludedProjects);
@@ -10249,6 +10725,14 @@
                     if (!matchesDurationFilter(task, durationFilter)) {
                         return false;
                     }
+                }
+
+                // Comment filter
+                if (commentFilter === 'with_comments' && !taskHasComments(task.id)) {
+                    return false;
+                }
+                if (commentFilter === 'without_comments' && taskHasComments(task.id)) {
+                    return false;
                 }
 
                 return true;
@@ -10544,12 +11028,14 @@
             localStorage.removeItem('contextFilter');
             localStorage.removeItem('sortFilter');
             localStorage.removeItem('durationFilter');
+            localStorage.removeItem('commentFilter');
             
             // Reset to defaults
             document.getElementById('dateFilter').value = 'today_overdue_nodate';
             document.getElementById('priorityFilter').value = 'all';
             document.getElementById('contextFilter').value = 'all';
             document.getElementById('durationFilter').value = 'all';
+            document.getElementById('commentFilter').value = 'all';
             document.getElementById('sortFilter').value = 'date';
             
             // Reset project checkboxes - check "All Projects"
@@ -10568,6 +11054,7 @@
             document.getElementById('priorityFilter').value = 'all';
             document.getElementById('projectFilter').value = 'all';
             document.getElementById('contextFilter').value = 'all';
+            document.getElementById('commentFilter').value = 'all';
             applyPreFilters();
         }
 

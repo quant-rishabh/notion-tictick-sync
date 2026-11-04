@@ -330,6 +330,158 @@
             .mission{margin-bottom:14px;padding:14px}
             .mission-action{padding:10px 11px;min-height:40px}
         }
+
+        /* Focused habit dashboard theme */
+        body{background:#f4f7fb;color:#172033}
+        .nav{background:#102a43;border-bottom:0;box-shadow:0 2px 12px rgba(16,42,67,.18)}
+        .nav-title{color:#fff;font-size:14px}
+        .nav-link{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.16);color:#dbeafe}
+        .nav-link:hover{background:rgba(255,255,255,.2);color:#fff}
+        .nav-link.active{background:#10b981;border-color:#10b981;color:#062e24}
+        .left-panel{background:#f7f9fc;border-right:1px solid #dfe7f1}
+        .right-panel{background:#fff}
+        .left-header{padding:16px 16px 4px}
+        .focus-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:14px}
+        .focus-chip{min-width:0;min-height:58px;display:flex;flex-direction:column;justify-content:center;gap:3px;padding:9px 10px;background:#fff;border:1px solid #dbe5ef;border-radius:10px;color:#526174;box-shadow:0 2px 6px rgba(31,52,73,.05);font-size:10px}
+        .focus-chip strong{display:block;color:#172033;font-size:20px;line-height:1}
+        .focus-chip.alert{border-color:#fecaca;background:#fff7f7;color:#b42318}
+        .focus-chip.alert strong{color:#dc2626}
+        .focus-chip.warn{border-color:#fde68a;background:#fffdf2;color:#a16207}
+        .focus-chip.warn strong{color:#d97706}
+        .filters{gap:6px;padding:8px;background:#eaf0f7;border:1px solid #dbe5ef;border-radius:10px;margin-bottom:12px}
+        .filter-btn{min-width:36px;padding:6px 9px;background:#fff;border-color:#d5dfeb;color:#526174;border-radius:7px;font-weight:600}
+        .filter-btn:hover{background:#e2eaf3;color:#172033}
+        .filter-btn.active{background:#2563eb;border-color:#2563eb;color:#fff;box-shadow:0 2px 5px rgba(37,99,235,.25)}
+        .filters .filter-btn:nth-child(2).active{background:#10b981;border-color:#10b981}
+        .filters .filter-btn:nth-child(3).active{background:#f59e0b;border-color:#f59e0b}
+        .filters .filter-btn:nth-child(4).active{background:#ef4444;border-color:#ef4444}
+        .filters .filter-btn:nth-child(5).active{background:#7c3aed;border-color:#7c3aed}
+        .filters .filter-btn:nth-child(6).active{background:#64748b;border-color:#64748b}
+        .habit-list{padding:2px 16px 18px}
+        .habit-item{position:relative;background:#fff;border:1px solid #dce5ef;border-left:5px solid #cbd5e1;border-radius:12px;padding:13px 14px;margin-bottom:9px;box-shadow:0 2px 7px rgba(31,52,73,.05);transition:transform .15s,box-shadow .15s,border-color .15s}
+        .habit-item:hover{background:#fff;transform:translateY(-1px);box-shadow:0 5px 14px rgba(31,52,73,.1)}
+        .habit-item.selected{background:#f4f8ff;border-color:#60a5fa;box-shadow:0 0 0 2px rgba(37,99,235,.12),0 5px 14px rgba(31,52,73,.08)}
+        .habit-item.active{border-left-color:#10b981}
+        .habit-item.slipping{border-left-color:#f59e0b}
+        .habit-item.dying{border-left-color:#ef4444}
+        .habit-item.archived{border-left-color:#94a3b8}
+        .habit-item-header{gap:10px}
+        .habit-item-name{max-width:66%;font-size:13px;color:#172033}
+        .habit-item-right{gap:6px}
+        .habit-item-neglect{font-size:10px}
+        .habit-badge{padding:3px 7px;border-radius:999px;font-size:9px;font-weight:700}
+        .habit-item-meta{gap:7px;margin-top:8px;color:#64748b;font-size:10px}
+        .habit-item-meta span{padding:3px 7px;background:#f1f5f9;border-radius:999px}
+        .cycle-dots{gap:4px;margin-top:9px}
+        .cycle-dot{width:13px;height:7px;border-radius:4px}
+        .cycle-dot.done{background:#10b981}
+        .cycle-dot.missed{background:#fca5a5}
+        .cycle-dot.future{background:#e2e8f0}
+        .timer-progress{margin-top:9px;padding-top:8px;border-top:1px solid #edf2f7}
+        .timer-progress-header{color:#526174}
+        .mission{background:linear-gradient(135deg,#102a43,#176b87);border:0;border-radius:14px;padding:16px;margin:0 0 14px;box-shadow:0 7px 18px rgba(16,42,67,.18)}
+        .mission-header{margin-bottom:12px}
+        .mission-title{font-size:14px;letter-spacing:.5px}
+        .mission-count{padding:4px 8px;background:rgba(255,255,255,.14);border-radius:999px;color:#dbeafe}
+        .mission-complete{padding:12px;border-radius:9px;background:rgba(16,185,129,.18);color:#d1fae5}
+        .mission-item{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.16);border-radius:9px;padding:10px;margin-top:8px}
+        .mission-rank{color:#fde68a;font-size:13px}
+        .mission-name{font-size:12px}
+        .mission-reason{color:#bfdbfe;font-size:10px}
+        .mission-action{background:#a7f3d0;color:#064e3b;padding:8px 10px}
+        .mission-action:hover{background:#d1fae5}
+        .right-panel{padding:22px 26px}
+        .detail-title{font-size:26px;color:#102a43}
+        .detail-subtitle{color:#64748b}
+        .checkin-btn{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8;padding:10px 18px}
+        .checkin-btn:hover{background:#dbeafe;color:#1e40af}
+        .checkin-btn.checked{background:#dcfce7;border-color:#86efac;color:#15803d}
+        .analysis-grid{gap:12px}
+        .a-card{border-color:#dbe5ef;border-radius:12px;padding:16px;box-shadow:0 2px 7px rgba(31,52,73,.04)}
+        .a-card-val{color:#102a43}
+        .detail-section-title{color:#526174;font-size:11px}
+        .detail-encourage{background:#f0fdf4;border-color:#bbf7d0;border-left-color:#10b981;color:#166534}
+        .nudge{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}
+        .coach-tip{background:#fffbeb;border-color:#fde68a;color:#92400e}
+        .habit-overview{padding:4px 2px 16px}
+        .habit-overview-eyebrow{color:#2563eb;font-size:10px;font-weight:800;letter-spacing:1.5px}
+        .habit-overview-title{margin-top:5px;color:#102a43;font-size:24px;font-weight:800;letter-spacing:-.5px}
+        .habit-overview-subtitle{margin-top:4px;color:#64748b;font-size:11px}
+        .habit-list-heading{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 10px;color:#526174;font-size:11px;font-weight:700}
+        .habit-list-heading span:last-child{color:#94a3b8;font-size:9px;font-weight:500}
+        .habit-list-heading:after{content:'';height:1px;flex:1;margin-left:10px;background:#dbe5ef;order:2}
+        .habit-list-heading span:last-child{order:3;margin-left:10px}
+        .right-panel{background:linear-gradient(180deg,#f8fbff 0%,#f3f7fb 100%);padding:18px 22px}
+        .detail-header{margin-bottom:10px}
+        .detail-title{font-size:25px;letter-spacing:-.4px;color:#0f2742;margin-bottom:5px}
+        .detail-subtitle{gap:7px;align-items:center;color:#718096}
+        .detail-subtitle span{background:#edf3f8;border-radius:999px;padding:4px 8px}
+        .detail-actions{margin-top:9px}
+        .checkin-btn{border:0;border-radius:10px;background:linear-gradient(135deg,#0f766e,#059669);color:#fff;box-shadow:0 6px 14px rgba(5,150,105,.2);font-size:13px!important;font-weight:800;padding:11px 16px!important}
+        .checkin-btn:hover{background:linear-gradient(135deg,#115e59,#047857);color:#fff;transform:translateY(-1px)}
+        .checkin-btn.checked{background:#d1fae5;color:#047857;border:1px solid #6ee7b7;box-shadow:none}
+        .nudge{margin:0 0 10px;padding:10px 12px;border:0;border-left:4px solid #f59e0b;border-radius:9px;background:#fff7df;color:#713f12;font-size:12px;line-height:1.35}
+        .hero-cards{gap:8px;margin-bottom:10px}
+        .hero-card{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;align-items:center;text-align:left;padding:11px 13px;border:1px solid #dbe7f0;border-radius:11px;background:#fff;box-shadow:0 3px 10px rgba(15,39,66,.04)}
+        .hero-card-val{grid-row:1 / span 2;font-size:25px}
+        .hero-card-label{font-size:9px;letter-spacing:.5px}
+        .hero-card-sub{margin-top:2px;font-size:10px}
+        .progress-section{padding:12px 13px;margin-bottom:10px;border-color:#dbe7f0;border-radius:11px}
+        .progress-section>div:first-child{color:#496175!important;margin-bottom:8px!important}
+        .progress-row{gap:8px;margin-bottom:9px}
+        .progress-label{width:72px;font-size:10px}
+        .progress-bar-wrap{height:12px;background:#e6edf2}
+        .progress-val{width:66px;font-size:11px}
+        .trend-line{margin-bottom:10px;padding:8px 11px;border-color:#dbe7f0;font-size:11px}
+        .detail-section{margin-bottom:11px;padding:11px 12px;background:#fff;border:1px solid #dbe7f0;border-radius:11px}
+        .detail-section-title{font-size:10px;color:#496175}
+        .view-tab{padding:3px 8px;font-size:9px;border-radius:999px}
+        .coach-tip{margin-top:10px;padding:10px 12px;font-size:11px}
+        .detail-encourage{padding:9px 11px;margin-bottom:10px}
+        .right-panel .challenge-link{margin-bottom:10px!important}
+        .streak-strong{color:#059669}
+        .overview-panel{display:grid;grid-template-columns:1.15fr repeat(3,1fr);gap:8px;margin:0 0 10px;padding:12px;background:#102a43;border-radius:12px;color:#fff;box-shadow:0 7px 16px rgba(16,42,67,.16)}
+        .overview-score{display:flex;align-items:center;gap:9px}
+        .overview-ring{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#34d399 var(--score),rgba(255,255,255,.16) 0);position:relative}
+        .overview-ring:after{content:'';position:absolute;inset:5px;border-radius:50%;background:#102a43}
+        .overview-ring strong{position:relative;z-index:1;font-size:11px}
+        .overview-caption{font-size:9px;color:#cbd5e1;text-transform:uppercase;letter-spacing:.7px}
+        .overview-title{font-size:13px;font-weight:800;margin-top:2px}
+        .overview-stat{padding-left:8px;border-left:1px solid rgba(255,255,255,.15)}
+        .overview-stat strong{display:block;font-size:17px}
+        .overview-stat span{font-size:9px;color:#cbd5e1}
+        .history-heading{font-size:10px;color:#496175;text-transform:uppercase;letter-spacing:.6px}
+        .monthly-chart{min-height:90px}
+        .monthly-chart .history-bars{height:92px}
+        .monthly-chart .h-bar{background:linear-gradient(180deg,#34d399,#059669)!important}
+        body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:14px;color:#243b53}
+        .nav-title{font-size:15px}
+        .left-header{padding:14px 16px 4px}
+        .habit-item{padding:15px 16px;margin-bottom:10px}
+        .habit-item-name{font-size:15px;font-weight:750;max-width:72%}
+        .habit-item-right{gap:0}
+        .habit-item-right .habit-type-badge{display:none}
+        .habit-item-right .status-tag{font-size:11px;padding:4px 9px;border-radius:999px}
+        .habit-item-meta{font-size:12px;gap:8px;margin-top:10px}
+        .habit-item-meta span{padding:4px 9px}
+        .cycle-dots{margin-top:11px}
+        .cycle-dots>span{font-size:11px!important;color:#64748b!important}
+        .habit-list-heading{font-size:12px}
+        @media (max-width:768px){
+            .focus-summary{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+            .focus-chip{padding:7px 6px;font-size:8px}
+            .focus-chip strong{font-size:17px}
+            .left-header{padding:12px 10px 4px}
+            .habit-list{padding-left:10px;padding-right:10px}
+            .right-panel{padding:18px 14px}
+            .habit-overview-title{font-size:21px}
+            .detail-title{font-size:22px}
+            .right-panel{padding:14px 12px}
+            .overview-panel{grid-template-columns:1.3fr repeat(3,1fr);gap:5px;padding:10px}
+            .overview-ring{width:36px;height:36px}
+            .overview-title{font-size:11px}
+            .overview-stat strong{font-size:14px}
+        }
     </style>
 </head>
 <body>
@@ -348,19 +500,17 @@
     <div class="container">
         <div class="left-panel">
             <div class="left-header">
+                <div class="habit-overview">
+                    <div class="habit-overview-eyebrow">TODAY</div>
+                    <div class="habit-overview-title">Your daily rhythm</div>
+                    <div class="habit-overview-subtitle">Small steps become lasting progress.</div>
+                </div>
                 <div class="focus-summary" id="focusSummary">
                     <div class="focus-chip"><strong>-</strong> done today</div>
                 </div>
-                <div id="todayMission"></div>
-
-                <div class="filters">
-                    <button class="filter-btn active" onclick="setFilter('all')">All</button>
-                    <button class="filter-btn" onclick="setFilter('active')">🟢</button>
-                    <button class="filter-btn" onclick="setFilter('slipping')">🟡</button>
-                    <button class="filter-btn" onclick="setFilter('dying')">🔴</button>
-                    <button class="filter-btn" onclick="setFilter('challenge')">⚔️</button>
-                    <button class="filter-btn" onclick="setFilter('archived')">📦</button>
-                    <span style="margin-left:auto;color:#666;font-size:9px" id="lastUpdated"></span>
+                <div class="habit-list-heading">
+                    <span>All habits</span>
+                    <span id="lastUpdated"></span>
                 </div>
             </div>
             <div class="habit-list" id="habitContainer">
@@ -376,9 +526,6 @@
     <button class="mobile-toggle" id="mobileToggle" onclick="toggleMobilePanel()">
         <span id="toggleIcon">📊</span> <span id="toggleText">Details</span>
     </button>
-
-    <!-- Auto-load habit data from file (generated by: node fetch-habits.js) -->
-    <script src="habits-data.js" onerror="window.__HABITS_DATA__=null"></script>
 
     <script>
         // State
@@ -438,8 +585,8 @@
         }
 
         // ============ DATA LOADING ============
-        // V2 API has no CORS — can't call from file:// or browser directly
-        // Strategy: try proxy (deployed) → try localStorage cache → show paste UI
+        // TickTick's Open API has no browser CORS support, so requests go through
+        // the server-side proxy with the bearer token kept in localStorage.
 
         function getCachedHabits() {
             try { return JSON.parse(localStorage.getItem('habits_cache') || 'null'); } catch { return null; }
@@ -457,16 +604,16 @@
         function getToken() { return localStorage.getItem('ticktick_token') || ''; }
 
         async function fetchHabits() {
-            const cookieT = getCookieT();
-            const csrf = getCsrf();
-            
-            if (!cookieT || !csrf) {
-                console.log('[HABITS] No credentials in localStorage');
+            const token = getToken();
+            if (!token) {
+                console.log('[HABITS] No TickTick bearer token in localStorage');
                 return null;
             }
             
             try {
-                const res = await fetch(`/api/ticktick/habits?t=${encodeURIComponent(cookieT)}&csrf=${encodeURIComponent(csrf)}`);
+                const res = await fetch('https://api.ticktick.com/open/v1/habit', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
                 if (res.ok) {
                     const data = await res.json();
                     console.log(`[HABITS] ✓ Got ${data.length} habits from TickTick`);
@@ -479,24 +626,65 @@
         }
 
         async function fetchCheckinsBatch(habitIds, lookbackDays) {
-            const cookieT = getCookieT();
-            const csrf = getCsrf();
-            
             try {
                 const afterStamp = getStamp(daysAgo(lookbackDays));
                 const res = await fetch('/api/ticktick/habits', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        action: 'query_checkins', 
-                        habitIds, 
+                    body: JSON.stringify({
+                        action: 'query_checkins',
+                        habitIds,
                         afterStamp,
-                        ticktick_cookie_t: cookieT,
-                        ticktick_csrf: csrf
+                        ticktick_cookie_t: getCookieT(),
+                        ticktick_csrf: getCsrf()
                     })
                 });
-                if (res.ok) return await res.json();
+                if (res.ok) {
+                    const normalized = normalizeCheckinsResponse(await res.json());
+                    console.log(`[CHECKINS] Loaded ${Object.values(normalized).reduce((total, items) => total + items.length, 0)} records`);
+                    return normalized;
+                }
+                console.warn(`[CHECKINS] TickTick returned ${res.status}`);
             } catch (e) { console.log('[CHECKINS] Failed:', e.message); }
+            return {};
+        }
+
+        function normalizeCheckinsResponse(data) {
+            if (Array.isArray(data)) {
+                if (data.length > 0 && data[0].habitId && (data[0].checkinStamp || data[0].stamp)) {
+                    return data.reduce((grouped, checkin) => {
+                        const habitId = checkin.habitId;
+                        if (!grouped[habitId]) grouped[habitId] = [];
+                        grouped[habitId].push({
+                            ...checkin,
+                            checkinStamp: Number(checkin.checkinStamp || checkin.stamp),
+                            status: checkin.status === undefined ? (Number(checkin.value) > 0 ? 2 : 0) : Number(checkin.status)
+                        });
+                        return grouped;
+                    }, {});
+                }
+                return data.reduce((grouped, habitGroup) => {
+                    if (!habitGroup || !habitGroup.habitId) return grouped;
+                    grouped[habitGroup.habitId] = (habitGroup.checkins || []).map(checkin => ({
+                        ...checkin,
+                        checkinStamp: Number(checkin.checkinStamp || checkin.stamp),
+                        status: checkin.status === undefined ? (Number(checkin.value) > 0 ? 2 : 0) : Number(checkin.status)
+                    }));
+                    return grouped;
+                }, {});
+            }
+
+            if (data && data.checkins && !Array.isArray(data.checkins)) {
+                return Object.fromEntries(Object.entries(data.checkins).map(([habitId, checkins]) => [
+                    habitId,
+                    (Array.isArray(checkins) ? checkins : []).map(checkin => ({
+                        ...checkin,
+                        checkinStamp: Number(checkin.checkinStamp || checkin.stamp),
+                        status: checkin.status === undefined ? (Number(checkin.value) > 0 ? 2 : 0) : Number(checkin.status)
+                    }))
+                ]));
+            }
+
             return {};
         }
 
@@ -512,7 +700,7 @@
                 promises.push(fetchCheckinsBatch(shortIds, 365));
             }
             if (longIds.length > 0) {
-                const maxLookback = Math.max(...longHabits.map(h => Math.min(Math.round(getIntervalDays(h) * 3), 365)));
+                const maxLookback = 365;
                 console.log(`[CHECKINS] Long batch: ${longIds.length} habits, ${maxLookback}d lookback`);
                 promises.push(fetchCheckinsBatch(longIds, maxLookback));
             }
@@ -528,21 +716,17 @@
         async function checkinHabit(habitId, stamp, value) {
             const habit = allHabits.find(h => h.id === habitId);
             if (!habit) throw new Error('Habit not found');
-            const cookieT = getCookieT();
-            const csrf = getCsrf();
-            const res = await fetch('/api/ticktick/habits', {
+            const res = await fetch(`https://api.ticktick.com/open/v1/habit/${encodeURIComponent(habitId)}/checkin`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Authorization': 'Bearer ' + getToken(),
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify({ 
-                    action: 'checkin', 
-                    habitId, 
-                    stamp, 
-                    value, 
-                    status: value === 0 ? 0 : 2, 
+                    stamp,
+                    value,
                     goal: habit.goal || 1,
-                    ticktick_token: getToken(),
-                    ticktick_cookie_t: cookieT,
-                    ticktick_csrf: csrf
+                    status: value === 0 ? 0 : 2
                 })
             });
             if (!res.ok) {
@@ -607,15 +791,10 @@
                 <div style="max-width:600px;margin:20px auto;text-align:center">
                     <div style="font-size:16px;color:#111;margin-bottom:8px">📋 Paste Habits JSON</div>
                     <div style="font-size:11px;color:#888;margin-bottom:12px">
-                        Open TickTick in Chrome → DevTools (F12) → Console → run this:
-                    </div>
-                    <div style="background:#f0f0f0;border:1px solid #ddd;border-radius:6px;padding:10px;text-align:left;margin-bottom:12px">
-                        <code style="font-size:11px;color:#059669;word-break:break-all;user-select:all">
-                            fetch('https://api.ticktick.com/api/v2/habits').then(r=>r.json()).then(d=>{copy(JSON.stringify(d));console.log('✅ Copied '+d.length+' habits!')})
-                        </code>
+                        Sign in on the task page first so the saved TickTick token can be used:
                     </div>
                     <div style="font-size:11px;color:#888;margin-bottom:8px">
-                        OR run the curl command. Then paste the JSON array below:
+                        If no token is configured, you can still paste an Open API response below:
                     </div>
                     <textarea id="pasteArea" style="width:100%;height:120px;background:#fff;color:#333;border:1px solid #ddd;border-radius:6px;padding:8px;font-family:monospace;font-size:11px;resize:vertical" placeholder='Paste JSON array here... [ { "id": "...", "name": "..." }, ... ]'></textarea>
                     <div style="margin-top:8px;display:flex;gap:8px;justify-content:center">
@@ -1314,8 +1493,6 @@
                 return !done && h._streak >= 3 && h._daysSinceLast >= h._intervalDays * 0.8;
             }).length;
 
-            document.getElementById('todayMission').innerHTML = buildMissionHtml(activeHabits);
-
             let summaryHtml = `<div class="focus-chip"><strong>${todaysDone}/${activeHabits.length}</strong> done today</div>`;
             if (overdueCount > 0) summaryHtml += `<div class="focus-chip alert">⚠️ <strong>${overdueCount}</strong> overdue</div>`;
             if (dueTodayCount > 0) summaryHtml += `<div class="focus-chip warn">📅 <strong>${dueTodayCount}</strong> due today</div>`;
@@ -1400,8 +1577,6 @@
             const todayCheckin = checkins.find(c => c.checkinStamp === today);
             const todayDone = todayCheckin && todayCheckin.status === 2;
             const status = getStatusTag(habit);
-            const streakInfo = getStreakWithUnit(habit);
-
             // Build 7 cycle dots (most recent on right)
             const interval = habit._intervalDays || 1;
             const doneStamps = new Set(checkins.filter(c => c.status === 2).map(c => c.checkinStamp));
@@ -1427,21 +1602,16 @@
             }
 
             const isSelected = habit.id === selectedHabitId;
-            const isTimer = isTimerUnit(habit.unit);
-            const typeBadge = isTimer ? '<span class="habit-type-badge timer">⏱️ Timer</span>' : '<span class="habit-type-badge checkin">✓ Check-in</span>';
-
             return `
             <div class="habit-item ${habit._status} ${isSelected ? 'selected' : ''}" onclick="selectHabit('${habit.id}')">
                 <div class="habit-item-header">
                     <div class="habit-item-name">${todayDone ? '✅' : '⬜'} ${habit.name}</div>
                     <div class="habit-item-right">
-                        ${typeBadge}
                         <span class="status-tag" style="background:${status.color}22;color:${status.color}">${status.text}</span>
                     </div>
                 </div>
                 <div class="habit-item-meta">
                     <span>🔄 ${parseRepeatRule(habit.repeatRule)}</span>
-                    <span>🔥 ${streakInfo.count} ${streakInfo.unit}</span>
                 </div>
                 <div class="cycle-dots">
                     ${dotsHtml}
@@ -1481,6 +1651,13 @@
             const bestStreak = calcBestStreak(habit.id);
             const streakGap = bestStreak - habit._streak;
             const streakColor = habit._streak >= 7 ? '#10b981' : habit._streak >= 3 ? '#f59e0b' : '#ef4444';
+            const monthly = getMonthlyScore(habit);
+            const yearCutoff = new Date();
+            yearCutoff.setDate(yearCutoff.getDate() - Math.min(ageDays, 365));
+            const yearDone = checkins.filter(c => c.status === 2 && stampToDate(c.checkinStamp) >= yearCutoff).length;
+            const yearExpected = Math.max(1, Math.round(getExpectedWeeklyFreq(habit) * Math.min(ageDays, 365) / 7));
+            const yearPct = Math.min(100, Math.round((yearDone / yearExpected) * 100));
+            const totalDone = checkins.filter(c => c.status === 2).length;
 
             // ── Weekly stats (for nudge/trend) ──
             const weekWindow = Math.min(ageDays, 7);
@@ -1503,12 +1680,11 @@
             } else if (habit._streak >= 3) {
                 nudge = `🔥 You have a <strong>${streakInfo.count}-${streakInfo.unit} streak</strong> going. Don't break it — check in today!`;
             } else if (habit._streak === 0 && habit._daysSinceLast > intervalDays * 2) {
-                nudge = `💡 <strong>Start fresh today.</strong> One check-in is all it takes to begin a new streak.`;
+                nudge = `🌱 <strong>Fresh start.</strong> One check-in today gets your momentum moving again.`;
             } else {
-                const newStreak = habit._streak + 1;
-                nudge = `💡 <strong>Do it now</strong> → streak goes to <strong>${newStreak}</strong>.`;
-                if (newStreak >= bestStreak && bestStreak > 0) nudge += ` 🏆 That ties your record!`;
-                else if (streakGap > 0 && streakGap <= 5) nudge += ` Only ${streakGap} more to beat your best!`;
+                nudge = habit._streak > 0
+                    ? `🔥 <strong>Keep the chain alive.</strong> Check in today to protect your ${streakInfo.count}-${streakInfo.unit} streak.`
+                    : `🌱 <strong>Build today's win.</strong> Consistency starts with one check-in.`;
             }
 
             // ── Progress bars ──
@@ -1546,17 +1722,17 @@
             if (habit._streak > 0 && habit._streak >= bestStreak) milestone = '🏆 Longest streak ever!';
 
             // ── Heatmap ── (show full history up to 1 year)
-            const defaultView = intervalDays <= 1.5 ? 'day' : intervalDays <= 10 ? 'week' : 'month';
+            const defaultView = 'day';
+            const defaultHistoryView = 'month';
             const heatmapWeeks = Math.min(52, Math.ceil(Math.min(ageDays, 365) / 7));
             const dayHeatmapHtml = buildDayHeatmap(habit, heatmapWeeks);
             const weekViewHtml = buildCycleView(habit, 'week', Math.min(52, Math.ceil(ageDays / 7)));
             const monthViewHtml = buildCycleView(habit, 'month', Math.min(12, Math.ceil(ageDays / 30)));
 
             // ── History chart ──
-            const historyHtml = buildHistoryChart(habit, defaultView);
+            const historyHtml = buildHistoryChart(habit, defaultHistoryView);
 
             // ── Coach tip ──
-            const monthly = getMonthlyScore(habit);
             let coachTip = '';
             if (habit._streak > 0 && streakGap > 0 && streakGap <= 3) {
                 coachTip = `🔥 You're <strong>${streakGap} ${streakInfo.unit}</strong> away from beating your all-time record of ${bestStreak}!`;
@@ -1602,9 +1778,19 @@
                     </div>
                     <div class="detail-actions">
                         <button class="checkin-btn ${todayDone ? 'checked' : ''}" onclick="toggleCheckin('${habit.id}')" style="flex:1;font-size:14px;padding:12px 20px">
-                            ${todayDone ? '✅ Done today' : '⬜ Check in today'}
+                            ${todayDone ? '✅ Done today' : '✓ Check in · protect your streak'}
                         </button>
                     </div>
+                </div>
+
+                <div class="overview-panel">
+                    <div class="overview-score">
+                        <div class="overview-ring" style="--score:${monthly.pct}%"><strong>${monthly.pct}%</strong></div>
+                        <div><div class="overview-caption">Overview</div><div class="overview-title">${monthly.pct >= 70 ? 'Great rhythm' : monthly.pct >= 35 ? 'Keep building' : 'Restart today'}</div></div>
+                    </div>
+                    <div class="overview-stat"><strong>${monthly.pct}%</strong><span>month</span></div>
+                    <div class="overview-stat"><strong>${yearPct}%</strong><span>year</span></div>
+                    <div class="overview-stat"><strong>${totalDone}</strong><span>total</span></div>
                 </div>
 
                 <div class="nudge">${nudge}</div>
@@ -1619,9 +1805,9 @@
                         ${habit._streak > 0 && habit._streak >= bestStreak ? '<div class="hero-card-sub" style="color:#fcd34d">🏆 New record!</div>' : ''}
                     </div>
                     <div class="hero-card">
-                        <div class="hero-card-val" style="color:#a78bfa">🏆 ${bestStreak}</div>
+                        <div class="hero-card-val" style="color:#7c3aed">🏆 ${bestStreak}</div>
                         <div class="hero-card-label">best ever</div>
-                        <div class="hero-card-sub" style="color:${streakGap > 0 ? '#888' : '#10b981'}">${streakGap > 0 ? streakGap + ' to beat' : "You're the best!"}</div>
+                        <div class="hero-card-sub" style="color:${streakGap > 0 ? '#64748b' : '#10b981'}">${streakGap > 0 ? streakGap + ' to beat' : "Personal best!"}</div>
                     </div>
                 </div>
 
@@ -1638,7 +1824,7 @@
 
                 <div class="detail-section">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-                        <div class="detail-section-title" style="margin-bottom:0">📅 Calendar</div>
+                        <div class="detail-section-title" style="margin-bottom:0">📅 Daily calendar</div>
                         <div class="view-tabs heatmap-tabs">
                             <button class="view-tab ${defaultView === 'day' ? 'active' : ''}" onclick="switchHeatmap('day')">Day</button>
                             <button class="view-tab ${defaultView === 'week' ? 'active' : ''}" onclick="switchHeatmap('week')">Week</button>
@@ -1656,12 +1842,13 @@
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
                         <div class="detail-section-title" style="margin-bottom:0">📊 History</div>
                         <div class="view-tabs history-tabs">
-                            <button class="view-tab ${defaultView === 'day' ? 'active' : ''}" onclick="switchHistory('day')">Day</button>
-                            <button class="view-tab ${defaultView === 'week' ? 'active' : ''}" onclick="switchHistory('week')">Week</button>
-                            <button class="view-tab ${defaultView === 'month' ? 'active' : ''}" onclick="switchHistory('month')">Month</button>
+                            <button class="view-tab ${defaultHistoryView === 'day' ? 'active' : ''}" onclick="switchHistory('day')">Day</button>
+                            <button class="view-tab ${defaultHistoryView === 'week' ? 'active' : ''}" onclick="switchHistory('week')">Week</button>
+                            <button class="view-tab ${defaultHistoryView === 'month' ? 'active' : ''}" onclick="switchHistory('month')">Month</button>
                         </div>
                     </div>
-                    <div id="historyContainer">${historyHtml}</div>
+                    <div class="history-heading">Monthly activity</div>
+                    <div id="historyContainer" class="monthly-chart">${historyHtml}</div>
                 </div>
 
                 <div class="coach-tip">💬 ${coachTip}</div>

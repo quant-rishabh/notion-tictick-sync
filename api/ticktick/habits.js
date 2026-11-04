@@ -1,91 +1,72 @@
-// Vercel serverless function for TickTick Habits API proxy
+// Server-side proxy for TickTick habit APIs.
 // Endpoint: /api/ticktick/habits
 
 export default async function handler(req, res) {
-    // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
 
-    if (req.method === 'OPTIONS') {
-        return res.status(204).end();
-    }
+    if (req.method === 'OPTIONS') return res.status(204).end();
 
-    // Get credentials from query params (GET) or body (POST)
-    let cookieT = req.query.t || '';
-    let csrf = req.query.csrf || '';
-    let body = req.body || {};
-    const bearerToken = body.ticktick_token || process.env.TICKTICK_BEARER_TOKEN || '';
-
-    if (body.ticktick_cookie_t) cookieT = body.ticktick_cookie_t;
-    if (body.ticktick_csrf) csrf = body.ticktick_csrf;
-
-    if (body.action === 'checkin' && !bearerToken) {
-        return res.status(401).json({
-            error: 'Missing TickTick API token',
-            help: 'Sign in through the task page first so ticktick_token is available'
-        });
-    }
-
-    if (body.action !== 'checkin' && (!cookieT || !csrf)) {
-        return res.status(400).json({
-            error: 'Missing credentials',
-            help: 'Pass t and csrf in query params or body'
-        });
-    }
-
-    const headers = {
-        'Cookie': `t=${cookieT}`,
-        'x-csrf-token': csrf,
-        'Content-Type': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-    };
+    const body = req.body || {};
+    const cookieT = body.ticktick_cookie_t || '';
+    const csrf = body.ticktick_csrf || '';
+    const token = body.ticktick_token ||
+        (req.headers.authorization || '').replace(/^Bearer\s+/i, '') ||
+        process.env.TICKTICK_BEARER_TOKEN ||
+        '';
 
     try {
-        let apiUrl = 'https://api.ticktick.com/api/v2/habits';
+        let apiUrl = 'https://api.ticktick.com/open/v1/habit';
         let method = 'GET';
-        let requestBody = null;
+        let headers = {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        };
+        let requestBody;
 
         if (body.action === 'query_checkins') {
+            if (!cookieT) {
+                return res.status(400).json({ error: 'Missing TickTick session cookie' });
+            }
             apiUrl = 'https://api.ticktick.com/api/v2/habitCheckins/query';
             method = 'POST';
+            headers = {
+                Cookie: `t=${cookieT}`,
+                'Content-Type': 'application/json',
+                'x-csrftoken': csrf
+            };
             requestBody = JSON.stringify({
                 habitIds: body.habitIds,
-                afterStamp: body.afterStamp
+                afterStamp: Number(body.afterStamp)
             });
         } else if (body.action === 'checkin') {
+            if (!token || !body.habitId || !body.stamp) {
+                return res.status(400).json({ error: 'Token, habitId, and stamp are required' });
+            }
             apiUrl = `https://api.ticktick.com/open/v1/habit/${encodeURIComponent(body.habitId)}/checkin`;
             method = 'POST';
             requestBody = JSON.stringify({
                 stamp: Number(body.stamp),
-                value: body.value,
+                value: body.value === undefined ? 1 : body.value,
                 goal: body.goal || 1,
                 status: body.status
             });
+        } else if (!token) {
+            return res.status(401).json({ error: 'Missing TickTick API token' });
         }
-
-        if (body.action === 'checkin') {
-            headers['Authorization'] = `Bearer ${bearerToken}`;
-            delete headers['Cookie'];
-            delete headers['x-csrf-token'];
-        }
-
-        console.log(`[HABITS API] ${method} ${apiUrl}`);
 
         const response = await fetch(apiUrl, {
             method,
             headers,
             body: requestBody
         });
-
         const data = await response.text();
-        
         res.status(response.status);
-        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Content-Type', response.headers.get('content-type') || 'application/json');
         return res.send(data);
-
     } catch (error) {
         console.error('[HABITS API] Error:', error.message);
-        return res.status(500).json({ error: error.message });
+        return res.status(502).json({ error: 'TickTick request failed', details: error.message });
     }
 }
