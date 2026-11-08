@@ -3190,6 +3190,9 @@
             <input type="text" id="aiSearchName" placeholder="What can I do in 5 minutes?">
             <label for="aiSearchInstruction">What should Gemini find?</label>
             <textarea id="aiSearchInstruction" placeholder="Find tasks I can realistically complete within 5 minutes. Prefer high priority and nearest due dates."></textarea>
+            <label for="aiSearchTags">Tags to add (optional)</label>
+            <input type="text" id="aiSearchTags" placeholder="e.g. focus, review, finance">
+            <div style="font-size: 11px; color: #9ca3af; margin-top: -6px; margin-bottom: 12px;">Comma-separated. Existing tags are kept and duplicate tags are skipped.</div>
             <div class="ai-search-modal-actions">
                 <button class="ai-search-cancel" onclick="closeAISearchModal()">Cancel</button>
                 <button onclick="saveAISearch()">Save Search</button>
@@ -3866,9 +3869,6 @@
                 <label style="font-size: 11px;">TickTick Access Token:</label>
                 <input type="password" id="accessToken" placeholder="Enter token" style="font-size: 11px; padding: 6px; margin-bottom: 8px;">
                 
-                <label style="font-size: 11px;">TickTick User ID (for inbox):</label>
-                <input type="text" id="ticktickUserId" placeholder="e.g., 116952856" style="font-size: 11px; padding: 6px; margin-bottom: 8px;">
-                
                 <label style="font-size: 11px;">OpenAI API Key:</label>
                 <input type="password" id="openaiKey" placeholder="Enter API key" style="font-size: 11px; padding: 6px; margin-bottom: 8px;">
 
@@ -3903,6 +3903,7 @@
     <div id="message" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999;"></div>
 
     <script>
+        const TICKTICK_USER_ID = '116952856';
         let allTasks = [];
         let filteredTasks = []; // Tasks after pre-filtering
         let tasksForAI = []; // Minimal data optimized for OpenAI
@@ -3958,6 +3959,20 @@
             localStorage.setItem('saved_ai_searches', JSON.stringify(aiSearches));
         }
 
+        function parseAISearchTags(value) {
+            const seen = new Set();
+            return String(value || '')
+                .split(',')
+                .map(tag => tag.trim())
+                .filter(Boolean)
+                .filter(tag => {
+                    const key = tag.toLocaleLowerCase();
+                    if (seen.has(key)) return false;
+                    seen.add(key);
+                    return true;
+                });
+        }
+
         function moveAISearch(searchId, targetIndex) {
             const sourceIndex = aiSearches.findIndex(search => search.id === searchId);
             if (sourceIndex < 0) return;
@@ -4005,6 +4020,7 @@
             document.getElementById('aiSearchModalTitle').textContent = search ? 'Edit AI Search' : 'Add AI Search';
             document.getElementById('aiSearchName').value = search ? search.title : '';
             document.getElementById('aiSearchInstruction').value = search ? search.instruction : '';
+            document.getElementById('aiSearchTags').value = search && Array.isArray(search.tags) ? search.tags.join(', ') : '';
             document.getElementById('aiSearchModalOverlay').style.display = 'flex';
             document.getElementById('aiSearchName').focus();
         }
@@ -4017,6 +4033,7 @@
         function saveAISearch() {
             const title = document.getElementById('aiSearchName').value.trim();
             const instruction = document.getElementById('aiSearchInstruction').value.trim();
+            const tags = parseAISearchTags(document.getElementById('aiSearchTags').value);
             if (!title || !instruction) {
                 showMessage('Enter a title and an instruction', 'error');
                 return;
@@ -4026,12 +4043,13 @@
                 if (search) {
                     search.title = title;
                     search.instruction = instruction;
+                    search.tags = tags;
                 }
                 const results = JSON.parse(localStorage.getItem(AI_SEARCH_RESULTS_KEY) || '{}');
                 delete results[editingAISearchId];
                 localStorage.setItem(AI_SEARCH_RESULTS_KEY, JSON.stringify(results));
             } else {
-                aiSearches.push({ id: `ai-${Date.now()}`, title, instruction });
+                aiSearches.push({ id: `ai-${Date.now()}`, title, instruction, tags });
             }
             saveAISearchOrder();
             renderAISearches();
@@ -4561,6 +4579,87 @@
             runAISearch(searchId);
         }
 
+        function buildTaskTagUpdatePayload(task, tags) {
+            const payload = {
+                id: task.id,
+                projectId: task.projectId,
+                title: task.title || '',
+                content: task.content || '',
+                desc: task.desc || '',
+                isAllDay: task.isAllDay,
+                startDate: task.startDate || null,
+                dueDate: task.dueDate || null,
+                timeZone: task.timeZone || null,
+                reminders: Array.isArray(task.reminders) ? task.reminders : [],
+                tags,
+                repeatFlag: task.repeatFlag || '',
+                priority: task.priority || 0,
+                sortOrder: task.sortOrder || 0,
+                items: Array.isArray(task.items) ? task.items : []
+            };
+            return Object.fromEntries(Object.entries(payload).filter(([, value]) => value !== undefined));
+        }
+
+        async function addAISearchTags(search, resultItems, tasks) {
+            const requestedTags = parseAISearchTags(search.tags);
+            if (requestedTags.length === 0) return { updated: 0, skipped: 0, failed: 0 };
+
+            const token = getTaskCommentToken();
+            if (!token) throw new Error('Configure your TickTick access token before adding AI search tags');
+
+            const taskMap = new Map(tasks.map(task => [task.id, task]));
+            const resultIds = [...new Set((resultItems || []).map(item => item.id).filter(Boolean))];
+            let updated = 0;
+            let skipped = 0;
+            let failed = 0;
+
+            for (const taskId of resultIds) {
+                const task = taskMap.get(taskId);
+                if (!task) continue;
+
+                const existingTags = Array.isArray(task.tags) ? [...task.tags] : [];
+                const existingKeys = new Set(existingTags.map(tag => String(tag).toLocaleLowerCase()));
+                const newTags = requestedTags.filter(tag => !existingKeys.has(tag.toLocaleLowerCase()));
+                if (newTags.length === 0) {
+                    skipped++;
+                    continue;
+                }
+
+                const mergedTags = [...existingTags, ...newTags];
+                try {
+                    const response = await fetch(`https://api.ticktick.com/open/v1/task/${encodeURIComponent(task.id)}`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(buildTaskTagUpdatePayload(task, mergedTags))
+                    });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                    task.tags = mergedTags;
+                    if (taskById[task.id]) taskById[task.id].tags = mergedTags;
+                    const allTask = allTasks.find(item => item.id === task.id);
+                    if (allTask) allTask.tags = mergedTags;
+                    updated++;
+                } catch (error) {
+                    failed++;
+                    console.error(`Failed to add AI search tags to "${task.title}":`, error);
+                }
+            }
+
+            return { updated, skipped, failed };
+        }
+
+        function showAISearchTagSummary(tags, summary) {
+            if (!tags.length) return;
+            const parts = [];
+            if (summary.updated) parts.push(`${summary.updated} updated`);
+            if (summary.skipped) parts.push(`${summary.skipped} already tagged`);
+            if (summary.failed) parts.push(`${summary.failed} failed`);
+            showMessage(`Tags: ${parts.join(', ')}`, summary.failed ? 'error' : 'success');
+        }
+
         async function runAISearch(searchId) {
             const search = aiSearches.find(item => item.id === searchId);
             if (!search) return;
@@ -4582,11 +4681,18 @@
                 activeAISearch = search;
                 activeAIResult = savedResult;
                 localStorage.removeItem('ai_recommendation');
+                let cachedTagSummary = null;
+                try {
+                    cachedTagSummary = await addAISearchTags(search, savedResult.results, filteredTasks);
+                } catch (error) {
+                    showMessage(error.message, 'error');
+                }
                 const totalCount = filteredTasks.length;
                 filteredTasks = applyAIResultToTasks(filteredTasks);
                 displayTasks(filteredTasks);
                 showAIResultBanner(search, filteredTasks.length, totalCount, savedResult.summary, true);
                 updateFilterInfo();
+                if (cachedTagSummary) showAISearchTagSummary(search.tags || [], cachedTagSummary);
                 showMessage(`Loaded ${filteredTasks.length} saved AI result(s)`, 'success');
                 console.log('Loaded saved Gemini result:', {
                     search: search.title,
@@ -4683,11 +4789,18 @@
                 activeAIResult = cachedResult;
                 const rankedTasks = applyAIResultToTasks(filteredTasks);
 
+                let tagSummary = null;
+                try {
+                    tagSummary = await addAISearchTags(search, cachedResult.results, filteredTasks);
+                } catch (error) {
+                    showMessage(error.message, 'error');
+                }
                 filteredTasks = rankedTasks;
                 displayTasks(filteredTasks);
                 showAIResultBanner(search, rankedTasks.length, compactTasks.length, cachedResult.summary);
                 updateFilterInfo();
                 showMessage(`Gemini found ${rankedTasks.length} matching task(s)`, 'success');
+                if (tagSummary) showAISearchTagSummary(search.tags || [], tagSummary);
             } catch (error) {
                 activeAISearch = null;
                 applyPreFiltersInternal();
@@ -8330,7 +8443,6 @@
             const geminiKey = document.getElementById('geminiKey').value;
             const cookieT = document.getElementById('ticktickCookieT').value;
             const csrf = document.getElementById('ticktickCsrf').value;
-            const userId = document.getElementById('ticktickUserId').value;
             
             if (accessToken) {
                 localStorage.setItem('ticktick_token', accessToken);
@@ -8347,9 +8459,6 @@
             }
             if (csrf) {
                 localStorage.setItem('ticktick_csrf', csrf);
-            }
-            if (userId) {
-                localStorage.setItem('ticktick_user_id', userId);
             }
             
             // Save excluded projects
@@ -8396,7 +8505,6 @@
             const geminiKey = localStorage.getItem('gemini_api_key') || localStorage.getItem('gemini_key');
             const cookieT = localStorage.getItem('ticktick_cookie_t');
             const csrf = localStorage.getItem('ticktick_csrf');
-            const userId = localStorage.getItem('ticktick_user_id');
             
             if (token) {
                 document.getElementById('accessToken').value = token;
@@ -8412,9 +8520,6 @@
             }
             if (csrf) {
                 document.getElementById('ticktickCsrf').value = csrf;
-            }
-            if (userId) {
-                document.getElementById('ticktickUserId').value = userId;
             }
         }
 
@@ -8448,7 +8553,7 @@
                 );
                 
                 // Ensure Inbox is always in projects (for Quick Add)
-                const userId = localStorage.getItem('ticktick_user_id') || '116952856';
+                const userId = TICKTICK_USER_ID;
                 const specialInboxId = `inbox${userId}`;
                 if (!projects[specialInboxId]) {
                     projects[specialInboxId] = { id: specialInboxId, name: 'Inbox', color: '#4CAF50' };
@@ -8568,7 +8673,7 @@
                 
                 // Also fetch from special inbox (inbox + userId format)
                 // Try to get userId from localStorage or extract from existing task
-                const userId = localStorage.getItem('ticktick_user_id') || '116952856';
+                const userId = TICKTICK_USER_ID;
                 const specialInboxId = `inbox${userId}`;
                 console.log('📥 Fetching special inbox:', specialInboxId);
                 
