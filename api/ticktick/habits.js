@@ -40,6 +40,13 @@ export default async function handler(req, res) {
                 habitIds: body.habitIds,
                 afterStamp: Number(body.afterStamp)
             });
+        } else if (body.action === 'get_habit_detail') {
+            if (!body.habitId) {
+                return res.status(400).json({ error: 'Habit ID is required' });
+            }
+            apiUrl = `https://api.ticktick.com/open/v1/habit/${encodeURIComponent(body.habitId)}`;
+        } else if (body.action === 'get_habit_sections') {
+            apiUrl = 'https://api.ticktick.com/open/v1/habit/sections';
         } else if (body.action === 'checkin') {
             if (!token || !body.habitId || !body.stamp) {
                 return res.status(400).json({ error: 'Token, habitId, and stamp are required' });

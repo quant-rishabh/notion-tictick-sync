@@ -513,7 +513,7 @@
             margin-bottom: 2px;
             border-radius: 4px;
             display: grid;
-            grid-template-columns: 20px minmax(180px, 1fr) minmax(145px, 190px) minmax(120px, 180px) minmax(90px, 120px);
+            grid-template-columns: 20px minmax(180px, 1fr) minmax(145px, 190px) minmax(90px, 120px);
             align-items: center;
             background: #2d2d2d;
             width: 100%;
@@ -999,6 +999,10 @@
         }
 
         .task-datetime {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
             min-width: 0;
             color: #1f2937;
             font-size: 11px;
@@ -1006,9 +1010,39 @@
             text-align: center;
         }
 
-        .task-datetime .task-time {
-            display: inline;
-            margin-left: 3px;
+        .task-schedule-status {
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .task-schedule-status.overdue {
+            color: #b91c1c;
+        }
+
+        .task-schedule-status.today {
+            color: #a16207;
+        }
+
+        .task-schedule-status.tomorrow {
+            color: #1d4ed8;
+        }
+
+        .task-schedule-status.future {
+            color: #334155;
+            font-weight: 600;
+        }
+
+        .task-schedule-detail {
+            color: #1f2937;
+            font-size: 10px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .task-schedule-empty {
+            color: #475569;
+            font-size: 11px;
+            font-weight: 600;
         }
 
         .task-datetime .time-remaining {
@@ -1709,8 +1743,9 @@
             max-height: 260px;
             margin-bottom: 20px;
             padding: 9px 10px;
-            color: #64748b;
+            color: #111827;
             font-size: 13px;
+            font-weight: 500;
             line-height: 1.6;
             resize: vertical;
             overflow-y: auto;
@@ -3132,7 +3167,12 @@
         .task-priority { color: #202124 !important; }
         .task-duration-tag { color: #1a73e8 !important; }
         .subtask-indicator { color: #3c4043 !important; }
-        .recurring-badge { color: #3c4043 !important; }
+        .recurring-badge {
+            background: #dbeafe !important;
+            border: 1px solid #93c5fd;
+            color: #1e3a8a !important;
+            font-weight: 700;
+        }
 
         /* Priority colors - light theme */
         .priority-high {
@@ -9279,13 +9319,7 @@
                     }
                 }
 
-                // Format time info (scheduled time with remaining)
-                const timeInfo = formatTaskTime(task);
-                
-                // Format date info (just the date part)
-                const dateInfo = formatTaskDate(task);
-                const dateTimeInfo = `${dateInfo || 'No date'}${timeInfo ? ` · ${timeInfo}` : ''}`;
-                const taskTags = getTaskTagsMarkup(task);
+                const dateTimeInfo = formatTaskSchedule(task);
                 
                 // Recurring indicator
                 const repeatText = parseRepeatFlag(task.repeatFlag);
@@ -9307,7 +9341,6 @@
                             </span>
                         </span>
                         <span class="task-datetime">${dateTimeInfo}</span>
-                        <span class="task-tags">${taskTags}</span>
                         <span class="project-name">${escapeHtml(projectName)}</span>
                         <div class="task-latest-comment" data-comment-preview="${task.id}" hidden></div>
                         ${detailsHtml}
@@ -9331,11 +9364,10 @@
 
             // Table header
             const headerHTML = `
-                <div class="task-header" style="display: grid; grid-template-columns: 20px minmax(180px, 1fr) minmax(145px, 190px) minmax(120px, 180px) minmax(90px, 120px); gap: 8px; padding: 6px 10px; border-radius: 4px; margin-bottom: 4px; font-size: 10px; text-transform: uppercase; font-weight: 600;">
+                <div class="task-header" style="display: grid; grid-template-columns: 20px minmax(180px, 1fr) minmax(145px, 190px) minmax(90px, 120px); gap: 8px; padding: 6px 10px; border-radius: 4px; margin-bottom: 4px; font-size: 10px; text-transform: uppercase; font-weight: 600;">
                     <span></span>
                     <span>Task</span>
                     <span style="text-align: center;">Date &amp; Time</span>
-                    <span style="text-align: center;">Tags</span>
                     <span style="text-align: center;">Project</span>
                 </div>
             `;
@@ -10525,6 +10557,44 @@
                     : '#94a3b8';
                 return `<span class="task-tag" style="--tag-color:${color}" title="${escapeHtml(tagName)}">${escapeHtml(tagName)}</span>`;
             }).join('');
+        }
+
+        function formatTaskSchedule(task) {
+            if (!task.dueDate) return '<span class="task-schedule-empty">No date</span>';
+
+            const date = new Date(task.dueDate);
+            if (Number.isNaN(date.getTime())) return '<span class="task-schedule-empty">No date</span>';
+
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const taskDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            const diffDays = Math.round((taskDay - today) / 86400000);
+            const hasTime = !task.isAllDay && (date.getHours() !== 0 || date.getMinutes() !== 0);
+            const dateLabel = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            const dayLabel = date.toLocaleDateString('en-US', { weekday: 'short' });
+            const detailLabel = hasTime
+                ? date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+                : 'All day';
+
+            let statusLabel;
+            let statusClass;
+            if (diffDays < 0) {
+                const overdueDays = Math.abs(diffDays);
+                statusLabel = `🔴 ${overdueDays} day${overdueDays === 1 ? '' : 's'} overdue`;
+                statusClass = 'overdue';
+            } else if (diffDays === 0) {
+                statusLabel = '🟡 Today';
+                statusClass = 'today';
+            } else if (diffDays === 1) {
+                statusLabel = '🔵 Tomorrow';
+                statusClass = 'tomorrow';
+            } else {
+                statusLabel = `In ${diffDays} days`;
+                statusClass = 'future';
+            }
+
+            return `<span class="task-schedule-status ${statusClass}">${statusLabel}</span>` +
+                `<span class="task-schedule-detail">${dateLabel} · ${dayLabel} · ${detailLabel}</span>`;
         }
 
         function formatTaskTime(task) {

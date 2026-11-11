@@ -13,10 +13,61 @@
         .nav-link{padding:4px 10px;background:#f0f0f0;color:#666;border:1px solid #ddd;border-radius:4px;text-decoration:none;font-size:11px;cursor:pointer}
         .nav-link:hover{background:#e0e0e0;color:#111}
         .nav-link.active{background:#6366f1;color:#fff;border-color:#6366f1}
+        .nav-brand{display:flex;align-items:center;gap:20px;min-width:0}
+        .day-status{display:flex;align-items:center;gap:12px;white-space:nowrap}
+        .day-date{color:#334155;font-size:12px;font-weight:700}
+        .day-time{color:#334155;font-size:13px;font-weight:700}
+        .day-meter{display:flex;align-items:center;gap:5px}
+        .day-battery{position:relative;width:31px;height:15px;padding:2px;border:1.5px solid #94a3b8;border-radius:4px;box-sizing:border-box}
+        .day-battery::after{position:absolute;top:4px;right:-4px;width:2px;height:5px;border-radius:0 2px 2px 0;background:#94a3b8;content:''}
+        .day-battery-fill{display:block;width:40%;height:100%;border-radius:2px;background:#22c55e;transition:width .5s ease,background .5s ease;animation:dayBatteryPulse 3s ease-in-out infinite}
+        .day-percent{min-width:43px;color:#475569;font-size:12px;font-weight:700}
+        .habit-budget-strip{margin:0 16px 10px;padding:12px;background:linear-gradient(145deg,#102a43,#176b87);border:1px solid #1d5872;border-radius:14px;color:#fff;box-shadow:0 6px 16px rgba(16,42,67,.16)}
+        .habit-budget-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+        .habit-budget-title{font-size:12px;font-weight:800;letter-spacing:.2px}
+        .habit-budget-subtitle{color:#bfdbfe;font-size:9px}
+        .habit-budget-rings{display:flex;align-items:center;gap:14px}
+        .habit-ring-card{display:flex;align-items:center;gap:7px;min-width:0}
+        .habit-ring{position:relative;width:58px;height:58px;flex:0 0 58px;border-radius:50%;background:conic-gradient(var(--ring-color) calc(var(--ring-progress) * 1%),rgba(255,255,255,.16) 0);animation:ringPulse 2.8s ease-in-out infinite}
+        .habit-ring::before{position:absolute;inset:6px;border-radius:50%;background:#123652;content:''}
+        .habit-ring-content{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:1}
+        .habit-ring-content strong{color:#fff;font-size:13px;line-height:1}
+        .habit-ring-content span{margin-top:2px;color:#bfdbfe;font-size:7px;text-transform:uppercase}
+        .habit-ring-copy{display:flex;flex-direction:column;gap:2px}
+        .habit-ring-label{color:#dbeafe;font-size:9px;font-weight:700}
+        .habit-ring-value{color:#fff;font-size:10px;font-weight:600}
+        .habit-budget-message{margin-left:auto;text-align:right}
+        .habit-budget-message strong{display:block;color:#fde68a;font-size:12px}
+        .habit-budget-message span{display:block;margin-top:2px;color:#bfdbfe;font-size:9px}
+        .habit-budget-context{display:flex;align-items:center;justify-content:space-between;margin:-4px 0 10px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.15);color:#dbeafe;font-size:9px}
+        .habit-budget-context strong{display:block;color:#fff;font-size:11px}
+        .habit-budget-compare{margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.15)}
+        .habit-budget-compare-head{display:flex;justify-content:space-between;align-items:baseline;color:#dbeafe;font-size:9px;margin-bottom:5px}
+        .habit-budget-compare-head strong{color:#fff;font-size:10px;letter-spacing:.5px}
+        .habit-budget-compare-head span{color:#bfdbfe}
+        .habit-budget-day-track,.habit-budget-effort-track{position:relative;height:10px;background:rgba(255,255,255,.16);border-radius:999px;overflow:visible}
+        .habit-budget-compare-time{height:100%;border-radius:999px;background:#60a5fa;transition:width .5s ease}
+        .habit-budget-now-marker{position:absolute;top:-3px;width:2px;height:16px;border-radius:2px;background:#fff;box-shadow:0 0 0 2px rgba(96,165,250,.35);transform:translateX(-1px);transition:left .5s ease}
+        .habit-budget-now-marker:after{position:absolute;top:-13px;left:50%;color:#fff;font-size:8px;font-weight:800;content:'NOW';transform:translateX(-50%)}
+        .habit-budget-effort-track{height:12px;background:rgba(255,255,255,.12)}
+        .habit-budget-compare-effort{height:100%;border-radius:999px;background:linear-gradient(90deg,#fbbf24,#f59e0b);transition:width .5s ease}
+        .habit-budget-timeline-labels{display:flex;justify-content:space-between;margin:5px 0 10px;color:#93c5fd;font-size:8px}
+        .habit-budget-effort-caption{display:flex;justify-content:space-between;margin-top:5px;color:#bfdbfe;font-size:8px}
+        @keyframes ringPulse{0%,100%{filter:drop-shadow(0 0 0 rgba(52,211,153,0))}50%{filter:drop-shadow(0 0 7px rgba(52,211,153,.35))}}
+        .habit-budget-strip.urgent{background:linear-gradient(145deg,#7f1d1d,#b45309);border-color:#dc2626}
+        .habit-budget-strip.urgent .habit-budget-fill{background:#fca5a5}
+        @keyframes habitBudgetPulse{0%,100%{opacity:.72}50%{opacity:1}}
+        @media(max-width:760px){.habit-budget-strip{margin-left:10px;margin-right:10px}.habit-budget-rings{gap:8px}.habit-ring{width:50px;height:50px;flex-basis:50px}.habit-budget-message{display:none}}
+        @keyframes dayBatteryPulse{0%,100%{opacity:.8}50%{opacity:1}}
+        @media(max-width:760px){.day-status{display:none}}
 
         /* Master-detail layout */
-        .container{display:flex;height:calc(100vh - 40px);max-width:100%;margin:0}
-        .left-panel{width:45%;min-width:340px;border-right:1px solid #e0e0e0;display:flex;flex-direction:column;overflow:hidden;background:#fafafa}
+        .container{display:grid;grid-template-columns:360px minmax(340px,38%) minmax(0,1fr);height:calc(100vh - 40px);max-width:100%;margin:0}
+        .left-panel{display:contents}
+        .filter-panel{min-width:0;border-right:1px solid #dbe5ef;overflow-y:auto;background:#f8fbff;padding:14px 12px}
+        .filter-panel .habit-budget-strip{margin:0 0 16px}
+        .filter-panel-title{color:#102a43;font-size:13px;font-weight:800;margin:2px 2px 14px}
+        .habit-list-panel{min-width:340px;border-right:1px solid #dbe5ef;display:flex;flex-direction:column;overflow:hidden;background:#fafafa}
         .right-panel{flex:1;overflow-y:auto;padding:16px 20px;background:#fff}
 
         /* Left panel sections */
@@ -32,12 +83,30 @@
 
         /* Habit list */
         .habit-list{flex:1;overflow-y:auto;padding:0 12px 12px}
+        .habit-week-header{display:grid;grid-template-columns:minmax(150px,1fr) repeat(7,34px);gap:4px;align-items:end;padding:8px 16px 5px;color:#94a3b8;font-size:9px;text-align:center;text-transform:uppercase}
+        .habit-week-header-name{text-align:left}
+        .habit-week-day{display:flex;flex-direction:column;gap:2px;line-height:1.1}
+        .habit-week-day strong{color:#64748b;font-size:9px}
+        .habit-week-day span{font-size:8px}
+        .habit-week-day.today strong,.habit-week-day.today span{color:#2563eb}
+        .habit-week-grid{display:grid;grid-template-columns:minmax(150px,1fr) repeat(7,34px);gap:4px;align-items:center;margin-top:8px}
+        .habit-week-cell{display:flex;align-items:center;justify-content:center;height:25px;border-radius:5px;font-size:14px;font-weight:700}
+        .habit-week-cell.done{color:#16803c;background:#ecfdf3}
+        .habit-week-cell.partial{color:#b45309;background:#fef3c7;font-size:9px}
+        .habit-week-cell.missed{color:#cbd5e1;background:#f8fafc}
+        .habit-week-cell.today{outline:2px solid #bfdbfe;outline-offset:-1px}
+        .habit-week-cell.today.done{box-shadow:0 0 0 2px #34d399,0 0 10px rgba(16,185,129,.35)}
+        .habit-week-cell.future{color:#e2e8f0;background:#f8fafc}
+        .habit-icon{display:inline-flex;align-items:center;justify-content:center;width:25px;height:25px;margin-right:7px;border-radius:8px;background:#eef4ff;font-size:14px;vertical-align:middle}
+        .habit-week-name-text{display:block;max-width:none;overflow-wrap:anywhere;line-height:1.25;white-space:normal}
+        .habit-week-name{min-width:0;overflow:hidden;color:#172033;font-size:13px;font-weight:600;text-overflow:ellipsis;white-space:nowrap}
+        .habit-week-name small{display:block;margin-top:2px;color:#64748b;font-size:9px;font-weight:500}
         .habit-item{background:#fff;border:1px solid #e0e0e0;border-radius:6px;padding:10px 12px;margin-bottom:6px;cursor:pointer;border-left:4px solid #ddd;transition:background 0.15s}
         .habit-item:hover{background:#f0f4ff}
         .habit-item.selected{background:#eef0ff;border-color:#6366f1}
         .habit-item.active{border-left-color:#10b981}
-        .habit-item.slipping{border-left-color:#f59e0b}
-        .habit-item.dying{border-left-color:#ef4444}
+        .habit-item.slipping{border-left-color:#fbbf24}
+        .habit-item.dying{border-left-color:#c4b5fd}
         .habit-item.archived{opacity:0.5;border-left-color:#bbb}
         .habit-item-header{display:flex;justify-content:space-between;align-items:center}
         .habit-item-name{font-size:12px;font-weight:600;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%}
@@ -62,6 +131,22 @@
         .timer-progress-header{display:flex;justify-content:space-between;font-size:10px;color:#555;margin-bottom:2px}
         .timer-progress-bar{height:5px;background:#e5e7eb;border-radius:3px;overflow:hidden}
         .timer-progress-fill{height:100%;border-radius:3px;transition:width 0.3s ease}
+        .habit-progress-actions{display:flex;gap:4px;margin-top:6px}
+        .habit-progress-actions button{padding:3px 7px;border:1px solid #bfdbfe;border-radius:6px;background:#eff6ff;color:#2563eb;font-size:9px;font-weight:700;cursor:pointer}
+        .habit-progress-actions button:hover{background:#dbeafe}
+        .habit-progress-actions button.complete{border-color:#86efac;background:#ecfdf5;color:#15803d}
+        .habit-progress-input{width:42px;padding:3px 5px;border:1px solid #bfdbfe;border-radius:6px;font-size:9px;color:#1e3a8a}
+        .habit-progress-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(15,23,42,.28);z-index:300}
+        .habit-progress-modal.open{display:flex}
+        .habit-progress-dialog{width:min(310px,calc(100vw - 32px));padding:18px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 18px 45px rgba(15,23,42,.2)}
+        .habit-progress-dialog h3{margin-bottom:14px;color:#1e293b;font-size:16px}
+        .habit-progress-dialog label{display:flex;align-items:center;gap:8px;color:#475569;font-size:13px}
+        .habit-progress-dialog input{width:145px;padding:9px 10px;border:1px solid #cbd5e1;border-radius:9px;font-size:15px;outline:none}
+        .habit-progress-dialog input:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.12)}
+        .habit-progress-dialog .modal-unit{font-size:13px;color:#475569}
+        .habit-progress-dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+        .habit-progress-dialog-actions button{min-width:94px;padding:8px 14px;border:1px solid #e2e8f0;border-radius:9px;background:#fff;color:#64748b;font-size:13px;cursor:pointer}
+        .habit-progress-dialog-actions button.confirm{border-color:#5969a6;background:#5969a6;color:#fff}
 
         /* Habit type badges */
         .habit-type-badge{font-size:9px;padding:1px 5px;border-radius:3px;font-weight:600;margin-right:4px}
@@ -141,8 +226,9 @@
             .nav-links{gap:4px;flex-wrap:wrap}
             .nav-link{padding:8px 12px;font-size:12px;min-height:36px}
             
-            .container{flex-direction:column;height:auto;min-height:calc(100vh - 50px)}
-            .left-panel{width:100%;min-width:100%;border-right:none;border-bottom:1px solid #e0e0e0;max-height:none}
+            .container{display:flex;flex-direction:column;height:auto;min-height:calc(100vh - 50px)}
+            .filter-panel{width:100%;border-right:none;border-bottom:1px solid #dbe5ef;padding:12px}
+            .habit-list-panel{width:100%;min-width:100%;border-right:none;border-bottom:1px solid #e0e0e0;max-height:none}
             .right-panel{min-height:100vh;padding:16px 12px}
             
             .left-header{padding:12px}
@@ -210,8 +296,9 @@
 
         /* Landscape mode on mobile */
         @media (max-width: 768px) and (orientation: landscape) {
-            .container{flex-direction:row}
-            .left-panel{width:50%;max-height:none;border-right:1px solid #e0e0e0;border-bottom:none}
+            .container{display:grid;grid-template-columns:50% 50%;height:calc(100vh - 50px)}
+            .filter-panel{grid-column:1;grid-row:1;max-height:none}
+            .habit-list-panel{grid-column:1;grid-row:2;min-width:0}
             .right-panel{width:50%}
             .habit-list{max-height:calc(100vh - 180px)}
         }
@@ -338,6 +425,11 @@
         .nav-link{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.16);color:#dbeafe}
         .nav-link:hover{background:rgba(255,255,255,.2);color:#fff}
         .nav-link.active{background:#10b981;border-color:#10b981;color:#062e24}
+        .day-date{color:#f8fafc}
+        .day-time{color:#f8fafc}
+        .day-percent{color:#e2e8f0}
+        .day-battery{border-color:#cbd5e1}
+        .day-battery::after{background:#cbd5e1}
         .left-panel{background:#f7f9fc;border-right:1px solid #dfe7f1}
         .right-panel{background:#fff}
         .left-header{padding:16px 16px 4px}
@@ -357,13 +449,26 @@
         .filters .filter-btn:nth-child(4).active{background:#ef4444;border-color:#ef4444}
         .filters .filter-btn:nth-child(5).active{background:#7c3aed;border-color:#7c3aed}
         .filters .filter-btn:nth-child(6).active{background:#64748b;border-color:#64748b}
+        .habit-filter-panel{padding:0 0 10px}
+        .habit-filter-row{display:block;margin-bottom:8px}
+        .habit-filter-field{min-width:0;margin-bottom:8px}
+        .habit-filter-field label{display:block;margin:0 0 3px 2px;color:#718096;font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase}
+        .habit-filter-field select{width:100%;padding:8px;border:1px solid #d5dfeb;border-radius:7px;background:#fff;color:#334155;font-size:10px;font-weight:600;outline:none}
+        .habit-filter-field input{width:100%;padding:8px;border:1px solid #d5dfeb;border-radius:7px;background:#fff;color:#334155;font-size:10px;font-weight:600;outline:none}
+        .habit-filter-field input:focus{border-color:#60a5fa;box-shadow:0 0 0 2px rgba(96,165,250,.15)}
+        .habit-filter-field select:focus{border-color:#60a5fa;box-shadow:0 0 0 2px rgba(96,165,250,.15)}
+        .habit-filter-summary{color:#94a3b8;font-size:9px}
         .habit-list{padding:2px 16px 18px}
+        .habit-section-heading{display:flex;align-items:center;gap:9px;margin:18px 2px 9px;padding:9px 11px;color:#713f12;background:linear-gradient(90deg,#fef3c7,#fffdf5);border:1px solid #fcd34d;border-left:5px solid #f59e0b;border-radius:9px;font-size:13px;font-weight:800;letter-spacing:.35px;line-height:1.2;box-shadow:0 2px 5px rgba(245,158,11,.16)}
+        .habit-section-heading:first-child{margin-top:6px}
+        .habit-section-heading::before{width:8px;height:8px;flex:0 0 8px;border-radius:50%;background:#f59e0b;box-shadow:0 0 0 3px #fde68a;content:''}
+        .habit-section-heading::after{height:2px;flex:1;background:#fcd34d;content:''}
         .habit-item{position:relative;background:#fff;border:1px solid #dce5ef;border-left:5px solid #cbd5e1;border-radius:12px;padding:13px 14px;margin-bottom:9px;box-shadow:0 2px 7px rgba(31,52,73,.05);transition:transform .15s,box-shadow .15s,border-color .15s}
         .habit-item:hover{background:#fff;transform:translateY(-1px);box-shadow:0 5px 14px rgba(31,52,73,.1)}
         .habit-item.selected{background:#f4f8ff;border-color:#60a5fa;box-shadow:0 0 0 2px rgba(37,99,235,.12),0 5px 14px rgba(31,52,73,.08)}
         .habit-item.active{border-left-color:#10b981}
-        .habit-item.slipping{border-left-color:#f59e0b}
-        .habit-item.dying{border-left-color:#ef4444}
+        .habit-item.slipping{border-left-color:#fbbf24}
+        .habit-item.dying{border-left-color:#c4b5fd}
         .habit-item.archived{border-left-color:#94a3b8}
         .habit-item-header{gap:10px}
         .habit-item-name{max-width:66%;font-size:13px;color:#172033}
@@ -414,18 +519,21 @@
         .right-panel{background:linear-gradient(180deg,#f8fbff 0%,#f3f7fb 100%);padding:18px 22px}
         .detail-header{margin-bottom:10px}
         .detail-title{font-size:25px;letter-spacing:-.4px;color:#0f2742;margin-bottom:5px}
-        .detail-subtitle{gap:7px;align-items:center;color:#718096}
-        .detail-subtitle span{background:#edf3f8;border-radius:999px;padding:4px 8px}
+        .detail-subtitle{gap:9px;align-items:center;color:#718096}
+        .detail-subtitle span{background:#edf3f8;border-radius:999px;padding:6px 11px;font-size:13px;font-weight:700}
         .detail-actions{margin-top:9px}
         .checkin-btn{border:0;border-radius:10px;background:linear-gradient(135deg,#0f766e,#059669);color:#fff;box-shadow:0 6px 14px rgba(5,150,105,.2);font-size:13px!important;font-weight:800;padding:11px 16px!important}
         .checkin-btn:hover{background:linear-gradient(135deg,#115e59,#047857);color:#fff;transform:translateY(-1px)}
         .checkin-btn.checked{background:#d1fae5;color:#047857;border:1px solid #6ee7b7;box-shadow:none}
+        .checkin-btn.secondary{background:#fff1f2;color:#be123c;border:1px solid #fecdd3;box-shadow:none}
+        .checkin-btn.secondary:hover{background:#ffe4e6;color:#9f1239}
+        .checkin-btn:disabled{cursor:default;opacity:.8}
         .nudge{margin:0 0 10px;padding:10px 12px;border:0;border-left:4px solid #f59e0b;border-radius:9px;background:#fff7df;color:#713f12;font-size:12px;line-height:1.35}
         .hero-cards{gap:8px;margin-bottom:10px}
-        .hero-card{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;align-items:center;text-align:left;padding:11px 13px;border:1px solid #dbe7f0;border-radius:11px;background:#fff;box-shadow:0 3px 10px rgba(15,39,66,.04)}
-        .hero-card-val{grid-row:1 / span 2;font-size:25px}
-        .hero-card-label{font-size:9px;letter-spacing:.5px}
-        .hero-card-sub{margin-top:2px;font-size:10px}
+        .hero-card{display:block;text-align:center;padding:14px 10px;border:1px solid #dbe7f0;border-radius:11px;background:#fff;box-shadow:0 3px 10px rgba(15,39,66,.04)}
+        .hero-card-val{font-size:30px;line-height:1.15}
+        .hero-card-label{font-size:11px;letter-spacing:.4px;margin-top:5px;font-weight:700;color:#526174}
+        .hero-card-sub{margin-top:5px;font-size:11px}
         .progress-section{padding:12px 13px;margin-bottom:10px;border-color:#dbe7f0;border-radius:11px}
         .progress-section>div:first-child{color:#496175!important;margin-bottom:8px!important}
         .progress-row{gap:8px;margin-bottom:9px}
@@ -454,6 +562,43 @@
         .monthly-chart{min-height:90px}
         .monthly-chart .history-bars{height:92px}
         .monthly-chart .h-bar{background:linear-gradient(180deg,#34d399,#059669)!important}
+        .right-panel{scrollbar-color:#b8c9d8 transparent;scrollbar-width:thin}
+        .detail-header{padding:4px 2px 0}
+        .detail-title{font-size:28px;letter-spacing:-.7px}
+        .overview-panel{grid-template-columns:1.35fr repeat(3,1fr);align-items:center}
+        .overview-score{min-width:0}
+        .overview-stat{min-height:42px;display:flex;flex-direction:column;justify-content:center}
+        .overview-stat strong{font-size:19px;line-height:1.1}
+        .overview-stat span{margin-top:3px}
+        .nudge{box-shadow:0 3px 10px rgba(245,158,11,.08)}
+        .hero-card{transition:transform .18s ease,box-shadow .18s ease}
+        .hero-card:hover{transform:translateY(-2px);box-shadow:0 7px 16px rgba(15,39,66,.09)}
+        .progress-section{box-shadow:0 3px 10px rgba(15,39,66,.035)}
+        .progress-section>div:first-child{font-size:11px!important;letter-spacing:.5px}
+        .detail-section{box-shadow:0 3px 10px rgba(15,39,66,.035)}
+        .history-heading{margin:2px 0 8px;padding-left:2px}
+        .trend-line{background:linear-gradient(90deg,#fff,#f8fbff)}
+        .detail-header-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+        .detail-header-row .detail-title{margin:0}
+        .detail-header-row .detail-actions{margin:0;flex:0 0 auto}
+        .detail-header-row .checkin-btn{padding:7px 12px!important;font-size:11px!important;white-space:nowrap}
+        .activity-graph{padding:13px 15px 10px;margin-bottom:10px;background:#fff;border:1px solid #dbe7f0;border-radius:11px;box-shadow:0 3px 10px rgba(15,39,66,.035)}
+        .activity-graph-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+        .activity-graph-title{color:#496175;font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase}
+        .activity-graph-caption{color:#94a3b8;font-size:10px}
+        .activity-graph .history-heading{display:none}
+        .activity-graph .history-bars{height:126px;padding:8px 2px 0;border-bottom:1px solid #dbe7f0;background:repeating-linear-gradient(to bottom,transparent 0,transparent 30px,rgba(148,163,184,.14) 31px)}
+        .activity-graph .h-bar{background:linear-gradient(180deg,#60a5fa,#2563eb)!important}
+        .activity-graph .h-bar-wrap{min-width:12px}
+        .activity-graph .h-bar-label{font-size:8px}
+        .activity-graph .h-bar-value{font-size:8px}
+        .activity-graph .history-bars{align-items:flex-end;gap:6px}
+        .activity-graph .h-bar-wrap{display:grid;grid-template-rows:14px minmax(0,1fr) 14px;align-items:end;justify-items:center;flex:1;height:100%;min-width:0}
+        .activity-graph .h-bar-track{order:2;align-self:stretch;width:100%;max-width:28px;display:flex;align-items:flex-end;background:#e8eef5;border-radius:4px 4px 2px 2px;overflow:hidden}
+        .activity-graph .h-bar{width:100%;flex:0 0 auto;max-width:none;border-radius:4px 4px 2px 2px}
+        .activity-graph .h-bar-value{order:1;color:#2563eb;font-size:9px;font-weight:800;line-height:1;margin-bottom:3px}
+        .activity-graph .h-bar-label{order:3;color:#64748b;font-size:8px;line-height:1;margin-top:5px;white-space:nowrap}
+        @media(max-width:768px){.activity-graph{padding:11px 12px 8px}.activity-graph .history-bars{height:110px}.detail-header-row .checkin-btn{padding:7px 9px!important}}
         body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:14px;color:#243b53}
         .nav-title{font-size:15px}
         .left-header{padding:14px 16px 4px}
@@ -482,40 +627,151 @@
             .overview-title{font-size:11px}
             .overview-stat strong{font-size:14px}
         }
+
+        /* Weekly game-board layout */
+        .left-panel{background:linear-gradient(180deg,#eef4fb 0%,#f7f9fc 45%,#eef3f8 100%)}
+        .habit-item{border-left:3px solid #dbe5ef;border-radius:14px;padding:12px 13px;background:rgba(255,255,255,.92)}
+        .habit-item.active{border-left-color:#34d399}
+        .habit-item.slipping{border-left-color:#fbbf24}
+        .habit-item.dying{border-left-color:#c4b5fd}
+        .habit-item:hover{border-color:#bfdbfe}
+        .habit-item.selected{border-color:#60a5fa;box-shadow:0 0 0 2px rgba(96,165,250,.15),0 6px 14px rgba(37,99,235,.08)}
+        .habit-week-grid{align-items:center}
+        .habit-week-name{display:flex;align-items:flex-start;min-width:0;overflow:visible;white-space:normal}
+        .habit-icon{flex:0 0 25px;box-shadow:inset 0 0 0 1px rgba(148,163,184,.16)}
+        .habit-name-copy{display:flex;flex-direction:column;min-width:0}
+        .habit-name-copy small{padding-left:0}
+        .habit-week-cell{height:28px;border-radius:9px;font-size:13px;font-weight:700;transition:transform .15s,box-shadow .15s}
+        .habit-week-cell:hover{transform:translateY(-1px)}
+        .habit-week-cell.missed{color:#e57373;background:#fff0f0;border-color:#fecaca}
+        .habit-week-cell.future{color:#dbe5ef;background:#f8fafc}
+        .habit-week-cell.today{outline:2px solid #93c5fd;outline-offset:-2px}
+        .habit-week-cell.today.done{box-shadow:0 0 0 2px #34d399,0 0 9px rgba(16,185,129,.28)}
+        .left-header{padding:14px 18px 8px}
+        .focus-summary{margin-bottom:12px}
+        .focus-chip{background:rgba(255,255,255,.9);border-color:#d6e2ef;box-shadow:0 3px 10px rgba(31,52,73,.07)}
+        .habit-week-header{margin:0 8px;padding:9px 10px 6px;border:1px solid #d6e2ef;border-bottom:0;border-radius:12px 12px 0 0;background:#102a43;color:#cbd5e1}
+        .habit-week-header-name{color:#f8fafc;font-size:10px;font-weight:700;letter-spacing:.6px}
+        .habit-week-day strong{color:#f8fafc}
+        .habit-week-day span{color:#93c5fd}
+        .habit-week-day.today{padding:3px 0;border-radius:5px;background:#1d6fa5}
+        .habit-week-day.today strong,.habit-week-day.today span{color:#fff}
+        .habit-list{margin:0 8px;padding:0 10px 18px;border:1px solid #d6e2ef;border-top:0;border-radius:0 0 12px 12px;background:rgba(255,255,255,.62)}
+        .habit-item{border:1px solid #d8e3ee;border-left:4px solid #cbd5e1;border-radius:9px;padding:10px 8px;margin:0 -1px 6px;background:#fff;box-shadow:0 2px 6px rgba(31,52,73,.05)}
+        .habit-item:first-child{margin-top:8px}
+        .habit-item:hover{transform:translateY(-1px);box-shadow:0 5px 12px rgba(31,52,73,.12)}
+        .habit-item.selected{border-color:#60a5fa;background:#f8fbff;box-shadow:0 0 0 2px rgba(37,99,235,.16),0 5px 12px rgba(31,52,73,.1)}
+        .habit-item.active{border-left-color:#10b981}
+        .habit-item.slipping{border-left-color:#fbbf24}
+        .habit-item.dying{border-left-color:#c4b5fd}
+        .habit-week-grid{grid-template-columns:minmax(150px,1fr) repeat(7,34px);gap:4px;margin-top:0}
+        .habit-week-name{font-size:12px;font-weight:700}
+        .habit-week-name small{color:#64748b;font-size:9px}
+        .habit-week-cell{height:27px;border:1px solid transparent;background:#f1f5f9;font-size:15px}
+        .habit-week-cell.done{background:#dcfce7;border-color:#bbf7d0;color:#15803d}
+        .habit-week-cell.missed{background:#fff0f0;border-color:#fecaca;color:#e57373}
+        .habit-week-cell.future{background:#f1f5f9;border-color:#e2e8f0;color:#cbd5e1}
+        .habit-week-cell.today{outline:2px solid #60a5fa;outline-offset:-2px;box-shadow:0 0 8px rgba(37,99,235,.2)}
+        .timer-progress{margin:8px 0 0;padding-top:7px}
+        .timer-progress-header{font-size:9px}
+
+        @media (max-width:768px){
+            .habit-week-header,.habit-list{margin-left:4px;margin-right:4px}
+            .habit-week-header,.habit-week-grid{grid-template-columns:minmax(125px,1fr) repeat(7,28px);gap:3px}
+            .habit-week-cell{height:25px}
+        }
     </style>
 </head>
 <body>
     <div class="nav">
-        <div class="nav-title">🎯 Habits</div>
+        <div class="nav-brand">
+            <div class="nav-title">📋 TickTick Manager</div>
+            <div class="day-status" title="Time remaining until midnight">
+                <span class="day-date" id="dayDate">Wednesday, 11 Nov 2026</span>
+                <div class="day-meter">
+                    <div class="day-battery" aria-label="Time remaining today">
+                        <span class="day-battery-fill" id="dayBatteryFill"></span>
+                    </div>
+                    <span class="day-percent" id="dayPercent">--% left</span>
+                </div>
+                <span class="day-time" id="dayTime">Time left: --</span>
+            </div>
+        </div>
         <div class="nav-links">
             <a href="/" class="nav-link">📋 Tasks</a>
-            <a href="focus-dashboard.html" class="nav-link">🎯 Focus</a>
-            <a href="calendar.html" class="nav-link">📅 Calendar</a>
             <a href="habit.html" class="nav-link active">🔥 Habits</a>
-            <button class="nav-link" onclick="refreshData()">↻</button>
-            <button class="nav-link" onclick="clearCache()" title="Clear cached data and re-paste">🗑️</button>
         </div>
     </div>
 
     <div class="container">
         <div class="left-panel">
-            <div class="left-header">
-                <div class="habit-overview">
-                    <div class="habit-overview-eyebrow">TODAY</div>
-                    <div class="habit-overview-title">Your daily rhythm</div>
-                    <div class="habit-overview-subtitle">Small steps become lasting progress.</div>
+            <aside class="filter-panel">
+                <div class="habit-budget-strip" id="habitTimeBudget"></div>
+                <div class="filter-panel-title">⚡ Quick filters</div>
+                <div class="habit-filter-panel">
+                <div class="habit-filter-row">
+                    <div class="habit-filter-field">
+                        <label for="habitSearchFilter">Quick search</label>
+                        <input id="habitSearchFilter" type="search" placeholder="Search habit name..." oninput="setHabitFilter('search', this.value)">
+                    </div>
+                    <div class="habit-filter-field">
+                        <label for="habitTypeFilter">Habit type</label>
+                        <select id="habitTypeFilter" onchange="setHabitFilter('type', this.value)">
+                            <option value="all" selected>All types</option>
+                            <option value="Boolean">Boolean · one check-in</option>
+                            <option value="Count">Count · repeated times</option>
+                            <option value="Real">Measured · amount or time</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="focus-summary" id="focusSummary">
-                    <div class="focus-chip"><strong>-</strong> done today</div>
+                <div class="habit-filter-row">
+                    <div class="habit-filter-field">
+                        <label for="habitViewFilter">Show</label>
+                        <select id="habitViewFilter" onchange="setHabitFilter('view', this.value)">
+                            <option value="today" selected>Today's habits</option>
+                            <option value="all">All habits</option>
+                            <option value="incomplete">Incomplete today</option>
+                            <option value="completed">Completed today</option>
+                            <option value="partial">Partially completed</option>
+                            <option value="overdue">Overdue / at risk</option>
+                        </select>
+                    </div>
+                    <div class="habit-filter-field">
+                        <label for="habitDurationFilter">Time needed</label>
+                        <select id="habitDurationFilter" onchange="setHabitFilter('duration', this.value)">
+                            <option value="all" selected>Any duration</option>
+                            <option value="none">No estimate</option>
+                            <option value="0-5">Up to 5m</option>
+                            <option value="6-15">6–15m</option>
+                            <option value="16-30">16–30m</option>
+                            <option value="31-60">31–60m</option>
+                            <option value="61-120">1–2h</option>
+                            <option value="120+">More than 2h</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="habit-list-heading">
-                    <span>All habits</span>
-                    <span id="lastUpdated"></span>
+                <div class="habit-filter-row">
+                    <div class="habit-filter-field">
+                        <label for="habitSortFilter">Sort by</label>
+                        <select id="habitSortFilter" onchange="setHabitFilter('sort', this.value)">
+                            <option value="urgent" selected>Most urgent</option>
+                            <option value="least-done">Least completed</option>
+                            <option value="most-done">Most completed</option>
+                            <option value="overdue">Longest overdue</option>
+                            <option value="shortest">Least time needed</option>
+                            <option value="longest">Most time needed</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
-            <div class="habit-list" id="habitContainer">
-                <div class="loading">Loading habits...</div>
-            </div>
+                <div class="habit-filter-summary" id="habitFilterSummary"></div>
+                </div>
+            </aside>
+            <section class="habit-list-panel">
+                <div class="habit-week-header" id="habitWeekHeader"></div>
+                <div class="habit-list" id="habitContainer">
+                    <div class="loading">Loading habits...</div>
+                </div>
+            </section>
         </div>
         <div class="right-panel" id="detailPanel">
             <div class="detail-empty">← Click a habit to see analysis</div>
@@ -527,15 +783,40 @@
         <span id="toggleIcon">📊</span> <span id="toggleText">Details</span>
     </button>
 
+    <div class="habit-progress-modal" id="habitProgressModal" role="dialog" aria-modal="true" aria-labelledby="habitProgressModalTitle">
+        <div class="habit-progress-dialog">
+            <h3 id="habitProgressModalTitle">Increase progress</h3>
+            <label for="habitProgressAmount">
+                <span>Increase</span>
+                <input id="habitProgressAmount" type="number" min="0" step="any" autofocus>
+                <span class="modal-unit" id="habitProgressUnit">min</span>
+            </label>
+            <div class="habit-progress-dialog-actions">
+                <button type="button" onclick="closeHabitProgressModal()">Close</button>
+                <button type="button" class="confirm" onclick="confirmHabitProgressModal()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // State
         let allHabits = [];
         let allCheckins = {};
+        let allHabitSections = [];
         let allProjects = [];
         let pomodoroStats = {}; // { habitName: minutes } from today's pomodoro/timer
-        let currentFilter = 'all';
+        let progressModalHabitId = null;
+        let currentFilter = 'today';
+        let habitViewFilter = 'today';
+        let habitDurationFilter = 'all';
+        let habitSortFilter = 'urgent';
+        let habitSearchFilter = '';
+        let habitTypeFilter = 'all';
+        let habitHoldTimer = null;
+        let habitHoldTriggered = false;
         let selectedHabitId = null;
         let renderedHabits = []; // cached after render for detail lookup
+        let budgetHabits = []; // today's budget remains independent of list filters
         let mobileShowingDetail = false; // for mobile panel toggle
 
         // ============ MOBILE PANEL TOGGLE ============
@@ -585,8 +866,7 @@
         }
 
         // ============ DATA LOADING ============
-        // TickTick's Open API has no browser CORS support, so requests go through
-        // the server-side proxy with the bearer token kept in localStorage.
+        // TickTick requests go through the local server-side proxy.
 
         function getCachedHabits() {
             try { return JSON.parse(localStorage.getItem('habits_cache') || 'null'); } catch { return null; }
@@ -611,8 +891,10 @@
             }
             
             try {
-                const res = await fetch('https://api.ticktick.com/open/v1/habit', {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                const res = await fetch('/api/ticktick/habits', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ticktick_token: token })
                 });
                 if (res.ok) {
                     const data = await res.json();
@@ -623,6 +905,88 @@
                 console.log('[HABITS] API error:', e.message);
             }
             return null;
+        }
+
+        async function fetchHabitDetail(habitId) {
+            const token = getToken();
+            if (!token || !habitId) return null;
+            try {
+                const res = await fetch('/api/ticktick/habits', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'get_habit_detail',
+                        habitId,
+                        ticktick_token: token
+                    })
+                });
+                if (!res.ok) {
+                    console.warn(`[HABITS] Detail request failed for ${habitId}: ${res.status}`);
+                    return null;
+                }
+                const detail = await res.json();
+                return detail && !Array.isArray(detail) ? detail : null;
+            } catch (error) {
+                console.warn(`[HABITS] Detail request failed for ${habitId}:`, error.message);
+                return null;
+            }
+        }
+
+        async function fetchHabitDetails(habits) {
+            const details = await Promise.all(habits.map(habit => fetchHabitDetail(habit.id)));
+            return habits.map((habit, index) => normalizeHabit({ ...habit, ...(details[index] || {}) }));
+        }
+
+        async function fetchHabitSections() {
+            const token = getToken();
+            if (!token) return [];
+            try {
+                const res = await fetch('/api/ticktick/habits', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'get_habit_sections', ticktick_token: token })
+                });
+                if (!res.ok) {
+                    console.warn(`[HABITS] Section request failed: ${res.status}`);
+                    return [];
+                }
+                const sections = await res.json();
+                return Array.isArray(sections) ? sections : [];
+            } catch (error) {
+                console.warn('[HABITS] Section request failed:', error.message);
+                return [];
+            }
+        }
+
+        function normalizeHabit(habit) {
+            const rawType = String(habit.type || '').trim().toLowerCase();
+            const rawGoal = Number(habit.goal);
+            const type = rawType === 'real' || rawType === 'number' || rawType === 'decimal'
+                ? 'Real'
+                : rawGoal > 1
+                    ? 'Count'
+                    : 'Boolean';
+            const goal = Number.isFinite(rawGoal) && rawGoal > 0 ? rawGoal : 1;
+            const rawStep = Number(habit.step);
+            const step = Number.isFinite(rawStep) && rawStep !== 0 ? Math.abs(rawStep) : 1;
+            const unit = String(habit.unit || (type === 'Real' ? 'Count' : 'Count')).trim() || 'Count';
+            const exDates = Array.isArray(habit.exDates)
+                ? habit.exDates.map(value => Number(String(value).replace(/-/g, ''))).filter(Number.isFinite)
+                : [];
+
+            return {
+                ...habit,
+                type,
+                goal,
+                step,
+                unit,
+                exDates,
+                _excludedStamps: new Set(exDates)
+            };
+        }
+
+        function isHabitExcludedOnStamp(habit, stamp) {
+            return Boolean(habit?._excludedStamps && habit._excludedStamps.has(Number(stamp)));
         }
 
         async function fetchCheckinsBatch(habitIds, lookbackDays) {
@@ -688,6 +1052,24 @@
             return {};
         }
 
+        function normalizeCheckinsForHabits(grouped, habits) {
+            const habitsById = new Map(habits.map(habit => [habit.id, habit]));
+            return Object.fromEntries(Object.entries(grouped || {}).map(([habitId, checkins]) => {
+                const habit = habitsById.get(habitId);
+                const goal = habit?.goal || 1;
+                return [habitId, (Array.isArray(checkins) ? checkins : []).map(checkin => {
+                    const value = Number.isFinite(Number(checkin.value)) ? Number(checkin.value) : 0;
+                    const completed = value >= goal || (habit?.type === 'Boolean' && Number(checkin.status) === 2);
+                    return {
+                        ...checkin,
+                        value: completed && value === 0 ? goal : value,
+                        goal,
+                        status: completed ? 2 : 0
+                    };
+                })];
+            }));
+        }
+
         async function fetchCheckinsGrouped(habits) {
             const active = habits.filter(h => h.status !== 1);
             const shortIds = active.filter(h => getIntervalDays(h) <= 7).map(h => h.id);
@@ -710,7 +1092,7 @@
             for (const result of results) {
                 Object.assign(merged, result?.checkins || result || {});
             }
-            return merged;
+            return normalizeCheckinsForHabits(merged, habits);
         }
 
         async function checkinHabit(habitId, stamp, value) {
@@ -726,7 +1108,7 @@
                     stamp,
                     value,
                     goal: habit.goal || 1,
-                    status: value === 0 ? 0 : 2
+                    status: value >= (habit.goal || 1) ? 2 : 0
                 })
             });
             if (!res.ok) {
@@ -918,6 +1300,107 @@
             return 7; // default daily
         }
 
+        function isHabitDueToday(habit) {
+            if (isHabitExcludedOnStamp(habit, todayStamp())) return false;
+            const scheduledDays = getByDaySchedule(habit);
+            if (scheduledDays) return scheduledDays.includes(new Date().getDay());
+
+            const rule = habit.repeatRule || '';
+            if (rule.includes('FREQ=DAILY')) return true;
+
+            const today = todayStamp();
+            const completedToday = (allCheckins[habit.id] || []).some(checkin =>
+                checkin.checkinStamp === today && checkin.status === 2
+            );
+            const interval = habit._intervalDays || getIntervalDays(habit);
+            return completedToday || (habit._daysSinceLast || 0) >= Math.max(1, interval * 0.8);
+        }
+
+        function formatHabitMinutes(minutes) {
+            if (minutes < 60) return `${minutes}m`;
+            const hours = Math.floor(minutes / 60);
+            const remaining = minutes % 60;
+            return `${hours}h${remaining ? ` ${remaining}m` : ''}`;
+        }
+
+        function getHabitDurationMinutes(habit) {
+            const structuredGoal = Number(habit.goal);
+            if (isTimerUnit(habit.unit) && structuredGoal > 0) {
+                return isHourUnit(habit.unit) ? structuredGoal * 60 : structuredGoal;
+            }
+
+            const title = String(habit.name || '');
+            const match = title.match(/\b(\d+(?:\.\d+)?)\s*(?:-|–|—)?\s*(minutes?|mins?|hours?|hrs?)\b/i);
+            if (!match) return 0;
+            const value = Number(match[1]);
+            return /hour|hr/i.test(match[2]) ? Math.round(value * 60) : Math.round(value);
+        }
+
+        function updateHabitTimeBudget(habitList) {
+            const budget = document.getElementById('habitTimeBudget');
+            if (!budget) return;
+
+            let totalMinutes = 0;
+            let completedMinutes = 0;
+            const plannedHabits = habitList.filter(habit => habit._status !== 'archived' && isHabitDueToday(habit))
+                .filter(habit => getHabitDurationMinutes(habit) > 0)
+            plannedHabits.forEach(habit => {
+                    const goalMinutes = getHabitDurationMinutes(habit);
+                    const todayCheckin = (allCheckins[habit.id] || []).find(checkin => checkin.checkinStamp === todayStamp());
+                    const todayDone = todayCheckin && todayCheckin.status === 2;
+                    const timerMinutes = Number(pomodoroStats[habit.name]) || 0;
+                    const measuredMinutes = Number(todayCheckin && todayCheckin.value) || 0;
+                    const completed = Math.min(goalMinutes, Math.max(timerMinutes, measuredMinutes, todayDone ? goalMinutes : 0));
+                    totalMinutes += goalMinutes;
+                    completedMinutes += completed;
+                });
+
+            const remainingMinutes = Math.max(0, totalMinutes - completedMinutes);
+            const now = new Date();
+            const endOfDay = new Date(now);
+            endOfDay.setHours(24, 0, 0, 0);
+            const dayMinutesLeft = Math.ceil((endOfDay - now) / 60000);
+            const dayElapsedPct = Math.min(100, Math.max(0, Math.round(((1440 - dayMinutesLeft) / 1440) * 100)));
+            const weekday = now.toLocaleDateString('en-US', { weekday: 'long' });
+            const dateLabel = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            const timeLabel = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+            const completedHabitCount = plannedHabits.filter(habit =>
+                (allCheckins[habit.id] || []).some(checkin => checkin.checkinStamp === todayStamp() && checkin.status === 2)
+            ).length;
+            const completionPct = totalMinutes > 0
+                ? Math.min(100, Math.round((completedMinutes / totalMinutes) * 100))
+                : 100;
+            const isUrgent = remainingMinutes > dayMinutesLeft;
+            const dayCapacityPct = dayMinutesLeft > 0
+                ? Math.min(100, Math.round((remainingMinutes / dayMinutesLeft) * 100))
+                : 100;
+            budget.classList.toggle('urgent', isUrgent);
+            budget.innerHTML =
+                `<div class="habit-budget-context"><span><strong>${weekday}</strong>${dateLabel}</span><span><strong>${timeLabel}</strong>current time</span><span><strong>${plannedHabits.length} planned</strong>${completedHabitCount} completed</span></div>` +
+                `<div class="habit-budget-rings">` +
+                    `<div class="habit-ring-card">` +
+                        `<div class="habit-ring" style="--ring-color:#34d399;--ring-progress:${completionPct}">` +
+                            `<div class="habit-ring-content"><strong>${completionPct}%</strong><span>done</span></div>` +
+                        `</div>` +
+                        `<div class="habit-ring-copy"><span class="habit-ring-label">Done</span><span class="habit-ring-value">${formatHabitMinutes(completedMinutes)} / ${formatHabitMinutes(totalMinutes)}</span></div>` +
+                    `</div>` +
+                    `<div class="habit-ring-card">` +
+                        `<div class="habit-ring" style="--ring-color:${isUrgent ? '#fb7185' : '#fbbf24'};--ring-progress:${dayCapacityPct}">` +
+                            `<div class="habit-ring-content"><strong>${dayCapacityPct}%</strong><span>of day</span></div>` +
+                        `</div>` +
+                        `<div class="habit-ring-copy"><span class="habit-ring-label">Needed</span><span class="habit-ring-value">${formatHabitMinutes(remainingMinutes)} / ${formatHabitMinutes(dayMinutesLeft)}</span></div>` +
+                    `</div>` +
+                `</div>` +
+                `<div class="habit-budget-compare">` +
+                    `<div class="habit-budget-compare-head"><strong>DAY SO FAR</strong><span>${dayElapsedPct}% elapsed · ${formatHabitMinutes(dayMinutesLeft)} left</span></div>` +
+                    `<div class="habit-budget-day-track"><div class="habit-budget-compare-time" style="width:${dayElapsedPct}%"></div><div class="habit-budget-now-marker" style="left:${dayElapsedPct}%"></div></div>` +
+                    `<div class="habit-budget-timeline-labels"><span>START</span><span>NOW</span><span>MIDNIGHT</span></div>` +
+                    `<div class="habit-budget-compare-head"><strong>HABIT LOAD</strong><span>${formatHabitMinutes(remainingMinutes)} still to fit</span></div>` +
+                    `<div class="habit-budget-effort-track"><div class="habit-budget-compare-effort" style="width:${dayCapacityPct}%"></div></div>` +
+                    `<div class="habit-budget-effort-caption"><span>Available time</span><span>${dayCapacityPct}% of remaining day</span></div>` +
+                `</div>`;
+        }
+
         // Day abbreviation → JS getDay() index
         const BYDAY_MAP = { SU: 0, MO: 1, TU: 2, WE: 3, TH: 4, FR: 5, SA: 6 };
 
@@ -945,11 +1428,13 @@
         // Calculate streak for a habit
         function calcStreak(habitId) {
             const checkins = allCheckins[habitId] || [];
+            const habit = allHabits.find(item => item.id === habitId);
             if (checkins.length === 0) return 0;
 
             // Sort by stamp descending
             const stamps = checkins
                 .filter(c => c.status === 2)
+                .filter(c => !isHabitExcludedOnStamp(habit, c.checkinStamp))
                 .map(c => c.checkinStamp)
                 .sort((a, b) => b - a);
 
@@ -961,6 +1446,10 @@
             
             for (let i = 0; i < 90; i++) {
                 const stamp = getStamp(checkDate);
+                if (isHabitExcludedOnStamp(habit, stamp)) {
+                    checkDate.setDate(checkDate.getDate() - 1);
+                    continue;
+                }
                 if (stamps.includes(stamp)) {
                     streak++;
                 } else if (i > 0) {
@@ -985,7 +1474,7 @@
             
             const checkins = allCheckins[habit.id] || [];
             // Done today → always active, regardless of window math
-            if (checkins.some(c => c.status === 2 && c.checkinStamp === getStamp(new Date()))) return 'active';
+            if (checkins.some(c => c.status === 2 && c.checkinStamp === getStamp(new Date()) && !isHabitExcludedOnStamp(habit, c.checkinStamp))) return 'active';
             const now = new Date();
             const ageDays = getHabitAge(habit);
             const windowDays = Math.min(ageDays, 7);
@@ -993,11 +1482,12 @@
             for (let i = 0; i < windowDays; i++) {
                 const d = new Date(now);
                 d.setDate(d.getDate() - i);
-                stamps.push(getStamp(d));
+                const stamp = getStamp(d);
+                if (!isHabitExcludedOnStamp(habit, stamp)) stamps.push(stamp);
             }
 
             const weeklyExpected = getExpectedWeeklyFreq(habit);
-            const expected = weeklyExpected * windowDays / 7;
+            const expected = weeklyExpected * stamps.length / 7;
             const done = checkins.filter(c => c.status === 2 && stamps.includes(c.checkinStamp)).length;
             const ratio = expected > 0 ? done / expected : 0;
 
@@ -1058,16 +1548,20 @@
             // Last 7 cycles window (capped to habit age)
             const numCycles = 7;
             const windowDays = Math.min(Math.round(intervalDays * numCycles), ageDays);
-            const expected = Math.min(numCycles, Math.floor(ageDays / intervalDays));
 
             // Count done in window
             const windowStamps = [];
             for (let i = 0; i < windowDays; i++) {
                 const d = new Date(now); d.setDate(d.getDate() - i);
-                windowStamps.push(getStamp(d));
+                const stamp = getStamp(d);
+                if (!isHabitExcludedOnStamp(habit, stamp)) windowStamps.push(stamp);
             }
+            const expected = Math.min(numCycles, Math.floor(windowStamps.length / intervalDays));
             const done = checkins.filter(c => c.status === 2 && windowStamps.includes(c.checkinStamp)).length;
-            const doneStamps = checkins.filter(c => c.status === 2).map(c => c.checkinStamp).sort((a, b) => b - a);
+            const doneStamps = checkins
+                .filter(c => c.status === 2 && !isHabitExcludedOnStamp(habit, c.checkinStamp))
+                .map(c => c.checkinStamp)
+                .sort((a, b) => b - a);
 
             // consistency: 1 - done/expected (0=perfect, 1=completely missing)
             const consistency = expected > 0 ? Math.max(0, 1 - done / expected) : 0;
@@ -1075,8 +1569,9 @@
             // BYDAY habits (exact scheduled days, not "Nx per week"): use slot-based counting
             const scheduledDays = getByDaySchedule(habit);
             if (scheduledDays) {
-                const slots = getByDaySlots(scheduledDays, windowDays);
-                const slotsExpected = Math.max(1, slots.length);
+                const slots = getByDaySlots(scheduledDays, windowDays)
+                    .filter(stamp => !isHabitExcludedOnStamp(habit, stamp));
+                const slotsExpected = slots.length;
                 const slotsDone = checkins.filter(c => c.status === 2 && slots.includes(c.checkinStamp)).length;
                 const byConsistency = Math.max(0, 1 - slotsDone / slotsExpected);
                 const slotsSinceLast = doneStamps.length > 0
@@ -1125,11 +1620,17 @@
             const ageDays = getHabitAge(habit);
             const windowDays = Math.min(ageDays, 30);
             const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - windowDays);
+            let effectiveWindowDays = 0;
+            for (let offset = 0; offset < windowDays; offset++) {
+                const date = new Date();
+                date.setDate(date.getDate() - offset);
+                if (!isHabitExcludedOnStamp(habit, getStamp(date))) effectiveWindowDays++;
+            }
             const done = checkins.filter(c => {
                 const d = stampToDate(c.checkinStamp);
-                return c.status === 2 && d >= cutoff;
+                return c.status === 2 && d >= cutoff && !isHabitExcludedOnStamp(habit, c.checkinStamp);
             }).length;
-            const expected = Math.max(1, Math.round(getExpectedWeeklyFreq(habit) * windowDays / 7));
+            const expected = Math.max(1, Math.round(getExpectedWeeklyFreq(habit) * effectiveWindowDays / 7));
             const pct = Math.min(100, Math.round((done / expected) * 100));
             return { done, expected, pct, windowDays };
         }
@@ -1140,6 +1641,7 @@
         function getStatusTag(habit) {
             const checkins = allCheckins[habit.id] || [];
             const today = todayStamp();
+            if (isHabitExcludedOnStamp(habit, today)) return { text: 'Excluded today', cls: 'on-track', color: '#64748b' };
             const todayDone = checkins.some(c => c.checkinStamp === today && c.status === 2);
             if (todayDone) return { text: 'Done ✅', cls: 'done', color: '#10b981' };
             if (habit._status === 'archived') return { text: 'Archived', cls: 'on-track', color: '#666' };
@@ -1191,11 +1693,13 @@
             const stamps = [];
             for (let i = 0; i < windowDays; i++) {
                 const d = new Date(now); d.setDate(d.getDate() - i);
-                stamps.push(getStamp(d));
+                const stamp = getStamp(d);
+                if (!isHabitExcludedOnStamp(habit, stamp)) stamps.push(stamp);
             }
-            const done = checkins.filter(c => c.status === 2 && stamps.includes(c.checkinStamp)).length;
-            const pct = numCycles > 0 ? Math.min(100, Math.round((done / numCycles) * 100)) : 0;
-            return { done, expected: numCycles, pct, windowDays };
+            const done = checkins.filter(c => c.status === 2 && stamps.includes(c.checkinStamp) && !isHabitExcludedOnStamp(habit, c.checkinStamp)).length;
+            const expected = Math.min(numCycles, Math.floor(stamps.length / interval));
+            const pct = expected > 0 ? Math.min(100, Math.round((done / expected) * 100)) : 0;
+            return { done, expected, pct, windowDays: stamps.length };
         }
 
         // Get adaptive progress windows based on frequency
@@ -1258,6 +1762,8 @@
 
                 if (isBeforeCreation) {
                     html += '<div class="gh-cell empty"></div>';
+                } else if (isHabitExcludedOnStamp(habit, stamp)) {
+                    html += `<div class="gh-cell empty"><div class="gh-tip">${formatDate(d)} · Excluded</div></div>`;
                 } else {
                     const done = doneStamps.has(stamp);
                     html += `<div class="gh-cell ${done ? 'done' : 'missed'}${isToday ? ' today' : ''}"><div class="gh-tip">${formatDate(d)}${done ? ' ✅' : ''}</div></div>`;
@@ -1282,7 +1788,7 @@
                         const dt = new Date(now); dt.setDate(dt.getDate() - (w * 7 + d));
                         stamps.push(getStamp(dt));
                     }
-                    const done = doneStamps.filter(s => stamps.includes(s)).length;
+                    const done = doneStamps.filter(s => stamps.includes(s) && !isHabitExcludedOnStamp(habit, s)).length;
                     const pct = Math.min(100, Math.round((done / weekExpected) * 100));
                     const color = pct >= 100 ? '#10b981' : pct >= 50 ? '#f59e0b' : (done === 0 ? '#e0e0e0' : '#ef4444');
                     const label = w === 0 ? 'This week' : w === 1 ? 'Last week' : `${w}w ago`;
@@ -1300,7 +1806,8 @@
                     const monthStamps = [];
                     for (let d = 1; d <= monthEnd.getDate(); d++) {
                         const dt = new Date(monthDate.getFullYear(), monthDate.getMonth(), d);
-                        if (dt <= now) monthStamps.push(getStamp(dt));
+                        const stamp = getStamp(dt);
+                        if (dt <= now && !isHabitExcludedOnStamp(habit, stamp)) monthStamps.push(stamp);
                     }
                     const done = doneStamps.filter(s => monthStamps.includes(s)).length;
                     const monthExpected = Math.max(1, Math.round(getExpectedWeeklyFreq(habit) * monthStamps.length / 7));
@@ -1322,7 +1829,12 @@
         // Build history bar chart
         function buildHistoryChart(habit, mode) {
             const checkins = allCheckins[habit.id] || [];
-            const doneStamps = checkins.filter(c => c.status === 2).map(c => c.checkinStamp);
+            const activityCheckins = checkins.filter(c =>
+                (c.status === 2 || Number(c.value) > 0) &&
+                !isHabitExcludedOnStamp(habit, c.checkinStamp)
+            );
+            const isMeasuredHabit = habit.type === 'Real' && Number(habit.goal) > 0;
+            const habitGoal = isMeasuredHabit ? Number(habit.goal) : 1;
             const now = new Date();
             const bars = [];
 
@@ -1333,20 +1845,26 @@
                 for (let i = dayCount - 1; i >= 0; i--) {
                     const d = new Date(now); d.setDate(d.getDate() - i);
                     const stamp = getStamp(d);
-                    const done = doneStamps.includes(stamp) ? 1 : 0;
-                    bars.push({ value: done, max: 1, label: formatDate(d) });
+                    const dayCheckins = activityCheckins.filter(c => c.checkinStamp === stamp);
+                    const value = isMeasuredHabit
+                        ? dayCheckins.reduce((sum, c) => sum + Number(c.value || 0), 0)
+                        : (dayCheckins.length > 0 ? 1 : 0);
+                    bars.push({ value, max: habitGoal, label: formatDate(d) });
                 }
             } else if (mode === 'week') {
                 const weekExp = Math.max(1, Math.ceil(getExpectedWeeklyFreq(habit)));
-                const weekCount = Math.min(52, Math.ceil(ageDays / 7));
+                const weekCount = Math.min(8, Math.ceil(ageDays / 7));
                 for (let w = weekCount - 1; w >= 0; w--) {
                     const stamps = [];
                     for (let d = 0; d < 7; d++) {
                         const dt = new Date(now); dt.setDate(dt.getDate() - (w * 7 + d));
                         stamps.push(getStamp(dt));
                     }
-                    const done = doneStamps.filter(s => stamps.includes(s)).length;
-                    bars.push({ value: done, max: weekExp, label: w === 0 ? 'This week' : w === 1 ? 'Last week' : `${w}w ago` });
+                    const weekCheckins = activityCheckins.filter(c => stamps.includes(c.checkinStamp));
+                    const value = isMeasuredHabit
+                        ? weekCheckins.reduce((sum, c) => sum + Number(c.value || 0), 0)
+                        : weekCheckins.length;
+                    bars.push({ value, max: isMeasuredHabit ? weekExp * habitGoal : weekExp, label: w === 0 ? 'This week' : w === 1 ? 'Last week' : `${w}w ago` });
                 }
             } else if (mode === 'month') {
                 const monthCount = Math.min(12, Math.ceil(ageDays / 30));
@@ -1358,20 +1876,25 @@
                         const dt = new Date(monthDate.getFullYear(), monthDate.getMonth(), d);
                         if (dt <= now) monthStamps.push(getStamp(dt));
                     }
-                    const done = doneStamps.filter(s => monthStamps.includes(s)).length;
+                    const monthCheckins = activityCheckins.filter(c => monthStamps.includes(c.checkinStamp));
+                    const done = isMeasuredHabit
+                        ? monthCheckins.reduce((sum, c) => sum + Number(c.value || 0), 0)
+                        : monthCheckins.length;
                     const monthExp = Math.max(1, Math.round(getExpectedWeeklyFreq(habit) * monthStamps.length / 7));
                     const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-                    bars.push({ value: done, max: monthExp, label: months[monthDate.getMonth()] });
+                    bars.push({ value: done, max: isMeasuredHabit ? monthExp * habitGoal : monthExp, label: months[monthDate.getMonth()] });
                 }
             }
 
-            const maxVal = Math.max(1, ...bars.map(b => b.value));
             let html = '<div class="history-bars">';
             for (const bar of bars) {
-                const heightPct = Math.max(3, (bar.value / maxVal) * 100);
+                const heightPct = Math.min(100, Math.max(3, (bar.value / Math.max(1, bar.max)) * 100));
                 const pct = bar.max > 0 ? Math.round((bar.value / bar.max) * 100) : 0;
                 const color = bar.value === 0 ? '#e8e8e8' : (pct >= 80 ? '#10b981' : pct >= 50 ? '#f59e0b' : '#ef4444');
-                html += `<div class="h-bar" style="height:${heightPct}%;background:${color}"><div class="h-tip">${bar.label}: ${bar.value}${bar.max > 1 ? '/' + bar.max : ''}</div></div>`;
+                const shortLabel = mode === 'week'
+                    ? (bar.label === 'This week' ? 'Now' : bar.label.replace('Last week', '1w').replace(' ago', ''))
+                    : bar.label;
+                html += `<div class="h-bar-wrap"><span class="h-bar-value">${bar.value}${bar.max > 1 ? '/' + bar.max : ''}</span><div class="h-bar-track"><div class="h-bar" style="height:${heightPct}%;background:${color}"><div class="h-tip">${bar.label}: ${bar.value}${bar.max > 1 ? '/' + bar.max : ''}</div></div></div><span class="h-bar-label">${shortLabel}</span></div>`;
             }
             html += '</div>';
             return html;
@@ -1394,6 +1917,100 @@
             const habit = renderedHabits.find(h => h.id === selectedHabitId);
             if (habit) {
                 document.getElementById('historyContainer').innerHTML = buildHistoryChart(habit, view);
+            }
+        }
+
+        function getHabitTodayState(habit) {
+                const checkins = allCheckins[habit.id] || [];
+                const today = todayStamp();
+                if (isHabitExcludedOnStamp(habit, today)) {
+                    return { completed: false, partial: false, scheduled: false, actionable: false };
+                }
+                const todayCheckin = checkins.find(c => c.checkinStamp === today);
+                const completed = Boolean(todayCheckin && todayCheckin.status === 2);
+                const partial = Boolean(todayCheckin && !completed && Number(todayCheckin.value) > 0);
+                const scheduledDays = getByDaySchedule(habit);
+                let scheduled = scheduledDays
+                    ? scheduledDays.includes(new Date().getDay())
+                    : String(habit.repeatRule || '').includes('FREQ=DAILY');
+
+                if (!scheduled && !scheduledDays && !String(habit.repeatRule || '').includes('FREQ=DAILY')) {
+                    const weekStart = new Date();
+                    weekStart.setHours(0, 0, 0, 0);
+                    weekStart.setDate(weekStart.getDate() - 6);
+                    const cycleDone = checkins.filter(c => c.status === 2 && stampToDate(c.checkinStamp) >= weekStart).length;
+                    scheduled = cycleDone < Math.max(1, Math.ceil(getExpectedWeeklyFreq(habit)));
+                }
+
+                return { completed, partial, scheduled, actionable: scheduled && !completed };
+            }
+
+        function matchesHabitDuration(habit) {
+                const minutes = getHabitDurationMinutes(habit);
+                if (habitDurationFilter === 'all') return true;
+                if (habitDurationFilter === 'none') return minutes === 0;
+                if (habitDurationFilter === '120+') return minutes > 120;
+                const [min, max] = habitDurationFilter.split('-').map(Number);
+                return minutes >= min && minutes <= max;
+        }
+
+        function matchesHabitSearchAndType(habit) {
+            const search = habitSearchFilter.trim().toLowerCase();
+            const matchesSearch = !search || String(habit.name || '').toLowerCase().includes(search);
+            const matchesType = habitTypeFilter === 'all' || habit.type === habitTypeFilter;
+            return matchesSearch && matchesType;
+        }
+
+        function setHabitFilter(kind, value) {
+                if (kind === 'view') habitViewFilter = value;
+                if (kind === 'duration') habitDurationFilter = value;
+                if (kind === 'sort') habitSortFilter = value;
+                if (kind === 'search') habitSearchFilter = value;
+                if (kind === 'type') habitTypeFilter = value;
+                currentFilter = habitViewFilter;
+                saveHabitFilters();
+                render();
+        }
+
+        function saveHabitFilters() {
+            const filterState = {
+                view: habitViewFilter,
+                duration: habitDurationFilter,
+                sort: habitSortFilter,
+                search: habitSearchFilter,
+                type: habitTypeFilter
+            };
+            try {
+                localStorage.setItem('habit_filter_state', JSON.stringify(filterState));
+            } catch (error) {
+                console.warn('[HABITS] Could not save filter preferences:', error);
+            }
+        }
+
+        function restoreHabitFilters() {
+            try {
+                const saved = JSON.parse(localStorage.getItem('habit_filter_state') || '{}');
+                const viewSelect = document.getElementById('habitViewFilter');
+                const durationSelect = document.getElementById('habitDurationFilter');
+                const sortSelect = document.getElementById('habitSortFilter');
+                const typeSelect = document.getElementById('habitTypeFilter');
+                const searchInput = document.getElementById('habitSearchFilter');
+                const hasOption = (select, value) => select && Array.from(select.options).some(option => option.value === value);
+
+                if (hasOption(viewSelect, saved.view)) habitViewFilter = saved.view;
+                if (hasOption(durationSelect, saved.duration)) habitDurationFilter = saved.duration;
+                if (hasOption(sortSelect, saved.sort)) habitSortFilter = saved.sort;
+                if (hasOption(typeSelect, saved.type)) habitTypeFilter = saved.type;
+                if (typeof saved.search === 'string') habitSearchFilter = saved.search;
+                currentFilter = habitViewFilter;
+
+                if (viewSelect) viewSelect.value = habitViewFilter;
+                if (durationSelect) durationSelect.value = habitDurationFilter;
+                if (sortSelect) sortSelect.value = habitSortFilter;
+                if (typeSelect) typeSelect.value = habitTypeFilter;
+                if (searchInput) searchInput.value = habitSearchFilter;
+            } catch (error) {
+                console.warn('[HABITS] Could not restore filter preferences:', error);
             }
         }
 
@@ -1470,6 +2087,9 @@
                 return mapped;
             });
 
+            budgetHabits = habits;
+            updateHabitTimeBudget(budgetHabits);
+
             // Stats
             const activeHabits = habits.filter(h => h._status !== 'archived');
             const statusCounts = { active: 0, slipping: 0, dying: 0 };
@@ -1482,49 +2102,61 @@
 
             const bestStreak = Math.max(0, ...habits.map(h => h._streak));
 
-            // Focus summary
-            const overdueCount = activeHabits.filter(h => h._daysSinceLast > h._intervalDays * 1.5).length;
-            const dueTodayCount = activeHabits.filter(h => {
-                const done = (allCheckins[h.id]||[]).some(c => c.checkinStamp === todayStamp() && c.status === 2);
-                return !done && h._daysSinceLast >= h._intervalDays * 0.8;
-            }).length;
-            const streaksAtRisk = activeHabits.filter(h => {
-                const done = (allCheckins[h.id]||[]).some(c => c.checkinStamp === todayStamp() && c.status === 2);
-                return !done && h._streak >= 3 && h._daysSinceLast >= h._intervalDays * 0.8;
-            }).length;
+            let filtered = habits.filter(h => {
+                if (h._status === 'archived') return habitViewFilter === 'all';
+                const state = getHabitTodayState(h);
+                if (habitViewFilter === 'today' && !state.scheduled && !state.completed) return false;
+                if (habitViewFilter === 'incomplete' && (!state.scheduled || state.completed)) return false;
+                if (habitViewFilter === 'completed' && !state.completed) return false;
+                if (habitViewFilter === 'partial' && !state.partial) return false;
+                if (habitViewFilter === 'overdue' && h._overdueDays <= 0 && h._status !== 'dying' && h._status !== 'slipping') return false;
+                return matchesHabitDuration(h) && matchesHabitSearchAndType(h);
+            });
 
-            let summaryHtml = `<div class="focus-chip"><strong>${todaysDone}/${activeHabits.length}</strong> done today</div>`;
-            if (overdueCount > 0) summaryHtml += `<div class="focus-chip alert">⚠️ <strong>${overdueCount}</strong> overdue</div>`;
-            if (dueTodayCount > 0) summaryHtml += `<div class="focus-chip warn">📅 <strong>${dueTodayCount}</strong> due today</div>`;
-            if (streaksAtRisk > 0) summaryHtml += `<div class="focus-chip warn">🔥 <strong>${streaksAtRisk}</strong> streak${streaksAtRisk > 1 ? 's' : ''} at risk</div>`;
-            document.getElementById('focusSummary').innerHTML = summaryHtml;
-
-            // Filter
-            let filtered = habits;
-            if (currentFilter === 'active') filtered = habits.filter(h => h._status === 'active');
-            else if (currentFilter === 'slipping') filtered = habits.filter(h => h._status === 'slipping');
-            else if (currentFilter === 'dying') filtered = habits.filter(h => h._status === 'dying');
-            else if (currentFilter === 'archived') filtered = habits.filter(h => h._status === 'archived');
-            else if (currentFilter === 'challenge') filtered = habits.filter(h => h._project && h._status !== 'archived');
-            else filtered = habits.filter(h => h._status !== 'archived');
-
-            // Sort: tier 1 = overdue days DESC, tier 2 = consistency DESC (worst first)
             filtered.sort((a, b) => {
-                if (a._status === 'archived' && b._status !== 'archived') return 1;
-                if (b._status === 'archived' && a._status !== 'archived') return -1;
+                const aState = getHabitTodayState(a);
+                const bState = getHabitTodayState(b);
+                const aDone = getMonthlyScore(a).pct;
+                const bDone = getMonthlyScore(b).pct;
+                if (habitSortFilter === 'least-done') return aDone - bDone;
+                if (habitSortFilter === 'most-done') return bDone - aDone;
+                if (habitSortFilter === 'overdue') return b._overdueDays - a._overdueDays;
+                if (habitSortFilter === 'shortest') return getHabitDurationMinutes(a) - getHabitDurationMinutes(b);
+                if (habitSortFilter === 'longest') return getHabitDurationMinutes(b) - getHabitDurationMinutes(a);
+                if (aState.actionable !== bState.actionable) return aState.actionable ? -1 : 1;
                 if (Math.abs(b._overdueDays - a._overdueDays) > 0.5) return b._overdueDays - a._overdueDays;
                 if (Math.abs(b._consistency - a._consistency) > 0.01) return b._consistency - a._consistency;
                 return b._daysSinceLast - a._daysSinceLast;
             });
 
             renderedHabits = filtered;
+            const summary = document.getElementById('habitFilterSummary');
+            if (summary) summary.textContent = `${filtered.length} habit${filtered.length === 1 ? '' : 's'} shown`;
 
             if (filtered.length === 0) {
                 container.innerHTML = `<div class="no-data">No habits found for this filter</div>`;
                 return;
             }
 
-            container.innerHTML = filtered.map(h => renderHabitItem(h)).join('');
+            renderHabitWeekHeader();
+            const sectionsById = new Map(allHabitSections.map(section => [section.id, section]));
+            const groupedSections = new Map();
+            filtered.forEach(habit => {
+                const section = sectionsById.get(habit.sectionId);
+                const sectionId = section?.id || '__other__';
+                if (!groupedSections.has(sectionId)) {
+                    groupedSections.set(sectionId, {
+                        name: section?.name || 'Other habits',
+                        sortOrder: Number(section?.sortOrder) || Number.MAX_SAFE_INTEGER,
+                        habits: []
+                    });
+                }
+                groupedSections.get(sectionId).habits.push(habit);
+            });
+            container.innerHTML = Array.from(groupedSections.values())
+                .sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name))
+                .map(group => `<div class="habit-section-heading">${group.name}</div>${group.habits.map(habit => renderHabitItem(habit)).join('')}`)
+                .join('');
 
             // Auto-select first if nothing selected or selected not in list
             if (!selectedHabitId || !filtered.find(h => h.id === selectedHabitId)) {
@@ -1532,6 +2164,49 @@
             } else {
                 selectHabit(selectedHabitId);
             }
+
+        }
+
+        function getHabitWeekDays() {
+            const today = new Date();
+            return Array.from({ length: 7 }, (_, index) => {
+                const date = new Date(today);
+                date.setHours(0, 0, 0, 0);
+                date.setDate(today.getDate() - (6 - index));
+                return date;
+            });
+        }
+
+        function renderHabitWeekHeader() {
+            const header = document.getElementById('habitWeekHeader');
+            if (!header) return;
+            const todayStampValue = todayStamp();
+            const days = getHabitWeekDays();
+            header.innerHTML = '<div class="habit-week-header-name">Habit</div>' + days.map(day => {
+                const isToday = getStamp(day) === todayStampValue;
+                return `<div class="habit-week-day ${isToday ? 'today' : ''}">
+                    <strong>${day.toLocaleDateString('en-US', { weekday: 'short' })}</strong>
+                    <span>${day.getDate()}</span>
+                </div>`;
+            }).join('');
+        }
+
+        function getHabitIcon(habit) {
+            const resource = String(habit.iconRes || '').toLowerCase();
+            const value = String(habit.name || '').toLowerCase();
+            const iconMap = [
+                [/water|drink|juice|water/, '💧'],
+                [/protein|egg|med|vitamin|creatine|pill/, '🥗'],
+                [/workout|run|walk|step|sunlight|sport|exercise/, '🏃'],
+                [/sleep|bed|brush|hair|skin|face|bath/, '🌙'],
+                [/read|book|english|learn|study/, '📚'],
+                [/fast/, '⏳'],
+                [/work|project|task|review|inbox/, '🎯'],
+                [/shop|travel|family|mummy|contact/, '🤝']
+            ];
+            const match = iconMap.find(([pattern]) => pattern.test(resource) || pattern.test(value));
+            const color = /^#[0-9a-f]{6}$/i.test(String(habit.color || '')) ? habit.color : '#dbeafe';
+            return { glyph: match ? match[1] : '✦', color };
         }
 
         // Detect if a unit is time-based (hour/hours/Hour/min/minute/minutes etc.)
@@ -1544,18 +2219,123 @@
             return /^(hour|hours|hr|hrs)$/i.test(unit.trim());
         }
 
-        // Timer progress bar for habits with time-based units
-        // Uses pomodoro stats (actual timer minutes today) not checkin value
+        function isQuantifiedHabit(habit) {
+            return Boolean(habit && (habit.type === 'Real' || Number(habit.goal) > 1));
+        }
+
+        function getHabitGoalValue(habit) {
+            return Number(habit?.goal) || 1;
+        }
+
+        function getHabitStepValue(habit) {
+            const step = Number(habit?.step);
+            return Number.isFinite(step) && step !== 0 ? Math.abs(step) : 1;
+        }
+
+        function formatHabitProgressValue(habit, value) {
+            if (isHourUnit(habit?.unit)) return formatHabitMinutes(value * 60);
+            if (isTimerUnit(habit?.unit)) return formatHabitMinutes(value);
+            return `${value}`;
+        }
+
+        async function saveHabitProgress(habitId, value, buttonEvent) {
+            if (buttonEvent) buttonEvent.stopPropagation();
+            const habit = allHabits.find(item => item.id === habitId);
+            if (!habit) return;
+            const goal = getHabitGoalValue(habit);
+            const nextValue = Math.min(goal, Math.max(0, Number(value) || 0));
+            try {
+                await checkinHabit(habitId, todayStamp(), nextValue);
+                const checkins = allCheckins[habitId] || [];
+                const existing = checkins.find(checkin => checkin.checkinStamp === todayStamp());
+                const updated = { habitId, checkinStamp: todayStamp(), value: nextValue, goal, status: nextValue >= goal ? 2 : 0 };
+                allCheckins[habitId] = existing
+                    ? checkins.map(checkin => checkin === existing ? { ...checkin, ...updated } : checkin)
+                    : [...checkins, updated];
+                render();
+                renderDetail();
+            } catch (error) {
+                console.error('[CHECKIN] Progress update failed:', error);
+            }
+        }
+
+        function addHabitProgress(habitId, amount, buttonEvent) {
+            const current = (allCheckins[habitId] || []).find(checkin => checkin.checkinStamp === todayStamp());
+            saveHabitProgress(habitId, (Number(current?.value) || 0) + amount, buttonEvent);
+        }
+
+        function addHabitProgressFromInput(habitId, input, buttonEvent) {
+            const habit = allHabits.find(item => item.id === habitId);
+            const amount = Number(input?.value);
+            if (!habit || !Number.isFinite(amount) || amount <= 0) return;
+            const nativeAmount = isHourUnit(habit.unit) ? amount / 60 : amount;
+            input.value = '';
+            addHabitProgress(habitId, nativeAmount, buttonEvent);
+        }
+
+        function openHabitProgressModal(habitId, buttonEvent) {
+            if (buttonEvent) buttonEvent.stopPropagation();
+            const habit = allHabits.find(item => item.id === habitId);
+            const modal = document.getElementById('habitProgressModal');
+            const input = document.getElementById('habitProgressAmount');
+            const unit = document.getElementById('habitProgressUnit');
+            if (!habit || !modal || !input || !unit) return;
+            progressModalHabitId = habitId;
+            input.value = '';
+            input.placeholder = isHourUnit(habit.unit) ? 'e.g. 35' : 'e.g. 1';
+            unit.textContent = isHourUnit(habit.unit) ? 'min' : (habit.unit || 'times');
+            modal.classList.add('open');
+            requestAnimationFrame(() => input.focus());
+        }
+
+        function closeHabitProgressModal() {
+            const modal = document.getElementById('habitProgressModal');
+            if (modal) modal.classList.remove('open');
+            progressModalHabitId = null;
+        }
+
+        function confirmHabitProgressModal() {
+            const habit = allHabits.find(item => item.id === progressModalHabitId);
+            const input = document.getElementById('habitProgressAmount');
+            const amount = Number(input?.value);
+            if (!habit || !Number.isFinite(amount) || amount <= 0) {
+                input?.focus();
+                return;
+            }
+            const nativeAmount = isHourUnit(habit.unit) ? amount / 60 : amount;
+            const habitId = progressModalHabitId;
+            closeHabitProgressModal();
+            addHabitProgress(habitId, nativeAmount);
+        }
+
+        function renderQuantifiedProgress(habit, todayCheckin) {
+            const goal = getHabitGoalValue(habit);
+            const current = Math.min(goal, Number(todayCheckin?.value) || 0);
+            const pct = Math.min(100, Math.round((current / goal) * 100));
+            const unitLabel = isTimerUnit(habit.unit) ? '' : ` ${habit.unit || 'times'}`;
+            return `<div class="timer-progress">
+                <div class="timer-progress-header"><span>📌 ${formatHabitProgressValue(habit, current)} / ${formatHabitProgressValue(habit, goal)}${unitLabel}</span><span>${pct}%</span></div>
+                <div class="timer-progress-bar"><div class="timer-progress-fill" style="width:${pct}%;background:${pct >= 100 ? '#10b981' : '#3b82f6'}"></div></div>
+                ${current < goal ? `<div class="habit-progress-actions"><button onclick="openHabitProgressModal('${habit.id}', event)">Add progress</button><button class="complete" onclick="saveHabitProgress('${habit.id}', ${goal}, event)">Complete</button></div>` : ''}</div>`;
+        }
+
+        // Timer progress uses Pomodoro minutes when available, otherwise TickTick's
+        // measured check-in value for the current day.
         function renderTimerProgress(habit, todayCheckin) {
+            if (isQuantifiedHabit(habit)) return renderQuantifiedProgress(habit, todayCheckin);
             if (!isTimerUnit(habit.unit)) return '';
             const goal = habit.goal || 1;
-            const timerMinutes = pomodoroStats[habit.name] || 0;
             const goalMinutes = isHourUnit(habit.unit) ? goal * 60 : goal;
-            const pct = Math.min(100, Math.round((timerMinutes / goalMinutes) * 100));
-            const isComplete = timerMinutes >= goalMinutes;
+            const pomodoroMinutes = pomodoroStats[habit.name] || 0;
+            const checkinValue = todayCheckin && Number(todayCheckin.value) > 0
+                ? Number(todayCheckin.value)
+                : 0;
+            const trackedMinutes = pomodoroMinutes > 0 ? pomodoroMinutes : checkinValue;
+            const pct = Math.min(100, Math.round((trackedMinutes / goalMinutes) * 100));
+            const isComplete = trackedMinutes >= goalMinutes;
 
             // Format display
-            const displayValue = timerMinutes >= 60 ? `${Math.floor(timerMinutes/60)}h ${timerMinutes%60}m` : `${timerMinutes}m`;
+            const displayValue = trackedMinutes >= 60 ? `${Math.floor(trackedMinutes/60)}h ${trackedMinutes%60}m` : `${trackedMinutes}m`;
             const displayGoal = goalMinutes >= 60 ? `${Math.floor(goalMinutes/60)}h${goalMinutes%60 > 0 ? ' ' + goalMinutes%60 + 'm' : ''}` : `${goalMinutes}m`;
 
             const barColor = isComplete ? '#10b981' : pct >= 50 ? '#f59e0b' : '#3b82f6';
@@ -1577,9 +2357,25 @@
             const todayCheckin = checkins.find(c => c.checkinStamp === today);
             const todayDone = todayCheckin && todayCheckin.status === 2;
             const status = getStatusTag(habit);
+            const weekDays = getHabitWeekDays();
+            const doneStamps = new Set(checkins.filter(c => c.status === 2).map(c => c.checkinStamp));
+            const partialCheckins = new Map(checkins
+                .filter(c => c.status !== 2 && Number(c.value) > 0)
+                .map(c => [c.checkinStamp, c]));
+            const weekCells = weekDays.map(day => {
+                const stamp = getStamp(day);
+                const isToday = stamp === today;
+                const isFuture = day > new Date();
+                const excluded = isHabitExcludedOnStamp(habit, stamp);
+                const done = doneStamps.has(stamp);
+                const partial = partialCheckins.get(stamp);
+                const partialText = partial ? `${Number(partial.value)}${habit.goal ? '/' + Number(habit.goal) : ''}` : '';
+                const cellClass = excluded ? 'future' : done ? 'done' : partial ? 'partial' : isFuture ? 'future' : 'missed';
+                const cellTitle = excluded ? 'Excluded' : done ? 'Completed' : partial ? `In progress: ${partialText}` : isFuture ? 'Upcoming' : 'Not completed';
+                return `<div class="habit-week-cell ${cellClass} ${isToday ? 'today' : ''}" title="${cellTitle}">${excluded ? '–' : done ? '✓' : partial ? partialText : '·'}</div>`;
+            }).join('');
             // Build 7 cycle dots (most recent on right)
             const interval = habit._intervalDays || 1;
-            const doneStamps = new Set(checkins.filter(c => c.status === 2).map(c => c.checkinStamp));
             const now = new Date();
             const ageDays = getHabitAge(habit);
             let dotsHtml = '';
@@ -1595,7 +2391,8 @@
                 let hasDone = false;
                 for (let d = cycleStart; d < cycleEnd; d++) {
                     const dt = new Date(now); dt.setDate(dt.getDate() - d);
-                    if (doneStamps.has(getStamp(dt))) { hasDone = true; break; }
+                    const stamp = getStamp(dt);
+                    if (!isHabitExcludedOnStamp(habit, stamp) && doneStamps.has(stamp)) { hasDone = true; break; }
                 }
                 if (hasDone) doneCount++;
                 dotsHtml += `<div class="cycle-dot ${hasDone ? 'done' : 'missed'}"></div>`;
@@ -1603,19 +2400,10 @@
 
             const isSelected = habit.id === selectedHabitId;
             return `
-            <div class="habit-item ${habit._status} ${isSelected ? 'selected' : ''}" onclick="selectHabit('${habit.id}')">
-                <div class="habit-item-header">
-                    <div class="habit-item-name">${todayDone ? '✅' : '⬜'} ${habit.name}</div>
-                    <div class="habit-item-right">
-                        <span class="status-tag" style="background:${status.color}22;color:${status.color}">${status.text}</span>
-                    </div>
-                </div>
-                <div class="habit-item-meta">
-                    <span>🔄 ${parseRepeatRule(habit.repeatRule)}</span>
-                </div>
-                <div class="cycle-dots">
-                    ${dotsHtml}
-                    <span style="font-size:9px;color:#666;margin-left:4px">${doneCount}/7</span>
+            <div class="habit-item ${habit._status} ${isSelected ? 'selected' : ''}" onclick="handleHabitRowClick('${habit.id}', event)" onpointerdown="startHabitHold('${habit.id}', event)" onpointerup="endHabitHold(event)" onpointerleave="endHabitHold(event)" onpointercancel="endHabitHold(event)">
+                <div class="habit-week-grid">
+                    <div class="habit-week-name"><span class="habit-icon" aria-hidden="true" style="background:${getHabitIcon(habit).color}22;border-color:${getHabitIcon(habit).color}55">${getHabitIcon(habit).glyph}</span><span class="habit-name-copy"><span class="habit-week-name-text">${habit.name}</span><small>${parseRepeatRule(habit.repeatRule)} · ${status.text}</small></span></div>
+                    ${weekCells}
                 </div>
                 ${renderTimerProgress(habit, todayCheckin)}
             </div>`;
@@ -1633,6 +2421,44 @@
             showDetailOnMobile(); // Auto-switch to detail on mobile
         }
 
+        function handleHabitRowClick(habitId, rowEvent) {
+            if (rowEvent?.target?.closest('button, input, select, a')) return;
+            selectHabit(habitId);
+        }
+
+        function startHabitHold(habitId, holdEvent) {
+            if (holdEvent?.target?.closest('button, input, select, a')) return;
+            window.clearTimeout(habitHoldTimer);
+            habitHoldTriggered = false;
+            habitHoldTimer = window.setTimeout(() => {
+                habitHoldTriggered = true;
+                handleHabitCheckin(habitId, holdEvent);
+            }, 900);
+        }
+
+        function endHabitHold(holdEvent) {
+            if (holdEvent?.target?.closest('button, input, select, a')) return;
+            window.clearTimeout(habitHoldTimer);
+            habitHoldTimer = null;
+        }
+
+        function handleHabitCheckin(habitId, checkinEvent) {
+            if (checkinEvent) checkinEvent.stopPropagation();
+            selectHabit(habitId);
+            const habit = allHabits.find(item => item.id === habitId);
+            if (!habit) return;
+            if (isQuantifiedHabit(habit)) {
+                const todayCheckin = (allCheckins[habitId] || []).find(checkin => checkin.checkinStamp === todayStamp());
+                if (todayCheckin?.status === 2) {
+                    saveHabitProgress(habitId, 0, checkinEvent);
+                } else {
+                    openHabitProgressModal(habitId, checkinEvent);
+                }
+                return;
+            }
+            toggleCheckin(habitId);
+        }
+
         function renderDetail() {
             const panel = document.getElementById('detailPanel');
             const habit = renderedHabits.find(h => h.id === selectedHabitId);
@@ -1643,7 +2469,9 @@
 
             const checkins = allCheckins[habit.id] || [];
             const today = todayStamp();
-            const todayDone = checkins.some(c => c.checkinStamp === today && c.status === 2);
+            const todayCheckin = checkins.find(c => c.checkinStamp === today);
+            const todayDone = Boolean(todayCheckin && todayCheckin.status === 2);
+            const todayHasProgress = Boolean(todayCheckin && (todayDone || Number(todayCheckin.value) > 0));
             const ageDays = getHabitAge(habit);
             const intervalDays = habit._intervalDays;
             const status = getStatusTag(habit);
@@ -1723,14 +2551,14 @@
 
             // ── Heatmap ── (show full history up to 1 year)
             const defaultView = 'day';
-            const defaultHistoryView = 'month';
             const heatmapWeeks = Math.min(52, Math.ceil(Math.min(ageDays, 365) / 7));
             const dayHeatmapHtml = buildDayHeatmap(habit, heatmapWeeks);
             const weekViewHtml = buildCycleView(habit, 'week', Math.min(52, Math.ceil(ageDays / 7)));
             const monthViewHtml = buildCycleView(habit, 'month', Math.min(12, Math.ceil(ageDays / 30)));
 
             // ── History chart ──
-            const historyHtml = buildHistoryChart(habit, defaultHistoryView);
+            const weeklyHistoryHtml = buildHistoryChart(habit, 'week');
+            const monthlyHistoryHtml = buildHistoryChart(habit, 'month');
 
             // ── Coach tip ──
             let coachTip = '';
@@ -1761,6 +2589,13 @@
             let goalInfo = '';
             if (habit.type === 'Real' && habit.goal > 1) goalInfo = `🎯 ${habit.goal} ${habit.unit || ''} per day`;
             if (habit.targetDays > 0) goalInfo += (goalInfo ? ' · ' : '') + `📅 ${habit.targetDays}-day target`;
+            const quantifiedHabit = isQuantifiedHabit(habit);
+            const quantifiedComplete = quantifiedHabit && Number(todayCheckin?.value) >= getHabitGoalValue(habit);
+            const detailActions = quantifiedHabit
+                ? `<button class="checkin-btn" ${quantifiedComplete ? 'disabled' : ''} onclick="openHabitProgressModal('${habit.id}', event)">${quantifiedComplete ? '✓ Complete' : 'Add progress'}</button>${todayHasProgress ? `<button class="checkin-btn secondary" onclick="clearTodayCheckin('${habit.id}', event)">↩ Undo today</button>` : ''}`
+                : todayHasProgress
+                    ? `<button class="checkin-btn checked" disabled>✓ Checked in</button><button class="checkin-btn secondary" onclick="clearTodayCheckin('${habit.id}', event)">↩ Undo today</button>`
+                    : '<button class="checkin-btn" onclick="toggleCheckin(\'' + habit.id + '\')">✓ Check in</button>';
 
             // ── Challenge link ──
             let challengeHtml = '';
@@ -1770,56 +2605,39 @@
 
             panel.innerHTML = `
                 <div class="detail-header">
-                    <div class="detail-title">${habit.name}</div>
-                    <div class="detail-subtitle">
-                        <span>🔄 ${parseRepeatRule(habit.repeatRule)}</span>
-                        ${goalInfo ? `<span>${goalInfo}</span>` : ''}
-                        <span style="color:${status.color}">${status.text}</span>
-                    </div>
-                    <div class="detail-actions">
-                        <button class="checkin-btn ${todayDone ? 'checked' : ''}" onclick="toggleCheckin('${habit.id}')" style="flex:1;font-size:14px;padding:12px 20px">
-                            ${todayDone ? '✅ Done today' : '✓ Check in · protect your streak'}
-                        </button>
+                    <div class="detail-header-row">
+                        <div>
+                            <div class="detail-title">${habit.name}</div>
+                            <div class="detail-subtitle">
+                                <span>🔄 ${parseRepeatRule(habit.repeatRule)}</span>
+                                ${goalInfo ? `<span>${goalInfo}</span>` : ''}
+                                <span style="color:${status.color}">${status.text}</span>
+                            </div>
+                        </div>
+                        <div class="detail-actions">
+                            ${detailActions}
+                        </div>
                     </div>
                 </div>
-
-                <div class="overview-panel">
-                    <div class="overview-score">
-                        <div class="overview-ring" style="--score:${monthly.pct}%"><strong>${monthly.pct}%</strong></div>
-                        <div><div class="overview-caption">Overview</div><div class="overview-title">${monthly.pct >= 70 ? 'Great rhythm' : monthly.pct >= 35 ? 'Keep building' : 'Restart today'}</div></div>
-                    </div>
-                    <div class="overview-stat"><strong>${monthly.pct}%</strong><span>month</span></div>
-                    <div class="overview-stat"><strong>${yearPct}%</strong><span>year</span></div>
-                    <div class="overview-stat"><strong>${totalDone}</strong><span>total</span></div>
-                </div>
-
-                <div class="nudge">${nudge}</div>
 
                 ${challengeHtml}
                 ${habit.encouragement ? `<div class="detail-encourage">"${habit.encouragement}"</div>` : ''}
 
                 <div class="hero-cards">
                     <div class="hero-card">
+                        <div class="hero-card-val" style="color:#2563eb">📌 ${totalDone}</div>
+                        <div class="hero-card-label">total completed</div>
+                    </div>
+                    <div class="hero-card">
                         <div class="hero-card-val" style="color:${streakColor}">🔥 ${streakInfo.count}</div>
-                        <div class="hero-card-label">${streakInfo.unit} streak</div>
+                        <div class="hero-card-label">current streak</div>
                         ${habit._streak > 0 && habit._streak >= bestStreak ? '<div class="hero-card-sub" style="color:#fcd34d">🏆 New record!</div>' : ''}
                     </div>
                     <div class="hero-card">
                         <div class="hero-card-val" style="color:#7c3aed">🏆 ${bestStreak}</div>
-                        <div class="hero-card-label">best ever</div>
+                        <div class="hero-card-label">best streak</div>
                         <div class="hero-card-sub" style="color:${streakGap > 0 ? '#64748b' : '#10b981'}">${streakGap > 0 ? streakGap + ' to beat' : "Personal best!"}</div>
                     </div>
-                </div>
-
-                <div class="progress-section">
-                    <div style="font-size:11px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">📊 Progress</div>
-                    ${progressHtml}
-                </div>
-
-                <div class="trend-line">
-                    <span class="trend-arrow" style="color:${trendColor}">${trendIcon}</span>
-                    <span style="color:${trendColor}">${trendText}</span>
-                    ${milestone ? `<span style="margin-left:auto;font-size:11px">${milestone}</span>` : ''}
                 </div>
 
                 <div class="detail-section">
@@ -1838,17 +2656,20 @@
                     </div>
                 </div>
 
-                <div class="detail-section">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-                        <div class="detail-section-title" style="margin-bottom:0">📊 History</div>
-                        <div class="view-tabs history-tabs">
-                            <button class="view-tab ${defaultHistoryView === 'day' ? 'active' : ''}" onclick="switchHistory('day')">Day</button>
-                            <button class="view-tab ${defaultHistoryView === 'week' ? 'active' : ''}" onclick="switchHistory('week')">Week</button>
-                            <button class="view-tab ${defaultHistoryView === 'month' ? 'active' : ''}" onclick="switchHistory('month')">Month</button>
-                        </div>
+                <div class="activity-graph">
+                    <div class="activity-graph-header">
+                        <span class="activity-graph-title">📈 Weekly activity</span>
+                        <span class="activity-graph-caption">last 8 weeks</span>
                     </div>
-                    <div class="history-heading">Monthly activity</div>
-                    <div id="historyContainer" class="monthly-chart">${historyHtml}</div>
+                    ${weeklyHistoryHtml}
+                </div>
+
+                <div class="activity-graph">
+                    <div class="activity-graph-header">
+                        <span class="activity-graph-title">📊 Monthly activity</span>
+                        <span class="activity-graph-caption">last 12 months</span>
+                    </div>
+                    ${monthlyHistoryHtml}
                 </div>
 
                 <div class="coach-tip">💬 ${coachTip}</div>
@@ -1856,6 +2677,21 @@
         }
 
         // ============ ACTIONS ============
+
+        async function clearTodayCheckin(habitId, buttonEvent) {
+            if (buttonEvent) buttonEvent.stopPropagation();
+            const habit = allHabits.find(item => item.id === habitId);
+            if (!habit) return;
+            const stamp = todayStamp();
+            try {
+                await checkinHabit(habitId, stamp, 0);
+                allCheckins[habitId] = (allCheckins[habitId] || []).filter(checkin => checkin.checkinStamp !== stamp);
+                render();
+                renderDetail();
+            } catch (error) {
+                console.error('[CHECKIN] Could not undo today:', error);
+            }
+        }
 
         function setFilter(f) {
             currentFilter = f;
@@ -1867,6 +2703,11 @@
         async function toggleCheckin(habitId) {
             const stamp = todayStamp();
             const checkins = allCheckins[habitId] || [];
+            const habit = allHabits.find(h => h.id === habitId);
+            if (isQuantifiedHabit(habit)) {
+                await saveHabitProgress(habitId, getHabitGoalValue(habit));
+                return;
+            }
             const todayCheckin = checkins.find(c => c.checkinStamp === stamp && c.status === 2);
 
             try {
@@ -1877,8 +2718,7 @@
                     allCheckins[habitId] = checkins.filter(c => !(c.checkinStamp === stamp && c.status === 2));
                 } else {
                     // Check in
-                    const habit = allHabits.find(h => h.id === habitId);
-                    const value = (habit && habit.type === 'Real') ? habit.goal : 1;
+                    const value = 1;
                     await checkinHabit(habitId, stamp, value);
                     // Add to local
                     if (!allCheckins[habitId]) allCheckins[habitId] = [];
@@ -1907,7 +2747,8 @@
                     return;
                 }
 
-                allHabits = habits;
+                allHabits = await fetchHabitDetails(habits);
+                allHabitSections = await fetchHabitSections();
                 
                 // Try to get projects (Open API works from file://)
                 try { allProjects = await fetchProjects(); } catch { allProjects = []; }
@@ -1938,8 +2779,6 @@
 
                 const cacheTime = getCacheTime();
                 const fetchTime = window.__HABITS_FETCH_TIME__ || cacheTime;
-                const src = fetchTime ? `Data from: ${new Date(fetchTime).toLocaleString()}` : `Updated: ${new Date().toLocaleTimeString()}`;
-                document.getElementById('lastUpdated').textContent = src;
                 render();
             } catch (e) {
                 console.error('Load error:', e);
@@ -1954,8 +2793,42 @@
             showPasteUI();
         }
 
+        function updateDayStatus() {
+            const now = new Date();
+            const tomorrow = new Date(now);
+            tomorrow.setHours(24, 0, 0, 0);
+            const remainingMs = Math.max(0, tomorrow - now);
+            const remainingMinutes = Math.ceil(remainingMs / 60000);
+            const hours = Math.floor(remainingMinutes / 60);
+            const minutes = remainingMinutes % 60;
+            const remainingPercent = Math.max(3, Math.round(remainingMs / 864000));
+            const dateLabel = document.getElementById('dayDate');
+            const timeLabel = document.getElementById('dayTime');
+            const percentLabel = document.getElementById('dayPercent');
+            const batteryFill = document.getElementById('dayBatteryFill');
+
+            if (dateLabel) {
+                dateLabel.textContent = new Intl.DateTimeFormat('en-GB', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                    weekday: 'long'
+                }).format(now);
+            }
+            if (timeLabel) timeLabel.textContent = `Time left: ${hours}h ${String(minutes).padStart(2, '0')}m`;
+            if (percentLabel) percentLabel.textContent = `${remainingPercent}% left`;
+            if (batteryFill) {
+                batteryFill.style.width = `${remainingPercent}%`;
+                batteryFill.style.background = remainingPercent < 25 ? '#ef4444' : remainingPercent < 50 ? '#f59e0b' : '#22c55e';
+            }
+        }
+
         // Boot
+        updateDayStatus();
+        window.setInterval(updateDayStatus, 60000);
+        window.setInterval(() => updateHabitTimeBudget(budgetHabits), 60000);
         initMobileView();
+        restoreHabitFilters();
         refreshData();
         
         // Handle resize (rotation, etc)
