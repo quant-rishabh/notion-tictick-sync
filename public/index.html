@@ -7300,15 +7300,22 @@
                     body: JSON.stringify(moves)
                 });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const results = await response.json();
+                if (!Array.isArray(results)) throw new Error('TickTick returned an invalid bulk move response');
+
+                const movedIds = new Set(results.map(result => result && result.id).filter(Boolean));
                 moves.forEach(move => {
+                    if (!movedIds.has(move.taskId)) return;
                     const task = taskMap.get(move.taskId);
                     if (task) task.projectId = targetProjectId;
                     if (taskById[move.taskId]) taskById[move.taskId].projectId = targetProjectId;
                 });
-                localStorage.setItem('ticktick_tasks', JSON.stringify(allTasks));
-                return { updated: moves.length, skipped, failed: 0 };
+                const updated = movedIds.size;
+                const failed = Math.max(0, moves.length - updated);
+                if (updated > 0) localStorage.setItem('ticktick_tasks', JSON.stringify(allTasks));
+                return { updated, skipped, failed };
             } catch (error) {
-                console.error('Failed to move AI search tasks:', error);
+                console.error('Failed to bulk move AI search tasks:', error);
                 return { updated: 0, skipped, failed: moves.length };
             }
         }
@@ -7323,13 +7330,14 @@
         }
 
         function showAISearchMoveSummary(targetProjectId, summary) {
-            if (!targetProjectId || !summary.updated && !summary.skipped && !summary.failed) return;
+            if (!targetProjectId) return;
             const project = projects[targetProjectId];
             const projectName = project?.name || 'selected list';
             const parts = [];
             if (summary.updated) parts.push(`${summary.updated} moved`);
             if (summary.skipped) parts.push(`${summary.skipped} already there`);
             if (summary.failed) parts.push(`${summary.failed} failed`);
+            if (!parts.length) parts.push('no matching AI results');
             showMessage(`List "${projectName}": ${parts.join(', ')}`, summary.failed ? 'error' : 'success');
         }
 
