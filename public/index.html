@@ -513,7 +513,7 @@
             margin-bottom: 2px;
             border-radius: 4px;
             display: grid;
-            grid-template-columns: 20px minmax(180px, 1fr) minmax(145px, 190px) minmax(90px, 120px);
+            grid-template-columns: 20px minmax(180px, 1fr) minmax(85px, 110px) minmax(145px, 190px) minmax(90px, 120px);
             align-items: center;
             background: #2d2d2d;
             width: 100%;
@@ -1247,16 +1247,70 @@
         }
 
         .task-duration .duration-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 62px;
+            padding: 4px 8px;
+            border: 1px solid transparent;
+            border-radius: 999px;
             cursor: pointer;
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: .1px;
+            transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+        }
+
+        .task-duration .duration-badge:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(15, 23, 42, .16);
         }
 
         .task-duration .duration-calculated {
-            color: #7dd3fc;
+            color: #6d28d9 !important;
+            background: #f3e8ff !important;
+            border-color: #d8b4fe !important;
             cursor: default;
         }
 
         .task-duration .duration-none {
-            color: #6b7280;
+            color: #64748b !important;
+            background: #f8fafc !important;
+            border: 1px dashed #94a3b8 !important;
+            font-weight: 600;
+        }
+
+        .task-duration .duration-none:hover {
+            color: #334155 !important;
+            background: #eef2ff !important;
+            border-color: #6366f1 !important;
+        }
+
+        .task-duration .duration-5min,
+        .task-duration .duration-10min,
+        .task-duration .duration-15min {
+            color: #075985 !important;
+            background: #e0f2fe !important;
+            border-color: #7dd3fc !important;
+        }
+
+        .task-duration .duration-30min,
+        .task-duration .duration-45min,
+        .task-duration .duration-1hour,
+        .task-duration .duration-90min {
+            color: #166534 !important;
+            background: #dcfce7 !important;
+            border-color: #86efac !important;
+        }
+
+        .task-duration .duration-2hour,
+        .task-duration .duration-4hour,
+        .task-duration .duration-8hour,
+        .task-duration .duration-1day {
+            color: #9a3412 !important;
+            background: #ffedd5 !important;
+            border-color: #fdba74 !important;
         }
 
         .task-delete-btn {
@@ -3500,6 +3554,631 @@
             color: #fff !important;
         }
 
+        .today-overview {
+            margin-bottom: 8px;
+            padding: 12px 14px;
+            border: 1px solid #dbe5ef;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #f8fbff 0%, #eef6ff 100%);
+            box-shadow: 0 3px 12px rgba(30, 64, 175, .08);
+        }
+
+        .saved-search-summary {
+            display: grid;
+            grid-template-columns: minmax(0, 1.8fr) repeat(2, minmax(110px, 1fr));
+            gap: 8px;
+            margin: 0 0 8px;
+            padding: 8px 10px;
+            border: 1px solid #dbe5ef;
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        .saved-filter-panel .saved-search-summary {
+            grid-template-columns: minmax(0, 1.5fr) .7fr .9fr;
+            gap: 6px;
+            margin: 7px 0 6px;
+            padding: 7px;
+        }
+
+        .saved-filter-panel .saved-search-summary-label {
+            font-size: 9px;
+        }
+
+        .saved-filter-panel .saved-search-summary-value {
+            font-size: 10px;
+        }
+
+        .saved-search-summary-item {
+            min-width: 0;
+        }
+
+        .saved-search-summary-label {
+            display: block;
+            margin-bottom: 2px;
+            color: #64748b;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .03em;
+        }
+
+        .saved-search-summary-value {
+            display: block;
+            overflow: hidden;
+            color: #243447;
+            font-size: 12px;
+            font-weight: 700;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 700px) {
+            .saved-search-summary {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .saved-search-summary-item:first-child {
+                grid-column: 1 / -1;
+            }
+        }
+
+        .today-overview-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .today-overview-title {
+            color: #102a43;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .today-overview-date {
+            margin-top: 2px;
+            color: #64748b;
+            font-size: 10px;
+        }
+
+        .today-time-left {
+            color: #1d4ed8;
+            font-size: 12px;
+            font-weight: 800;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .today-time-left small {
+            display: block;
+            margin-top: 2px;
+            color: #64748b;
+            font-size: 9px;
+            font-weight: 600;
+        }
+
+        .today-battery {
+            position: relative;
+            height: 8px;
+            margin: 0 0 11px;
+            overflow: visible;
+            border-radius: 999px;
+            background: #dbe5ef;
+        }
+
+        .today-battery::after {
+            position: absolute;
+            top: 2px;
+            right: -3px;
+            width: 3px;
+            height: 4px;
+            border-radius: 0 2px 2px 0;
+            background: #94a3b8;
+            content: '';
+        }
+
+        .today-battery-fill {
+            height: 100%;
+            width: 0;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            transition: width .4s ease, background .4s ease;
+        }
+
+        .today-battery-fill.warning {
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+        }
+
+        .today-battery-fill.urgent {
+            background: linear-gradient(90deg, #f97316, #dc2626);
+        }
+
+        .today-ring-layout {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            gap: 12px;
+            margin: 4px 0 11px;
+            padding: 8px 4px;
+            border: 1px solid #dbe5ef;
+            border-radius: 9px;
+            background: #fff;
+        }
+
+        .today-ring-card {
+            display: flex;
+            min-width: 0;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .today-ring {
+            position: relative;
+            width: 66px;
+            height: 66px;
+            flex: 0 0 66px;
+        }
+
+        .today-ring svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .today-ring-track,
+        .today-ring-progress {
+            fill: none;
+            stroke-width: 11;
+        }
+
+        .today-ring-track {
+            stroke: #dcfce7;
+        }
+
+        .today-ring-track.time {
+            stroke: #dbeafe;
+        }
+
+        .today-ring-progress {
+            stroke: #16a34a;
+            stroke-linecap: round;
+            stroke-dasharray: 301.59;
+            stroke-dashoffset: 301.59;
+            transition: stroke-dashoffset .5s ease, stroke .3s ease;
+        }
+
+        .today-ring-progress.time {
+            stroke: #2563eb;
+        }
+
+        .today-ring-center {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .today-ring-center strong {
+            color: #111827;
+            font-size: 13px;
+            line-height: 1;
+        }
+
+        .today-ring-center span {
+            margin-top: 3px;
+            color: #374151;
+            font-size: 7px;
+            font-weight: 800;
+            letter-spacing: .7px;
+        }
+
+        .today-ring-label {
+            color: #111827;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .today-ring-sub {
+            margin-top: 2px;
+            color: #374151;
+            font-size: 9px;
+            font-weight: 600;
+        }
+
+        .today-overview-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 6px;
+        }
+
+        .today-overview-metric {
+            min-width: 0;
+            padding: 7px 8px;
+            border: 1px solid rgba(148, 163, 184, .35);
+            border-radius: 7px;
+            background: rgba(255, 255, 255, .72);
+        }
+
+        .today-overview-metric strong {
+            display: block;
+            color: #102a43;
+            font-size: 14px;
+            line-height: 1.1;
+        }
+
+        .today-overview-metric span {
+            display: block;
+            margin-top: 3px;
+            overflow: hidden;
+            color: #64748b;
+            font-size: 9px;
+            font-weight: 700;
+            text-overflow: ellipsis;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .today-work-track {
+            height: 5px;
+            margin-top: 8px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #dbe5ef;
+        }
+
+        .today-work-fill {
+            height: 100%;
+            width: 0;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            transition: width .4s ease;
+        }
+
+        .project-workload {
+            margin-bottom: 8px;
+            padding: 10px 12px;
+            border: 1px solid #dbe5ef;
+            border-radius: 10px;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, .06);
+        }
+
+        .project-workload.over-budget {
+            border-color: #f59e0b;
+            background: #fffbeb;
+        }
+
+        .project-workload-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .project-workload-title {
+            color: #111827;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .project-workload-summary {
+            color: #111827;
+            font-size: 10px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .project-workload-alert {
+            margin-bottom: 8px;
+            color: #92400e;
+            font-size: 9px;
+            font-weight: 800;
+        }
+
+        .project-workload-row {
+            display: grid;
+            grid-template-columns: minmax(120px, 1fr) auto;
+            align-items: center;
+            gap: 10px;
+            margin-top: 7px;
+        }
+
+        .project-workload-name {
+            min-width: 0;
+            overflow: hidden;
+            color: #111827;
+            font-size: 10px;
+            font-weight: 700;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .project-workload-name::before {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            margin-right: 5px;
+            border-radius: 50%;
+            background: var(--project-color, #2563eb);
+            content: '';
+        }
+
+        .project-workload-value {
+            color: #111827;
+            font-size: 10px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .project-workload-track {
+            height: 6px;
+            margin-top: 4px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #e5e7eb;
+        }
+
+        .project-workload-fill {
+            height: 100%;
+            min-width: 3px;
+            border-radius: inherit;
+            background: var(--project-color, #2563eb);
+        }
+
+        .project-workload-meta {
+            margin-top: 3px;
+            color: #374151;
+            font-size: 9px;
+        }
+
+        .project-ring-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+            gap: 8px;
+        }
+
+        .project-ring-card {
+            min-width: 0;
+            padding: 9px;
+            border: 1px solid #dbe5ef;
+            border-radius: 9px;
+            background: #fff;
+        }
+
+        .project-ring-card.over {
+            border-color: #f59e0b;
+            background: #fffbeb;
+        }
+
+        .project-ring-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            margin-bottom: 7px;
+        }
+
+        .project-ring-name {
+            min-width: 0;
+            overflow: hidden;
+            color: #111827;
+            font-size: 10px;
+            font-weight: 800;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .project-ring-status {
+            color: #92400e;
+            font-size: 8px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .project-ring-body {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .project-ring {
+            position: relative;
+            width: 58px;
+            height: 58px;
+            flex: 0 0 58px;
+        }
+
+        .project-ring svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .project-ring circle {
+            fill: none;
+            stroke-linecap: round;
+        }
+
+        .project-ring-track {
+            stroke: #e5e7eb;
+            stroke-width: 6;
+        }
+
+        .project-ring-progress {
+            stroke: var(--project-color, #2563eb);
+            stroke-width: 6;
+            stroke-dasharray: 144.51;
+            transition: stroke-dashoffset .5s ease;
+        }
+
+        .project-ring-load {
+            stroke: var(--project-color, #2563eb);
+            stroke-width: 3;
+            stroke-dasharray: 169.65;
+            opacity: .35;
+            transition: stroke-dashoffset .5s ease;
+        }
+
+        .project-ring-center {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #111827;
+            font-size: 10px;
+            font-weight: 900;
+        }
+
+        .project-ring-stats {
+            min-width: 0;
+        }
+
+        .project-ring-time {
+            color: #111827;
+            font-size: 13px;
+            font-weight: 900;
+        }
+
+        .project-ring-time span {
+            color: #6b7280;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .project-ring-detail {
+            margin-top: 3px;
+            color: #374151;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        /* Focus-ring command center theme */
+        .today-overview,
+        .project-workload {
+            border-color: #1e293b !important;
+            background: rgba(15, 23, 42, .96) !important;
+            box-shadow: 0 8px 24px rgba(2, 6, 23, .18) !important;
+        }
+
+        .today-overview-title,
+        .project-workload-title,
+        .today-overview-metric strong,
+        .project-workload-summary,
+        .project-ring-name,
+        .project-ring-time,
+        .project-ring-time span,
+        .project-ring-detail,
+        .today-ring-label,
+        .today-ring-sub {
+            color: #f8fafc !important;
+        }
+
+        .today-overview-date,
+        .today-overview-metric span {
+            color: #94a3b8 !important;
+        }
+
+        .today-time-left {
+            color: #34d399 !important;
+        }
+
+        .today-time-left small {
+            color: #94a3b8 !important;
+        }
+
+        .today-overview-live {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .today-live-clock {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 9px;
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            background: rgba(2, 6, 23, .75);
+            color: #fff;
+            font-size: 11px;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+
+        .today-live-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #34d399;
+            box-shadow: 0 0 8px rgba(52, 211, 153, .8);
+        }
+
+        .today-ring-layout {
+            border-color: #1e293b !important;
+            background: rgba(2, 6, 23, .66) !important;
+        }
+
+        .today-ring-track {
+            stroke: #14532d !important;
+        }
+
+        .today-ring-track.time {
+            stroke: #1e3a8a !important;
+        }
+
+        .today-ring-center strong,
+        .today-ring-center span {
+            color: #fff !important;
+        }
+
+        .today-overview-metric {
+            border-color: #1e293b !important;
+            background: rgba(2, 6, 23, .72) !important;
+        }
+
+        .today-work-track {
+            background: #1e293b !important;
+        }
+
+        .project-workload-alert {
+            color: #fbbf24 !important;
+        }
+
+        .project-ring-card {
+            border-color: #1e293b !important;
+            background: rgba(2, 6, 23, .72) !important;
+        }
+
+        .project-ring-card.over {
+            border-color: rgba(245, 158, 11, .65) !important;
+            background: rgba(69, 26, 3, .35) !important;
+        }
+
+        .project-ring-status {
+            color: #94a3b8 !important;
+        }
+
+        .project-ring-track {
+            stroke: #1e293b !important;
+        }
+
+        .project-ring-center {
+            color: #fff !important;
+        }
+
+        @media (max-width: 760px) {
+            .today-overview-metrics {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
         /* Workflow section */
         .workflow-section h3 {
             color: #5f6368 !important;
@@ -3555,30 +4234,1446 @@
             background: #80868b !important;
         }
 
+        /* Final contrast pass for the focus dashboard */
+        .today-overview,
+        .project-workload {
+            background: #0f172a !important;
+            border: 1px solid #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        .today-overview-title,
+        .project-workload-title,
+        .project-workload-summary,
+        .today-overview-metric strong,
+        .project-ring-name,
+        .project-ring-time,
+        .project-ring-time span,
+        .project-ring-detail,
+        .today-ring-label,
+        .today-ring-sub {
+            color: #f8fafc !important;
+        }
+
+        .today-overview-date,
+        .today-overview-metric span,
+        .project-ring-status {
+            color: #cbd5e1 !important;
+        }
+
+        .today-overview-live,
+        .today-live-clock,
+        .today-overview-metric,
+        .project-ring-card,
+        .today-ring-layout {
+            background: #020617 !important;
+            border-color: #334155 !important;
+        }
+
+        .today-live-clock strong,
+        .today-time-left,
+        .today-ring-center strong,
+        .today-ring-center span,
+        .project-ring-center {
+            color: #ffffff !important;
+        }
+
+        .today-time-left small {
+            color: #cbd5e1 !important;
+        }
+
+        .today-ring-track {
+            stroke: #14532d !important;
+        }
+
+        .today-ring-track.time {
+            stroke: #1e3a8a !important;
+        }
+
+        .today-overview-metric {
+            box-shadow: inset 0 0 0 1px rgba(148, 163, 184, .08);
+        }
+
+        .today-work-track {
+            background: #334155 !important;
+        }
+
+        .project-workload-alert {
+            color: #fbbf24 !important;
+        }
+
+        .project-ring-track {
+            stroke: #334155 !important;
+        }
+
+        .project-ring-card.over {
+            background: #451a03 !important;
+            border-color: #f59e0b !important;
+        }
+
+        /* Compact command-center spacing */
+        .today-overview {
+            margin-bottom: 6px !important;
+            padding: 9px 11px !important;
+            border-radius: 10px !important;
+        }
+
+        .today-overview-head {
+            margin-bottom: 6px !important;
+        }
+
+        .today-ring-layout {
+            justify-content: flex-start !important;
+            gap: 18px !important;
+            margin: 2px 0 7px !important;
+            padding: 5px 8px !important;
+        }
+
+        .today-ring-card {
+            gap: 6px !important;
+        }
+
+        .today-ring {
+            width: 52px !important;
+            height: 52px !important;
+            flex-basis: 52px !important;
+        }
+
+        .today-ring-center strong {
+            font-size: 11px !important;
+        }
+
+        .today-ring-label {
+            font-size: 9px !important;
+        }
+
+        .today-ring-sub {
+            font-size: 8px !important;
+        }
+
+        .today-overview-metrics {
+            gap: 5px !important;
+        }
+
+        .today-overview-metric {
+            padding: 5px 7px !important;
+        }
+
+        .today-overview-metric strong {
+            font-size: 12px !important;
+        }
+
+        .today-overview-metric span {
+            margin-top: 2px !important;
+            font-size: 8px !important;
+        }
+
+        .today-work-track {
+            margin-top: 5px !important;
+        }
+
+        .project-workload {
+            margin-bottom: 6px !important;
+            padding: 8px 10px !important;
+            border-radius: 10px !important;
+        }
+
+        .project-workload-head {
+            margin-bottom: 5px !important;
+        }
+
+        .project-workload-alert {
+            margin-bottom: 5px !important;
+            font-size: 8px !important;
+        }
+
+        .project-ring-grid {
+            grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)) !important;
+            gap: 6px !important;
+        }
+
+        .project-ring-card {
+            padding: 7px !important;
+            border-radius: 8px !important;
+        }
+
+        .project-ring-head {
+            margin-bottom: 4px !important;
+        }
+
+        .project-ring-body {
+            gap: 7px !important;
+        }
+
+        .project-ring {
+            width: 48px !important;
+            height: 48px !important;
+            flex-basis: 48px !important;
+        }
+
+        .project-ring-time {
+            font-size: 11px !important;
+        }
+
+        .project-ring-detail {
+            margin-top: 2px !important;
+            font-size: 8px !important;
+        }
+
+        .today-overview-head {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 10px !important;
+            margin-bottom: 5px !important;
+        }
+
+        .today-overview-date {
+            color: #f8fafc !important;
+            font-size: 11px !important;
+            font-weight: 800 !important;
+            white-space: nowrap;
+        }
+
+        .today-ring-layout {
+            align-items: center !important;
+            justify-content: flex-start !important;
+            gap: 18px !important;
+            margin: 4px 0 2px !important;
+            padding: 7px 8px !important;
+            border: 0 !important;
+            background: transparent !important;
+        }
+
+        .today-ring-card {
+            gap: 8px !important;
+        }
+
+        .today-ring {
+            width: 60px !important;
+            height: 60px !important;
+            flex-basis: 60px !important;
+        }
+
+        .today-ring-center strong {
+            font-size: 12px !important;
+        }
+
+        .today-ring-label {
+            font-size: 10px !important;
+        }
+
+        .today-ring-sub {
+            font-size: 9px !important;
+        }
+
+        .today-overview-summary {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-left: 4px;
+            color: #94a3b8 !important;
+            font-size: 10px;
+            line-height: 1.3;
+            white-space: nowrap;
+        }
+
+        .today-overview-summary strong {
+            color: #f8fafc !important;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        #todayLiveClock {
+            color: #fff !important;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .today-date-separator {
+            margin: 0 4px;
+            color: #64748b !important;
+        }
+
+        .today-header-battery {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .today-mini-battery {
+            position: relative;
+            width: 31px;
+            height: 15px;
+            padding: 2px;
+            border: 1.5px solid #64748b;
+            border-radius: 4px;
+            background: #020617;
+        }
+
+        .today-mini-battery::after {
+            position: absolute;
+            top: 4px;
+            right: -4px;
+            width: 2px;
+            height: 5px;
+            border-radius: 0 2px 2px 0;
+            background: #64748b;
+            content: '';
+        }
+
+        .today-mini-battery > div {
+            width: 0;
+            height: 100%;
+            border-radius: 2px;
+            background: #22c55e;
+            transition: width .4s ease, background .4s ease;
+        }
+
+        .today-time-left {
+            display: flex;
+            align-items: baseline;
+            gap: 7px;
+            color: #34d399 !important;
+            font-size: 11px !important;
+            font-weight: 900 !important;
+        }
+
+        .today-time-left small {
+            color: #cbd5e1 !important;
+            font-size: 10px !important;
+            font-weight: 700 !important;
+        }
+
+        /* Compact dark project details */
+        .today-overview {
+            margin-bottom: 8px !important;
+            padding: 14px 18px !important;
+            background: #172235 !important;
+            border-color: #263a55 !important;
+            color: #f4f7fb !important;
+        }
+
+        .today-overview-head {
+            margin-bottom: 8px !important;
+        }
+
+        .today-ring-layout {
+            gap: 20px !important;
+            padding: 8px 0 !important;
+        }
+
+        .today-ring {
+            width: 58px !important;
+            height: 58px !important;
+            flex-basis: 58px !important;
+        }
+
+        .today-overview-summary {
+            gap: 4px !important;
+            font-size: 10px !important;
+        }
+
+        .project-workload {
+            margin-bottom: 8px !important;
+            padding: 12px 16px !important;
+            background: #172235 !important;
+            border-color: #263a55 !important;
+            color: #f4f7fb !important;
+        }
+
+        .project-workload-head {
+            align-items: center !important;
+            margin-bottom: 0 !important;
+        }
+
+        .project-workload-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .project-workload-title {
+            color: #f4f7fb !important;
+            font-size: 12px !important;
+        }
+
+        .project-workload-summary {
+            color: #c1cede !important;
+            font-size: 10px !important;
+        }
+
+        .project-workload-alert {
+            margin-top: 3px !important;
+            margin-bottom: 0 !important;
+            color: #9fb0c4 !important;
+            font-size: 9px !important;
+            font-weight: 600 !important;
+        }
+
+        .project-workload-toggle {
+            margin: 0 !important;
+            padding: 5px 9px !important;
+            border: 1px solid #3c5878 !important;
+            border-radius: 6px !important;
+            background: #223752 !important;
+            color: #dce8f5 !important;
+            font-size: 10px !important;
+            font-weight: 700 !important;
+        }
+
+        .project-workload-toggle:hover {
+            background: #2d4a6b !important;
+        }
+
+        .project-ring-grid {
+            display: none !important;
+            margin-top: 12px;
+        }
+
+        .project-workload.expanded .project-ring-grid {
+            display: grid !important;
+        }
+
+        .project-ring-card {
+            border-color: #304967 !important;
+            background: #203149 !important;
+        }
+
+        .project-ring-name,
+        .project-ring-time,
+        .project-ring-time span,
+        .project-ring-detail,
+        .project-ring-center {
+            color: #edf4fb !important;
+        }
+
+        .project-ring-status {
+            color: #a9bad0 !important;
+        }
+
+        .project-ring-track {
+            stroke: #39516d !important;
+        }
+
+        .quick-add-bar {
+            margin-bottom: 8px !important;
+        }
+
+        /* Calm dashboard finish */
+        body {
+            background: #f3f6fa !important;
+            color: #243447 !important;
+        }
+
+        .nav-bar {
+            min-height: 58px;
+            padding: 10px 24px !important;
+            background: rgba(255, 255, 255, .96) !important;
+            border-bottom: 1px solid #dfe7ef !important;
+            box-shadow: 0 2px 10px rgba(31, 50, 81, .06) !important;
+        }
+
+        .nav-brand-group {
+            gap: 24px;
+        }
+
+        .nav-title {
+            color: #243447 !important;
+            font-size: 15px;
+            letter-spacing: -.01em;
+        }
+
+        .nav-day-status {
+            gap: 14px;
+        }
+
+        .nav-day-date,
+        .nav-time-left {
+            color: #526579 !important;
+        }
+
+        .nav-day-percent {
+            color: #526579 !important;
+        }
+
+        .main-layout {
+            grid-template-columns: 248px minmax(0, 1fr) 320px;
+            height: calc(100vh - 58px);
+            gap: 1px;
+            background: #dfe7ef;
+        }
+
+        .left-panel,
+        .right-panel {
+            background: #ffffff !important;
+        }
+
+        .left-panel {
+            padding: 24px 18px !important;
+            border-right: 0 !important;
+        }
+
+        .left-panel h3,
+        .right-section h3,
+        .ai-chat-section h3 {
+            color: #526579 !important;
+            font-size: 11px;
+            letter-spacing: .08em;
+        }
+
+        .filter-item {
+            margin-bottom: 16px;
+        }
+
+        .filter-item label {
+            color: #718397 !important;
+            font-size: 11px;
+        }
+
+        .filter-item select,
+        .workflow-section select {
+            min-height: 36px;
+            padding: 8px 10px !important;
+            background: #f7f9fc !important;
+            border-color: #d8e1eb !important;
+            border-radius: 7px;
+            color: #2f4358 !important;
+        }
+
+        .middle-panel {
+            padding: 24px 28px 40px !important;
+            background: #f3f6fa !important;
+        }
+
+        .today-overview,
+        .project-workload,
+        .quick-add-bar,
+        .task-header {
+            border: 1px solid #dfe7ef !important;
+            border-radius: 12px !important;
+            background: #ffffff !important;
+            box-shadow: 0 4px 14px rgba(31, 50, 81, .06) !important;
+        }
+
+        .today-overview {
+            margin-bottom: 16px !important;
+            padding: 20px 22px !important;
+        }
+
+        .today-overview-head {
+            margin-bottom: 16px !important;
+        }
+
+        .today-overview-date {
+            color: #526579 !important;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+        }
+
+        #todayLiveClock {
+            color: #7b8b9b !important;
+        }
+
+        .today-date-separator {
+            color: #b0bdc9 !important;
+        }
+
+        .today-time-left,
+        .today-time-left small {
+            color: #3974c6 !important;
+        }
+
+        .today-ring-layout {
+            gap: 28px !important;
+            margin: 0 !important;
+            padding: 14px 0 !important;
+            border-top: 1px solid #edf1f5 !important;
+            border-bottom: 1px solid #edf1f5 !important;
+            background: transparent !important;
+        }
+
+        .today-ring-card {
+            gap: 11px !important;
+        }
+
+        .today-ring {
+            width: 68px !important;
+            height: 68px !important;
+            flex-basis: 68px !important;
+        }
+
+        .today-ring-track {
+            stroke: #dff3e8 !important;
+        }
+
+        .today-ring-track.time {
+            stroke: #e2edfb !important;
+        }
+
+        .today-ring-center strong,
+        .today-ring-center span {
+            color: #243447 !important;
+        }
+
+        .today-ring-label {
+            color: #334e68 !important;
+            font-size: 11px !important;
+        }
+
+        .today-ring-sub {
+            color: #718397 !important;
+            font-size: 10px !important;
+        }
+
+        .today-overview-summary {
+            gap: 8px !important;
+            margin-left: auto;
+            color: #718397 !important;
+            font-size: 11px !important;
+        }
+
+        .today-overview-summary strong,
+        .today-overview-metric strong {
+            color: #243447 !important;
+        }
+
+        .project-workload {
+            margin-bottom: 16px !important;
+            padding: 18px 20px !important;
+        }
+
+        .project-workload-title {
+            color: #243447 !important;
+            font-size: 12px !important;
+        }
+
+        .project-workload-summary,
+        .project-workload-alert {
+            color: #718397 !important;
+        }
+
+        .project-ring-grid {
+            gap: 12px !important;
+        }
+
+        .project-ring-card {
+            padding: 13px !important;
+            border-color: #e0e8f0 !important;
+            border-radius: 10px !important;
+            background: #f9fbfd !important;
+        }
+
+        .project-ring-name,
+        .project-ring-time,
+        .project-ring-time span,
+        .project-ring-detail,
+        .project-ring-center {
+            color: #334e68 !important;
+        }
+
+        .project-ring-name {
+            font-size: 11px !important;
+        }
+
+        .project-ring-status {
+            color: #7b8b9b !important;
+        }
+
+        .project-ring-track {
+            stroke: #e1e9f1 !important;
+        }
+
+        .quick-add-bar {
+            margin-bottom: 16px !important;
+            padding: 12px !important;
+        }
+
+        .quick-add-bar input,
+        .quick-add-bar select {
+            min-height: 34px;
+            background: #f7f9fc !important;
+            border-color: #d8e1eb !important;
+            color: #334e68 !important;
+        }
+
+        .task-header {
+            min-height: 46px;
+            margin-bottom: 12px;
+            padding: 10px 14px !important;
+            background: #ffffff !important;
+        }
+
+        .task-list {
+            margin-top: 0 !important;
+        }
+
+        .task-item {
+            margin-bottom: 7px !important;
+            padding: 10px 12px !important;
+            border-color: #e0e8f0 !important;
+            border-radius: 9px !important;
+            box-shadow: 0 2px 5px rgba(31, 50, 81, .04) !important;
+        }
+
+        .right-panel {
+            border-left: 0 !important;
+        }
+
+        .workflow-section,
+        .ai-chat-section {
+            padding: 24px 20px !important;
+        }
+
+        .right-section {
+            padding: 0 0 20px !important;
+        }
+
+        @media (max-width: 1200px) {
+            .middle-panel {
+                padding: 20px !important;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .nav-bar {
+                padding: 10px 14px !important;
+            }
+
+            .main-layout {
+                height: calc(100vh - 58px);
+            }
+
+            .middle-panel {
+                padding: 14px !important;
+            }
+
+            .today-ring-layout {
+                flex-wrap: wrap;
+                gap: 14px !important;
+            }
+
+            .today-overview-summary {
+                width: 100%;
+                margin-left: 0;
+                padding-top: 10px;
+                border-top: 1px solid #edf1f5;
+            }
+        }
+
+        /* Final compact dashboard overrides */
+        .today-overview,
+        .project-workload {
+            background: #080808 !important;
+            border-color: #000000 !important;
+        }
+
+        .today-overview {
+            margin-bottom: 8px !important;
+            padding: 14px 18px !important;
+        }
+
+        .today-overview-head {
+            margin-bottom: 8px !important;
+        }
+
+        .today-ring-layout {
+            gap: 20px !important;
+            padding: 8px 0 !important;
+        }
+
+        .today-ring {
+            width: 58px !important;
+            height: 58px !important;
+            flex-basis: 58px !important;
+        }
+
+        .today-overview-summary {
+            gap: 4px !important;
+            font-size: 10px !important;
+        }
+
+        .project-workload {
+            margin-bottom: 8px !important;
+            padding: 12px 16px !important;
+        }
+
+        .project-workload-head {
+            align-items: center !important;
+            margin-bottom: 0 !important;
+        }
+
+        .project-workload-title {
+            color: #f4f7fb !important;
+        }
+
+        .project-workload-summary {
+            color: #c1cede !important;
+        }
+
+        .project-workload-alert {
+            margin-top: 3px !important;
+            margin-bottom: 0 !important;
+            color: #9fb0c4 !important;
+        }
+
+        .project-ring-grid {
+            display: none !important;
+            margin-top: 12px;
+        }
+
+        .project-workload.expanded .project-ring-grid {
+            display: grid !important;
+        }
+
+        .project-ring-card {
+            border-color: #304967 !important;
+            background: #203149 !important;
+        }
+
+        .project-ring-name,
+        .project-ring-time,
+        .project-ring-time span,
+        .project-ring-detail,
+        .project-ring-center {
+            color: #edf4fb !important;
+        }
+
+        .project-ring-status {
+            color: #a9bad0 !important;
+        }
+
+        .project-ring-track {
+            stroke: #000000 !important;
+        }
+
+        .today-overview-date,
+        #todayLiveClock,
+        .today-ring-label,
+        .today-ring-sub,
+        .today-overview-summary {
+            color: #ffffff !important;
+        }
+
+        .today-ring-center strong,
+        .today-ring-center span,
+        .today-overview-summary strong {
+            color: #ffffff !important;
+        }
+
+        .today-time-left,
+        .today-time-left small {
+            color: #ffffff !important;
+        }
+
+        .project-workload-summary,
+        .project-workload-alert,
+        .project-ring-status,
+        .project-ring-detail,
+        .project-ring-time span {
+            color: #ffffff !important;
+        }
+
+        .project-ring-card {
+            background: #111111 !important;
+            border-color: #000000 !important;
+        }
+
+        .project-workload-toggle {
+            background: #000000 !important;
+            border-color: #ffffff !important;
+            color: #ffffff !important;
+        }
+
+        .today-ring-track,
+        .today-ring-track.time {
+            stroke: #000000 !important;
+        }
+
+        .today-overview *,
+        .project-workload * {
+            color: #ffffff !important;
+        }
+
+        .today-overview .today-ring-track,
+        .today-overview .today-ring-track.time,
+        .project-workload .project-ring-track {
+            stroke: #000000 !important;
+        }
+
+        /* Friendly, playful surfaces */
+        body {
+            background: #f7f9fc !important;
+        }
+
+        .today-overview {
+            background: linear-gradient(135deg, #fff8e7 0%, #fff1d6 100%) !important;
+            border-color: #f4d39a !important;
+            box-shadow: 0 6px 18px rgba(245, 158, 11, .12) !important;
+        }
+
+        .project-workload {
+            background: linear-gradient(135deg, #f8f3ff 0%, #eef5ff 100%) !important;
+            border-color: #d8c8f2 !important;
+            box-shadow: 0 6px 18px rgba(99, 102, 241, .10) !important;
+        }
+
+        .today-overview *,
+        .project-workload * {
+            color: #111827 !important;
+        }
+
+        .today-overview .today-time-left,
+        .today-overview .today-time-left small,
+        .today-overview .today-ring-center strong,
+        .today-overview .today-ring-center span,
+        .today-overview .today-overview-summary strong,
+        .project-workload .project-workload-toggle {
+            color: #111827 !important;
+        }
+
+        .today-overview .today-ring-track,
+        .today-overview .today-ring-track.time,
+        .project-workload .project-ring-track {
+            stroke: rgba(17, 24, 39, .14) !important;
+        }
+
+        .project-workload-toggle {
+            border-color: #111827 !important;
+            background: #ffffff !important;
+            box-shadow: 0 2px 0 rgba(17, 24, 39, .12);
+        }
+
+        .project-workload-toggle:hover {
+            background: #fff1c7 !important;
+        }
+
+        .project-ring-card {
+            background: rgba(255, 255, 255, .72) !important;
+            border-color: rgba(99, 102, 241, .18) !important;
+            box-shadow: 0 3px 8px rgba(99, 102, 241, .08);
+        }
+
+        /* Soft charcoal summary theme */
+        .today-overview {
+            background: linear-gradient(135deg, #2d333b 0%, #414955 100%) !important;
+            border-color: #596575 !important;
+            box-shadow: 0 7px 20px rgba(31, 41, 55, .18) !important;
+        }
+
+        .project-workload {
+            background: linear-gradient(135deg, #343a43 0%, #4a5360 100%) !important;
+            border-color: #657181 !important;
+            box-shadow: 0 7px 20px rgba(31, 41, 55, .16) !important;
+        }
+
+        .today-overview *,
+        .project-workload * {
+            color: #ffffff !important;
+        }
+
+        .today-overview .today-ring-track,
+        .today-overview .today-ring-track.time,
+        .project-workload .project-ring-track {
+            stroke: rgba(255, 255, 255, .22) !important;
+        }
+
+        .project-workload-toggle {
+            background: #252b33 !important;
+            border-color: #ffffff !important;
+            color: #ffffff !important;
+            box-shadow: 0 2px 0 rgba(0, 0, 0, .2);
+        }
+
+        .project-workload-toggle:hover {
+            background: #171b20 !important;
+        }
+
+        .project-ring-card {
+            background: rgba(255, 255, 255, .12) !important;
+            border-color: rgba(255, 255, 255, .22) !important;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, .10);
+        }
+
+        /* Keep all summary copy white on charcoal surfaces */
+        section.today-overview,
+        section.today-overview *,
+        section.project-workload,
+        section.project-workload * {
+            color: #ffffff !important;
+        }
+
+        section.today-overview .today-ring-track,
+        section.today-overview .today-ring-track.time,
+        section.project-workload .project-ring-track {
+            stroke: rgba(255, 255, 255, .22) !important;
+        }
+
+        section.project-workload .project-workload-toggle {
+            color: #ffffff !important;
+            background: #252b33 !important;
+            border-color: #ffffff !important;
+        }
+
+        #todayOverviewTimeLeft,
+        #todayOverviewTimeLeft small {
+            color: #ffffff !important;
+        }
+
+        #todayDonePercent,
+        #todayTimePercent,
+        #todayOverviewTotal,
+        #todayOverviewPlanned,
+        #todayOverviewRemaining {
+            color: #ffffff !important;
+        }
+
+        body section.today-overview .today-ring-center span {
+            color: #ffffff !important;
+        }
+
+        /* Semantic ring colors: completed work vs. time passing */
+        .today-ring-progress.done {
+            stroke: #22c55e !important;
+        }
+
+        .today-ring-progress.time {
+            stroke: #ef4444 !important;
+        }
+
+        .today-ring-track {
+            stroke: rgba(34, 197, 94, .22) !important;
+        }
+
+        .today-ring-track.time {
+            stroke: rgba(239, 68, 68, .22) !important;
+        }
+
+        body section.today-overview .today-ring-card:first-child .today-ring-center strong,
+        body section.today-overview .today-ring-card:first-child .today-ring-center span,
+        body section.today-overview .today-ring-card:first-child .today-ring-label,
+        body section.today-overview .today-ring-card:first-child .today-ring-sub {
+            color: #22c55e !important;
+        }
+
+        body section.today-overview .today-ring-card:nth-child(2) .today-ring-center strong,
+        body section.today-overview .today-ring-card:nth-child(2) .today-ring-center span,
+        body section.today-overview .today-ring-card:nth-child(2) .today-ring-label,
+        body section.today-overview .today-ring-card:nth-child(2) .today-ring-sub {
+            color: #ef4444 !important;
+        }
+
+        /* Keep ring copy neutral; use color only on the circular progress */
+        body section.today-overview .today-ring-card:first-child .today-ring-center strong,
+        body section.today-overview .today-ring-card:first-child .today-ring-center span,
+        body section.today-overview .today-ring-card:first-child .today-ring-label,
+        body section.today-overview .today-ring-card:first-child .today-ring-sub,
+        body section.today-overview .today-ring-card:nth-child(2) .today-ring-center strong,
+        body section.today-overview .today-ring-card:nth-child(2) .today-ring-center span,
+        body section.today-overview .today-ring-card:nth-child(2) .today-ring-label,
+        body section.today-overview .today-ring-card:nth-child(2) .today-ring-sub {
+            color: #ffffff !important;
+        }
+
+        .nav-quick-add {
+            grid-column: 2;
+            align-self: center;
+            width: auto;
+            min-width: 0;
+            max-width: none;
+            margin: 0 28px 0 27px !important;
+            padding: 3px !important;
+            border: 0 !important;
+            border-radius: 7px !important;
+            background: #eef2f6 !important;
+            box-shadow: none !important;
+        }
+
+        .nav-quick-add #quickTaskTitle {
+            min-width: 90px;
+            padding: 6px 8px !important;
+            background: #ffffff !important;
+            border-color: #cbd5e1 !important;
+            color: #111827 !important;
+        }
+
+        .nav-quick-add select,
+        .nav-quick-add input[type="date"],
+        .nav-quick-add input[type="time"] {
+            min-height: 30px;
+            padding: 5px 6px !important;
+            background: #ffffff !important;
+            border-color: #cbd5e1 !important;
+            color: #111827 !important;
+        }
+
+        .nav-quick-add #quickTaskProject {
+            max-width: 130px !important;
+        }
+
+        .nav-quick-add button {
+            margin: 0 !important;
+            padding: 6px 10px !important;
+        }
+
+        .nav-bar {
+            display: grid !important;
+            grid-template-columns: 249px minmax(0, 1fr) 320px;
+            gap: 1px;
+            padding: 10px 0 !important;
+        }
+
+        .nav-brand-group {
+            display: contents;
+        }
+
+        .nav-title {
+            grid-column: 1;
+            align-self: center;
+            margin-left: 24px;
+        }
+
+        .nav-bar > div:last-child {
+            grid-column: 3;
+            justify-self: end;
+            align-self: center;
+            margin-right: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .nav-quick-add #quickTaskDate,
+            .nav-quick-add #quickTaskTime {
+                display: none;
+            }
+        }
+
+        @media (max-width: 680px) {
+            .nav-quick-add #quickTaskPriority {
+                display: none;
+            }
+        }
+
+        .saved-filter-panel {
+            margin: 0 0 14px;
+            padding: 10px;
+            border: 1px solid #d8e1eb;
+            border-radius: 8px;
+            background: #f7f9fc;
+        }
+
+        .saved-filter-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .saved-filter-panel-title {
+            color: #243447;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .saved-filter-add {
+            padding: 4px 7px;
+            border: 0;
+            border-radius: 5px;
+            background: #2563eb;
+            color: #fff;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        #savedFilterList {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .saved-filter-empty {
+            color: #718397;
+            font-size: 10px;
+        }
+
+        .saved-filter-item {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto auto;
+            align-items: center;
+            gap: 4px;
+            padding: 5px;
+            border: 1px solid #dbe5ef;
+            border-radius: 6px;
+            background: #fff;
+        }
+
+        .saved-filter-card-main {
+            min-width: 0;
+        }
+
+        .saved-filter-run {
+            min-width: 0;
+            padding: 2px 3px;
+            overflow: visible;
+            border: 0;
+            background: transparent;
+            color: #334e68;
+            cursor: pointer;
+            font-size: 11px;
+            text-align: left;
+            white-space: normal;
+            overflow-wrap: anywhere;
+        }
+
+        .saved-filter-stats {
+            display: flex;
+            gap: 8px;
+            margin: 3px 3px 0;
+            color: #64748b;
+            font-size: 9px;
+        }
+
+        .saved-filter-stats strong {
+            color: #243447;
+            font-size: 10px;
+        }
+
+        .saved-filter-item button:not(.saved-filter-run) {
+            padding: 4px 5px;
+            border: 0;
+            border-radius: 4px;
+            background: transparent;
+            color: #718397;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        .saved-filter-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(15, 23, 42, .55);
+        }
+
+        .saved-filter-dialog {
+            width: min(680px, 100%);
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 20px;
+            border: 1px solid #d8e1eb;
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 18px 50px rgba(15, 23, 42, .22);
+        }
+
+        .saved-filter-dialog h2 {
+            margin-bottom: 14px;
+            color: #243447;
+            font-size: 17px;
+        }
+
+        .saved-filter-dialog label {
+            display: block;
+            margin-bottom: 5px;
+            color: #526579;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .saved-filter-dialog input,
+        .saved-filter-dialog select,
+        .saved-filter-dialog textarea {
+            width: 100%;
+            min-height: 34px;
+            padding: 7px 9px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background: #fff;
+            color: #243447;
+            font-size: 12px;
+        }
+
+        .saved-filter-condition {
+            display: grid;
+            grid-template-columns: 105px 82px 62px 82px 1fr auto;
+            gap: 7px;
+            align-items: end;
+            margin-top: 9px;
+            padding: 9px;
+            border: 1px solid #e0e8f0;
+            border-radius: 7px;
+            background: #f8fafc;
+        }
+
+        .saved-filter-condition select[multiple] {
+            min-height: 74px;
+        }
+
+        .saved-filter-remove {
+            min-height: 34px;
+            padding: 0 9px;
+            border: 1px solid #fecaca;
+            border-radius: 6px;
+            background: #fff1f2;
+            color: #b91c1c;
+            cursor: pointer;
+        }
+
+        .saved-filter-dialog-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .saved-filter-dialog-actions button {
+            padding: 8px 13px;
+            border: 0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .saved-filter-preview {
+            margin-top: 10px;
+            padding: 8px 9px;
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+            background: #eff6ff;
+            color: #1e3a8a;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .saved-filter-selected-values {
+            margin-top: 4px;
+            color: #2563eb;
+            font-size: 10px;
+            line-height: 1.3;
+        }
+
+        .saved-filter-cancel {
+            background: #e5e7eb;
+            color: #334155;
+        }
+
+        .saved-filter-save {
+            background: #2563eb;
+            color: #fff;
+        }
+
+        @media (max-width: 600px) {
+            .saved-filter-condition {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .saved-filter-condition > :nth-child(5) {
+                grid-column: 1 / -1;
+            }
+        }
+
+        /* Readable project workload cards without changing the day overview */
+        .project-workload {
+            padding: 16px 18px !important;
+        }
+
+        .project-workload-title {
+            font-size: 14px !important;
+        }
+
+        .project-workload-summary {
+            font-size: 12px !important;
+        }
+
+        .project-workload-alert {
+            font-size: 11px !important;
+        }
+
+        .project-workload-toggle {
+            padding: 7px 12px !important;
+            font-size: 11px !important;
+        }
+
+        .project-ring-grid {
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
+            gap: 14px !important;
+            margin-top: 14px !important;
+        }
+
+        .project-ring-card {
+            padding: 16px !important;
+        }
+
+        .project-ring-head {
+            margin-bottom: 10px !important;
+        }
+
+        .project-ring-name {
+            font-size: 13px !important;
+        }
+
+        .project-ring-status {
+            font-size: 10px !important;
+        }
+
+        .project-ring-body {
+            gap: 12px !important;
+        }
+
+        .project-ring {
+            width: 70px !important;
+            height: 70px !important;
+            flex-basis: 70px !important;
+        }
+
+        .project-ring-center {
+            font-size: 12px !important;
+        }
+
+        .project-ring-time {
+            font-size: 15px !important;
+        }
+
+        .project-ring-time span {
+            font-size: 11px !important;
+        }
+
+        .project-ring-detail {
+            margin-top: 5px !important;
+            font-size: 11px !important;
+            line-height: 1.4 !important;
+        }
+
     </style>
 </head>
 <body>
     <div class="nav-bar">
         <div class="nav-brand-group">
             <div class="nav-title">📋 TickTick Manager</div>
-            <div class="nav-day-status" title="Time remaining until midnight">
-                <span class="nav-day-date" id="navDayDate">Sunday, 8 Nov 2026</span>
-                <div class="nav-day-meter">
-                    <div class="nav-day-battery" aria-label="Time remaining today">
-                        <span class="nav-day-battery-fill" id="navDayBatteryFill"></span>
-                    </div>
-                    <span class="nav-day-percent" id="navDayPercent">--% left</span>
-                </div>
-                <span class="nav-time-left" id="navTimeLeft">Time left: --</span>
+            <div class="quick-add-bar nav-quick-add" style="display: flex; gap: 6px; padding: 8px 10px; background: #1a1a1a; border-radius: 6px; margin-bottom: 8px; align-items: center;">
+                <input type="text" id="quickTaskTitle" placeholder="New task..."
+                       style="flex: 1; padding: 8px 10px; font-size: 12px; background: #0d0d0d; border: 1px solid #333; border-radius: 4px; color: #e0e0e0; outline: none;"
+                       onkeydown="if(event.key === 'Enter') createQuickTask()">
+                <select id="quickTaskProject" style="padding: 6px; font-size: 11px; background: #0d0d0d; border: 1px solid #333; border-radius: 4px; color: #9ca3af; max-width: 100px;">
+                    <option value="">Project</option>
+                </select>
+                <select id="quickTaskPriority" style="padding: 6px; font-size: 11px; background: #0d0d0d; border: 1px solid #333; border-radius: 4px; color: #9ca3af; width: 70px;">
+                    <option value="0">Priority</option>
+                    <option value="1">🔵 Low</option>
+                    <option value="3">🟡 Med</option>
+                    <option value="5">🔴 High</option>
+                </select>
+                <input type="date" id="quickTaskDate" style="padding: 6px; font-size: 11px; background: #0d0d0d; border: 1px solid #333; border-radius: 4px; color: #9ca3af; width: 110px;">
+                <input type="time" id="quickTaskTime" style="padding: 6px; font-size: 11px; background: #0d0d0d; border: 1px solid #333; border-radius: 4px; color: #9ca3af; width: 75px;">
+                <button onclick="createQuickTask()" style="padding: 6px 12px; font-size: 11px; background: #2563eb; border: none; border-radius: 4px; color: #fff; cursor: pointer; white-space: nowrap;">+ Add</button>
             </div>
         </div>
         <div style="display: flex; align-items: center; gap: 10px;">
-            <span id="taskSummary" style="font-size: 12px; color: #9ca3af;"></span>
-            <a href="workflow.html" class="nav-link" style="padding: 6px 12px; font-size: 12px; background: linear-gradient(135deg, #f59e0b, #d97706);">⚡ Workflow</a>
-            <a href="focus-dashboard.html" class="nav-link" style="padding: 6px 12px; font-size: 12px; background: linear-gradient(135deg, #667eea, #764ba2);">🎯 Focus</a>
             <a href="habit.html" class="nav-link" style="padding: 6px 12px; font-size: 12px; background: linear-gradient(135deg, #10b981, #059669);">🎯 Habit</a>
-            <a href="tree.html" class="nav-link" style="padding: 6px 12px; font-size: 12px;">🌳 Tree</a>
-            <button class="right-panel-toggle" onclick="toggleRightPanel()" id="rightPanelToggleBtn">⚡ Workflow</button>
         </div>
     </div>
     <div class="right-panel-overlay" id="rightPanelOverlay" onclick="closeRightPanel()"></div>
@@ -3593,6 +5688,11 @@
             <label for="aiSearchTags">Tags to add (optional)</label>
             <input type="text" id="aiSearchTags" placeholder="e.g. focus, review, finance">
             <div style="font-size: 11px; color: #9ca3af; margin-top: -6px; margin-bottom: 12px;">Comma-separated. Existing tags are kept and duplicate tags are skipped.</div>
+            <label for="aiSearchProject">Move matching tasks to list (optional)</label>
+            <select id="aiSearchProject">
+                <option value="">No list change</option>
+            </select>
+            <div style="font-size: 11px; color: #9ca3af; margin-top: -6px; margin-bottom: 12px;">After Gemini returns results, matching tasks will be moved to this list.</div>
             <div class="ai-search-modal-actions">
                 <button class="ai-search-cancel" onclick="closeAISearchModal()">Cancel</button>
                 <button onclick="saveAISearch()">Save Search</button>
@@ -4046,11 +6146,43 @@
         </div>
     </div>
 
+    <div id="savedFilterModal" class="saved-filter-modal" style="display: none;" onclick="if(event.target === this) closeSavedFilterModal()">
+        <div class="saved-filter-dialog" role="dialog" aria-modal="true" aria-labelledby="savedFilterDialogTitle">
+            <h2 id="savedFilterDialogTitle">Create saved search</h2>
+            <label for="savedFilterName">Search title</label>
+            <input id="savedFilterName" type="text" placeholder="Critical follow-ups today">
+            <label for="savedFilterGroupLogic" style="margin-top: 12px;">Match groups</label>
+            <select id="savedFilterGroupLogic" onchange="updateSavedFilterPreview()">
+                <option value="AND">All groups (AND)</option>
+                <option value="OR">Any group (OR)</option>
+            </select>
+            <small style="display: block; margin-top: 5px; color: #64748b;">
+                Put alternatives in the same group. Groups are then combined using the setting above.
+            </small>
+            <div id="savedFilterConditions"></div>
+            <div id="savedFilterPreview" class="saved-filter-preview"></div>
+            <button type="button" class="saved-filter-add" style="margin-top: 10px;" onclick="addSavedFilterCondition()">+ Add condition</button>
+            <div class="saved-filter-dialog-actions">
+                <button type="button" class="saved-filter-cancel" onclick="closeSavedFilterModal()">Cancel</button>
+                <button type="button" class="saved-filter-save" onclick="saveSavedFilter()">Save search</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Main 3-Column Layout -->
     <div class="main-layout">
         <!-- LEFT PANEL - Filters -->
         <div class="left-panel">
             <h3>📊 Filters</h3>
+            <div class="saved-filter-panel">
+                <div class="saved-filter-panel-header">
+                    <span class="saved-filter-panel-title">🔎 Saved searches</span>
+                    <button class="saved-filter-add" type="button" onclick="openSavedFilterModal()">+ New</button>
+                </div>
+                <div id="savedFilterList">
+                    <div class="saved-filter-empty">No saved searches</div>
+                </div>
+            </div>
             
             <div class="filter-item">
                 <label>📅 Date Range</label>
@@ -4109,10 +6241,10 @@
             </div>
             
             <div class="filter-item">
-                <label>📁 Project <span onclick="toggleAllProjects()" style="cursor: pointer; color: #4CAF50; font-size: 10px; margin-left: 5px;">[Toggle]</span></label>
-                <div id="projectFilter" style="max-height: 120px; overflow-y: auto; padding: 6px; background: #1a1a1a; border: 1px solid #444; border-radius: 4px; font-size: 11px;">
-                    <div style="color: #666;">Load tasks first</div>
-                </div>
+                <label for="projectFilter">📁 Project</label>
+                <select id="projectFilter" onchange="onFilterDropdownChange()" style="width: 100%; padding: 8px 10px; font-size: 12px; background: #1a1a1a; border: 1px solid #444; border-radius: 4px; color: #e0e0e0;">
+                    <option value="all">All Projects</option>
+                </select>
             </div>
             
             <div class="filter-item">
@@ -4156,33 +6288,64 @@
         
         <!-- MIDDLE PANEL - Task List -->
         <div class="middle-panel">
-            <!-- Quick Add Bar -->
-            <div class="quick-add-bar" style="display: flex; gap: 6px; padding: 8px 10px; background: #1a1a1a; border-radius: 6px; margin-bottom: 8px; align-items: center;">
-                <input type="text" id="quickTaskTitle" placeholder="New task..." 
-                       style="flex: 1; padding: 8px 10px; font-size: 12px; background: #0d0d0d; border: 1px solid #333; border-radius: 4px; color: #e0e0e0; outline: none;"
-                       onkeydown="if(event.key === 'Enter') createQuickTask()">
-                <select id="quickTaskProject" style="padding: 6px; font-size: 11px; background: #0d0d0d; border: 1px solid #333; border-radius: 4px; color: #9ca3af; max-width: 100px;">
-                    <option value="">Project</option>
-                </select>
-                <select id="quickTaskPriority" style="padding: 6px; font-size: 11px; background: #0d0d0d; border: 1px solid #333; border-radius: 4px; color: #9ca3af; width: 70px;">
-                    <option value="0">Priority</option>
-                    <option value="1">🔵 Low</option>
-                    <option value="3">🟡 Med</option>
-                    <option value="5">🔴 High</option>
-                </select>
-                <input type="date" id="quickTaskDate" style="padding: 6px; font-size: 11px; background: #0d0d0d; border: 1px solid #333; border-radius: 4px; color: #9ca3af; width: 110px;">
-                <input type="time" id="quickTaskTime" style="padding: 6px; font-size: 11px; background: #0d0d0d; border: 1px solid #333; border-radius: 4px; color: #9ca3af; width: 75px;">
-                <button onclick="createQuickTask()" style="padding: 6px 12px; font-size: 11px; background: #2563eb; border: none; border-radius: 4px; color: #fff; cursor: pointer; white-space: nowrap;">+ Add</button>
-            </div>
-            
-            <div class="task-header">
-                <div class="task-count" id="filterInfo">Loading tasks...</div>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <span style="font-size: 10px; color: #6b7280;" title="Select a task, then: Enter=new sibling, Tab=new child, Space=complete">Select task → <kbd style="background:#374151;padding:1px 4px;border-radius:3px;font-size:9px;">Enter</kbd> <kbd style="background:#374151;padding:1px 4px;border-radius:3px;font-size:9px;">Tab</kbd></span>
-                    <button onclick="loadFromCache()" style="padding: 4px 10px; font-size: 11px; background: #333;">Load Cached</button>
+            <!-- Today overview -->
+            <section class="today-overview" aria-label="Today overview">
+                <div class="today-overview-head">
+                    <div class="today-overview-date">
+                        <span id="todayOverviewDate">Loading date...</span>
+                        <span class="today-date-separator">·</span>
+                        <span id="todayLiveClock">--:--:--</span>
+                    </div>
+                    <div class="today-header-battery">
+                        <div class="today-mini-battery" aria-label="Remaining day">
+                            <div id="todayOverviewBattery"></div>
+                        </div>
+                        <div class="today-time-left" id="todayOverviewTimeLeft">
+                            --% left
+                            <small>Time left</small>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            
+                <div class="today-ring-layout">
+                    <div class="today-ring-card">
+                        <div class="today-ring">
+                            <svg viewBox="0 0 120 120" aria-hidden="true">
+                                <circle class="today-ring-track" cx="60" cy="60" r="48"></circle>
+                                <circle class="today-ring-progress done" id="todayDoneRing" cx="60" cy="60" r="48"></circle>
+                            </svg>
+                            <div class="today-ring-center">
+                                <strong id="todayDonePercent">0%</strong>
+                                <span>DONE</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="today-ring-label">Done today</div>
+                            <div class="today-ring-sub" id="todayDoneRingSub">0m / 0m</div>
+                        </div>
+                    </div>
+                    <div class="today-ring-card">
+                        <div class="today-ring">
+                            <svg viewBox="0 0 120 120" aria-hidden="true">
+                                <circle class="today-ring-track time" cx="60" cy="60" r="48"></circle>
+                                <circle class="today-ring-progress time" id="todayTimeRing" cx="60" cy="60" r="48"></circle>
+                            </svg>
+                            <div class="today-ring-center">
+                                <strong id="todayTimePercent">0%</strong>
+                                <span>LEFT</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="today-ring-label">Day remaining</div>
+                            <div class="today-ring-sub" id="todayTimeRingSub">0h 0m left</div>
+                        </div>
+                    </div>
+                    <div class="today-overview-summary">
+                        <div>Goal/project time allocated: <strong id="todayOverviewTotal">0m</strong></div>
+                        <div>Scheduled today / allocated: <strong id="todayOverviewPlanned">0m / 0m (0%)</strong></div>
+                        <div>Still to do today: <strong id="todayOverviewRemaining">0m</strong></div>
+                    </div>
+                </div>
+            </section>
             <!-- Task List -->
             <div class="task-list" id="taskList" tabindex="0" style="outline: none;">
                 <div class="loading">Configure your access token and load tasks</div>
@@ -4314,6 +6477,8 @@
         let filteredTasks = []; // Tasks after pre-filtering
         let tasksForAI = []; // Minimal data optimized for OpenAI
         let projects = {};
+        const SAVED_FILTERS_STORAGE_KEY = 'saved_task_filters';
+        let editingSavedFilterId = null;
         
         // PERF: Global task lookup map - O(1) lookup instead of O(n) .find()
         let taskById = {};
@@ -4427,6 +6592,12 @@
             document.getElementById('aiSearchName').value = search ? search.title : '';
             document.getElementById('aiSearchInstruction').value = search ? search.instruction : '';
             document.getElementById('aiSearchTags').value = search && Array.isArray(search.tags) ? search.tags.join(', ') : '';
+            const projectSelect = document.getElementById('aiSearchProject');
+            projectSelect.innerHTML = '<option value="">No list change</option>' +
+                getOrderedProjects().map(project =>
+                    `<option value="${escapeHtml(project.id)}">${escapeHtml(project.name)}</option>`
+                ).join('');
+            projectSelect.value = search?.targetProjectId || '';
             document.getElementById('aiSearchModalOverlay').style.display = 'flex';
             document.getElementById('aiSearchName').focus();
         }
@@ -4440,6 +6611,7 @@
             const title = document.getElementById('aiSearchName').value.trim();
             const instruction = document.getElementById('aiSearchInstruction').value.trim();
             const tags = parseAISearchTags(document.getElementById('aiSearchTags').value);
+            const targetProjectId = document.getElementById('aiSearchProject').value;
             if (!title || !instruction) {
                 showMessage('Enter a title and an instruction', 'error');
                 return;
@@ -4450,12 +6622,13 @@
                     search.title = title;
                     search.instruction = instruction;
                     search.tags = tags;
+                    search.targetProjectId = targetProjectId;
                 }
                 const results = JSON.parse(localStorage.getItem(AI_SEARCH_RESULTS_KEY) || '{}');
                 delete results[editingAISearchId];
                 localStorage.setItem(AI_SEARCH_RESULTS_KEY, JSON.stringify(results));
             } else {
-                aiSearches.push({ id: `ai-${Date.now()}`, title, instruction, tags });
+                aiSearches.push({ id: `ai-${Date.now()}`, title, instruction, tags, targetProjectId });
             }
             saveAISearchOrder();
             renderAISearches();
@@ -4954,14 +7127,12 @@
         }
 
         function getAISearchFilterKey() {
-            const selectedProjects = Array.from(document.querySelectorAll('.project-filter-checkbox:checked'))
-                .map(checkbox => checkbox.value)
-                .sort();
+            const selectedProject = document.getElementById('projectFilter')?.value || 'all';
             return JSON.stringify({
                 date: document.getElementById('dateFilter')?.value || 'all',
                 priority: document.getElementById('priorityFilter')?.value || 'all',
-                project: document.getElementById('projectFilter')?.value || 'all',
-                projects: selectedProjects,
+                project: selectedProject,
+                projects: selectedProject === 'all' ? [] : [selectedProject],
                 context: document.getElementById('contextFilter')?.value || 'all',
                 duration: document.getElementById('durationFilter')?.value || 'all',
                 comments: document.getElementById('commentFilter')?.value || 'all',
@@ -5098,6 +7269,50 @@
             return { updated, skipped, failed };
         }
 
+        async function moveAISearchTasks(search, resultItems, tasks) {
+            const targetProjectId = search.targetProjectId;
+            if (!targetProjectId) return { updated: 0, skipped: 0, failed: 0 };
+
+            const token = getTaskCommentToken();
+            if (!token) throw new Error('Configure your TickTick access token before moving AI search tasks');
+
+            const taskMap = new Map(tasks.map(task => [task.id, task]));
+            const moves = [...new Set((resultItems || []).map(item => item.id).filter(Boolean))]
+                .map(taskId => taskMap.get(taskId))
+                .filter(task => task && task.projectId !== targetProjectId)
+                .map(task => ({
+                    fromProjectId: task.projectId,
+                    toProjectId: targetProjectId,
+                    taskId: task.id
+                }));
+            const skipped = [...new Set((resultItems || []).map(item => item.id).filter(Boolean))]
+                .map(taskId => taskMap.get(taskId))
+                .filter(task => task && task.projectId === targetProjectId).length;
+            if (moves.length === 0) return { updated: 0, skipped, failed: 0 };
+
+            try {
+                const response = await fetch('https://api.ticktick.com/open/v1/task/move', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': getTaskCommentToken(),
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(moves)
+                });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                moves.forEach(move => {
+                    const task = taskMap.get(move.taskId);
+                    if (task) task.projectId = targetProjectId;
+                    if (taskById[move.taskId]) taskById[move.taskId].projectId = targetProjectId;
+                });
+                localStorage.setItem('ticktick_tasks', JSON.stringify(allTasks));
+                return { updated: moves.length, skipped, failed: 0 };
+            } catch (error) {
+                console.error('Failed to move AI search tasks:', error);
+                return { updated: 0, skipped, failed: moves.length };
+            }
+        }
+
         function showAISearchTagSummary(tags, summary) {
             if (!tags.length) return;
             const parts = [];
@@ -5105,6 +7320,17 @@
             if (summary.skipped) parts.push(`${summary.skipped} already tagged`);
             if (summary.failed) parts.push(`${summary.failed} failed`);
             showMessage(`Tags: ${parts.join(', ')}`, summary.failed ? 'error' : 'success');
+        }
+
+        function showAISearchMoveSummary(targetProjectId, summary) {
+            if (!targetProjectId || !summary.updated && !summary.skipped && !summary.failed) return;
+            const project = projects[targetProjectId];
+            const projectName = project?.name || 'selected list';
+            const parts = [];
+            if (summary.updated) parts.push(`${summary.updated} moved`);
+            if (summary.skipped) parts.push(`${summary.skipped} already there`);
+            if (summary.failed) parts.push(`${summary.failed} failed`);
+            showMessage(`List "${projectName}": ${parts.join(', ')}`, summary.failed ? 'error' : 'success');
         }
 
         async function runAISearch(searchId) {
@@ -5129,8 +7355,10 @@
                 activeAIResult = savedResult;
                 localStorage.removeItem('ai_recommendation');
                 let cachedTagSummary = null;
+                let cachedMoveSummary = null;
                 try {
                     cachedTagSummary = await addAISearchTags(search, savedResult.results, filteredTasks);
+                    cachedMoveSummary = await moveAISearchTasks(search, savedResult.results, filteredTasks);
                 } catch (error) {
                     showMessage(error.message, 'error');
                 }
@@ -5140,6 +7368,7 @@
                 showAIResultBanner(search, filteredTasks.length, totalCount, savedResult.summary, true);
                 updateFilterInfo();
                 if (cachedTagSummary) showAISearchTagSummary(search.tags || [], cachedTagSummary);
+                if (cachedMoveSummary) showAISearchMoveSummary(search.targetProjectId, cachedMoveSummary);
                 showMessage(`Loaded ${filteredTasks.length} saved AI result(s)`, 'success');
                 console.log('Loaded saved Gemini result:', {
                     search: search.title,
@@ -5237,8 +7466,10 @@
                 const rankedTasks = applyAIResultToTasks(filteredTasks);
 
                 let tagSummary = null;
+                let moveSummary = null;
                 try {
                     tagSummary = await addAISearchTags(search, cachedResult.results, filteredTasks);
+                    moveSummary = await moveAISearchTasks(search, cachedResult.results, filteredTasks);
                 } catch (error) {
                     showMessage(error.message, 'error');
                 }
@@ -5248,6 +7479,7 @@
                 updateFilterInfo();
                 showMessage(`Gemini found ${rankedTasks.length} matching task(s)`, 'success');
                 if (tagSummary) showAISearchTagSummary(search.tags || [], tagSummary);
+                if (moveSummary) showAISearchMoveSummary(search.targetProjectId, moveSummary);
             } catch (error) {
                 activeAISearch = null;
                 applyPreFiltersInternal();
@@ -5763,9 +7995,12 @@
         // Duration tags system (stored locally since TickTick API doesn't support tags)
         const DURATION_OPTIONS = [
             { key: '5min', label: '5 min', emoji: '⚡', minutes: 5 },
+            { key: '10min', label: '10 min', emoji: '⚡', minutes: 10 },
             { key: '15min', label: '15 min', emoji: '🔹', minutes: 15 },
             { key: '30min', label: '30 min', emoji: '🔸', minutes: 30 },
+            { key: '45min', label: '45 min', emoji: '🔸', minutes: 45 },
             { key: '1hour', label: '1 hour', emoji: '⏰', minutes: 60 },
+            { key: '90min', label: '1.5 hours', emoji: '🕐', minutes: 90 },
             { key: '2hour', label: '2 hours', emoji: '🕐', minutes: 120 },
             { key: '4hour', label: '4 hours', emoji: '🕓', minutes: 240 },
             { key: '8hour', label: '8 hours', emoji: '🕗', minutes: 480 },
@@ -5808,27 +8043,50 @@
         
         // Duration to tag name mapping
         const DURATION_TO_TAG = {
-            '5min': '5-min',
-            '15min': '15-min',
-            '30min': '30-min',
-            '1hour': '1-hour',
-            '2hour': '2-hour',
-            '4hour': '4-hour',
-            '8hour': '8-hour',
-            '1day': '1-day',
-            '1week': '1-week',
-            '1month': '1-month',
-            '2month': '2-month',
-            '3month': '3-month',
-            '6month': '6-month',
-            '1year': '1-year'
+            '5min': 'duration/5-min',
+            '10min': 'duration/10-min',
+            '15min': 'duration/15-min',
+            '30min': 'duration/30-min',
+            '45min': 'duration/45-min',
+            '1hour': 'duration/1-hour',
+            '90min': 'duration/90-min',
+            '2hour': 'duration/2-hour',
+            '4hour': 'duration/4-hour',
+            '8hour': 'duration/8-hour',
+            '1day': 'duration/1-day',
+            '1week': 'duration/1-week',
+            '1month': 'duration/1-month',
+            '2month': 'duration/2-month',
+            '3month': 'duration/3-month',
+            '6month': 'duration/6-month',
+            '1year': 'duration/1-year'
         };
-        
+
         const TAG_TO_DURATION = {
+            'duration/5-min': '5min',
+            'duration/10-min': '10min',
+            'duration/15-min': '15min',
+            'duration/30-min': '30min',
+            'duration/45-min': '45min',
+            'duration/1-hour': '1hour',
+            'duration/90-min': '90min',
+            'duration/2-hour': '2hour',
+            'duration/4-hour': '4hour',
+            'duration/8-hour': '8hour',
+            'duration/1-day': '1day',
+            'duration/1-week': '1week',
+            'duration/1-month': '1month',
+            'duration/2-month': '2month',
+            'duration/3-month': '3month',
+            'duration/6-month': '6month',
+            'duration/1-year': '1year',
             '5-min': '5min',
+            '10-min': '10min',
             '15-min': '15min',
             '30-min': '30min',
+            '45-min': '45min',
             '1-hour': '1hour',
+            '90-min': '90min',
             '2-hour': '2hour',
             '4-hour': '4hour',
             '8-hour': '8hour',
@@ -6689,7 +8947,7 @@
             const project = projects[task.projectId];
             const projectName = project ? project.name : 'Unknown';
             const priorityText = task.priority === 5 ? '🔴' : task.priority === 3 ? '🟡' : task.priority === 1 ? '🔵' : '';
-            const dateText = task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No date';
+            const dateText = task.dueDate ? getTaskCalendarDay(task).toLocaleDateString() : 'No date';
             document.getElementById('durationTaskMeta').textContent = `${projectName} • ${dateText} ${priorityText}`;
             
             // Update progress
@@ -6886,7 +9144,7 @@
             // Build updated tags array - preserve existing non-duration tags
             let newTags = task.tags ? [...task.tags] : [];
             // Remove any existing duration tags
-            newTags = newTags.filter(t => !TAG_TO_DURATION[t]);
+            newTags = newTags.filter(t => !isDurationTag(t));
             // Add new duration tag
             newTags.push(tagName);
             
@@ -7720,7 +9978,7 @@
                 if (!hasRecurrenceType) return false;
                 
                 // Check if overdue
-                const isOverdue = task.dueDate && new Date(task.dueDate) < today;
+                const isOverdue = task.dueDate && getTaskCalendarDay(task) < today;
                 
                 // Check if no date
                 const hasNoDate = !task.dueDate && !task.startDate;
@@ -7752,7 +10010,7 @@
                 }
                 
                 // Check if overdue
-                const isOverdue = task.dueDate && new Date(task.dueDate) < today;
+                const isOverdue = task.dueDate && getTaskCalendarDay(task) < today;
                 
                 // Check if no date
                 const hasNoDate = !task.dueDate;
@@ -8287,7 +10545,7 @@
             // Update local task tags
             const tagName = DURATION_TO_TAG[durationKey];
             if (!task.tags) task.tags = [];
-            task.tags = task.tags.filter(t => !TAG_TO_DURATION[t]);
+            task.tags = task.tags.filter(t => !isDurationTag(t));
             task.tags.push(tagName);
             localStorage.setItem('ticktick_tasks', JSON.stringify(allTasks));
             
@@ -8502,11 +10760,51 @@
         function getDurationFromTags(task) {
             if (!task.tags || !Array.isArray(task.tags)) return null;
             for (const tag of task.tags) {
-                if (TAG_TO_DURATION[tag]) {
-                    return TAG_TO_DURATION[tag];
-                }
+                const durationKey = getDurationKeyFromTag(tag);
+                if (durationKey) return durationKey;
             }
             return null;
+        }
+
+        function isDurationTag(tag) {
+            const normalizedTag = String(tag).toLowerCase().trim();
+            return Boolean(TAG_TO_DURATION[normalizedTag] ||
+                TAG_TO_DURATION[normalizedTag.split('/').pop()]);
+        }
+
+        function getDurationKeyFromTag(tag) {
+            const normalizedTag = String(tag).toLowerCase().trim();
+            return TAG_TO_DURATION[normalizedTag] ||
+                TAG_TO_DURATION[normalizedTag.split('/').pop()] ||
+                null;
+        }
+
+        function getDurationTagForKey(durationKey) {
+            const fetchedTag = availableTags.find(tag =>
+                getDurationKeyFromTag(tag?.name || tag?.label || '') === durationKey
+            );
+            return fetchedTag ? String(fetchedTag.name || fetchedTag.label) : DURATION_TO_TAG[durationKey];
+        }
+
+        function getAvailableDurationOptions() {
+            const fetchedOptions = availableTags
+                .map(tag => {
+                    const tagName = String(tag?.name || tag?.label || '');
+                    const durationKey = getDurationKeyFromTag(tagName);
+                    return durationKey ? { durationKey, tagName } : null;
+                })
+                .filter(Boolean);
+
+            if (fetchedOptions.length === 0) {
+                return DURATION_OPTIONS.map(option => ({
+                    durationKey: option.key,
+                    tagName: getDurationTagForKey(option.key)
+                }));
+            }
+
+            return DURATION_OPTIONS
+                .map(option => fetchedOptions.find(item => item.durationKey === option.key))
+                .filter(Boolean);
         }
         
         // Get children of a task (by parentId)
@@ -8634,9 +10932,9 @@
             }
             
             // Build new tags array
-            let newTags = (task.tags || []).filter(tag => !TAG_TO_DURATION[tag]);
-            if (newDuration && DURATION_TO_TAG[newDuration]) {
-                newTags.push(DURATION_TO_TAG[newDuration]);
+            let newTags = (task.tags || []).filter(tag => !isDurationTag(tag));
+            if (newDuration) {
+                newTags.push(getDurationTagForKey(newDuration));
             }
             
             const updatePayload = {
@@ -8938,9 +11236,8 @@
             localStorage.setItem('tagFilter', document.getElementById('tagFilter').value);
             localStorage.setItem('commentFilter', document.getElementById('commentFilter').value);
             
-            // Save selected projects from checkboxes
-            const projectCheckboxes = document.querySelectorAll('.project-filter-checkbox:checked');
-            const selectedProjects = Array.from(projectCheckboxes).map(cb => cb.value);
+            const selectedProject = document.getElementById('projectFilter').value;
+            const selectedProjects = selectedProject === 'all' ? [] : [selectedProject];
             localStorage.setItem('projectFilter', JSON.stringify(selectedProjects));
             
             localStorage.setItem('contextFilter', document.getElementById('contextFilter').value);
@@ -9027,7 +11324,7 @@
                     // Format date for AI readability
                     let formattedDate = null;
                     if (t.dueDate) {
-                        const date = new Date(t.dueDate);
+                            const date = getTaskCalendarDay(t);
                         formattedDate = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
                     }
                     const aiTask = {
@@ -9185,7 +11482,7 @@
                         // Format date for AI readability
                         let formattedDate = null;
                         if (t.dueDate) {
-                            const date = new Date(t.dueDate);
+                            const date = getTaskCalendarDay(t);
                             formattedDate = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
                         }
                         const aiTask = {
@@ -9340,6 +11637,7 @@
                                 ${recurringBadge}
                             </span>
                         </span>
+                        <span class="task-duration">${durationBadge}</span>
                         <span class="task-datetime">${dateTimeInfo}</span>
                         <span class="project-name">${escapeHtml(projectName)}</span>
                         <div class="task-latest-comment" data-comment-preview="${task.id}" hidden></div>
@@ -9362,15 +11660,8 @@
                 return html;
             }
 
-            // Table header
-            const headerHTML = `
-                <div class="task-header" style="display: grid; grid-template-columns: 20px minmax(180px, 1fr) minmax(145px, 190px) minmax(90px, 120px); gap: 8px; padding: 6px 10px; border-radius: 4px; margin-bottom: 4px; font-size: 10px; text-transform: uppercase; font-weight: 600;">
-                    <span></span>
-                    <span>Task</span>
-                    <span style="text-align: center;">Date &amp; Time</span>
-                    <span style="text-align: center;">Project</span>
-                </div>
-            `;
+            // Keep the task list compact without a separate column header.
+            const headerHTML = '';
 
             const tasksHTML = rootTasks.map((task, index) => {
                 const isLastRoot = index === rootTasks.length - 1;
@@ -9385,6 +11676,7 @@
             }
 
             queueTaskCommentPreviews(tasks);
+            updateTodayOverview();
         }
 
         // Context menu state
@@ -10559,6 +12851,18 @@
             }).join('');
         }
 
+        function getTaskCalendarDay(task) {
+            if (!task || !task.dueDate) return null;
+            const due = new Date(task.dueDate);
+            if (Number.isNaN(due.getTime())) return null;
+
+            if (task.isAllDay && due.getUTCHours() === 0 && due.getUTCMinutes() === 0 &&
+                due.getUTCSeconds() === 0 && due.getUTCMilliseconds() === 0) {
+                return new Date(due.getUTCFullYear(), due.getUTCMonth(), due.getUTCDate());
+            }
+            return new Date(due.getFullYear(), due.getMonth(), due.getDate());
+        }
+
         function formatTaskSchedule(task) {
             if (!task.dueDate) return '<span class="task-schedule-empty">No date</span>';
 
@@ -10567,7 +12871,7 @@
 
             const now = new Date();
             const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            const taskDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            const taskDay = getTaskCalendarDay(task);
             const diffDays = Math.round((taskDay - today) / 86400000);
             const hasTime = !task.isAllDay && (date.getHours() !== 0 || date.getMinutes() !== 0);
             const dateLabel = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -10609,7 +12913,7 @@
             if (!hasTime) {
                 // All-day task - show remaining days
                 const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                const taskDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+                const taskDay = getTaskCalendarDay(task);
                 const diffDays = Math.ceil((taskDay - today) / (1000 * 60 * 60 * 24));
                 
                 let remainingClass = '';
@@ -10680,7 +12984,7 @@
             const date = new Date(task.dueDate);
             const now = new Date();
             const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            const taskDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            const taskDate = getTaskCalendarDay(task);
             
             const diffDays = Math.ceil((taskDate - today) / (1000 * 60 * 60 * 24));
             
@@ -10744,38 +13048,26 @@
             return project?.closed === true;
         }
 
-        // Populate project filter with checkboxes
+        function getOrderedProjects() {
+            const projectList = Object.values(projects);
+            const inboxProjects = projectList.filter(project =>
+                project.id?.toLowerCase().startsWith('inbox') ||
+                project.name?.toLowerCase() === 'inbox'
+            );
+            const otherProjects = projectList.filter(project => !inboxProjects.includes(project));
+            return [...inboxProjects, ...otherProjects];
+        }
+
+        // Populate project filter with a single-select dropdown
         function populateProjectDropdown() {
             const projectContainer = document.getElementById('projectFilter');
-            
-            // Check if there are saved preferences
-            const savedProjectFilter = localStorage.getItem('projectFilter');
-            const hasPreferences = savedProjectFilter && savedProjectFilter !== '[]';
-            
-            // Build checkbox list - only check "All Projects" if no saved preferences
-            let html = `
-                <div style="margin-bottom: 5px;">
-                    <label style="display: flex; align-items: center; cursor: pointer; font-weight: normal;">
-                        <input type="checkbox" class="project-filter-checkbox" value="all" ${!hasPreferences ? 'checked' : ''} onchange="handleProjectCheckboxChange(this)" style="margin-right: 8px; cursor: pointer; width: 16px; height: 16px;">
-                        <span style="font-weight: 500;">All Projects</span>
-                    </label>
-                </div>
+            const orderedProjects = getOrderedProjects();
+            projectContainer.innerHTML = `
+                <option value="all">All Projects</option>
+                ${orderedProjects.map(project =>
+                    `<option value="${escapeHtml(project.id)}">${escapeHtml(project.name)}</option>`
+                ).join('')}
             `;
-            
-            Object.values(projects).forEach(project => {
-                const dotColor = project.color || '#1a73e8';
-                html += `
-                    <div style="margin-bottom: 5px;">
-                        <label style="display: flex; align-items: center; cursor: pointer; font-weight: normal;">
-                            <input type="checkbox" class="project-filter-checkbox" value="${project.id}" onchange="handleProjectCheckboxChange(this)" style="margin-right: 8px; cursor: pointer; width: 16px; height: 16px;">
-                            <span style="color: ${dotColor}; font-size: 12px; margin-right: 5px;">●</span>
-                            <span>${escapeHtml(project.name)}</span>
-                        </label>
-                    </div>
-                `;
-            });
-            
-            projectContainer.innerHTML = html;
             
             // Restore saved filter selections (will override default if preferences exist)
             restoreFilterSelections();
@@ -10793,7 +13085,7 @@
             const savedQuickProject = localStorage.getItem('quickTaskProject');
             
             let html = '<option value="">Select Project...</option>';
-            Object.values(projects).forEach(project => {
+            getOrderedProjects().forEach(project => {
                 html += `<option value="${project.id}">${escapeHtml(project.name)}</option>`;
             });
             
@@ -10999,24 +13291,17 @@
             }
             if (savedProjectFilter) {
                 try {
-                    // Parse saved projects array and check corresponding checkboxes
+                    // Restore the previously selected project, keeping older array storage compatible.
                     const selectedProjects = JSON.parse(savedProjectFilter);
-                    
-                    // First uncheck all (including "All Projects")
-                    const allCheckboxes = document.querySelectorAll('.project-filter-checkbox');
-                    allCheckboxes.forEach(cb => cb.checked = false);
-                    
-                    // Then check only the saved ones
-                    selectedProjects.forEach(projectId => {
-                        const checkbox = document.querySelector(`.project-filter-checkbox[value="${projectId}"]`);
-                        if (checkbox) {
-                            checkbox.checked = true;
-                        }
-                    });
+                    const selectedProject = Array.isArray(selectedProjects) && selectedProjects.length === 1
+                        ? selectedProjects[0]
+                        : 'all';
+                    const projectFilter = document.getElementById('projectFilter');
+                    projectFilter.value = Array.from(projectFilter.options).some(option => option.value === selectedProject)
+                        ? selectedProject
+                        : 'all';
                 } catch (e) {
-                    // If parsing fails, check "all" by default
-                    const allCheckbox = document.querySelector('.project-filter-checkbox[value="all"]');
-                    if (allCheckbox) allCheckbox.checked = true;
+                    document.getElementById('projectFilter').value = 'all';
                 }
             }
             if (savedContextFilter) {
@@ -11225,8 +13510,7 @@
             tasks.forEach(task => {
                 let dateDiff = Infinity;
                 if (task.dueDate) {
-                    const taskDate = new Date(task.dueDate);
-                    const taskDay = new Date(taskDate.getFullYear(), taskDate.getMonth(), taskDate.getDate());
+                    const taskDay = getTaskCalendarDay(task);
                     dateDiff = Math.floor((taskDay.getTime() - todayTime) / (1000 * 60 * 60 * 24));
                 }
                 taskMetrics.set(task.id, {
@@ -11288,7 +13572,398 @@
         }
 
         // Called when user changes a filter dropdown - keep AI results as a second filter layer
+        function getSavedFilters() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(SAVED_FILTERS_STORAGE_KEY) || '[]');
+                return Array.isArray(saved) ? saved : [];
+            } catch (error) {
+                console.error('Could not load saved searches:', error);
+                return [];
+            }
+        }
+
+        function saveSavedFilters(filters) {
+            localStorage.setItem(SAVED_FILTERS_STORAGE_KEY, JSON.stringify(filters));
+        }
+
+        function getSavedFilterValueOptions(category) {
+            if (category === 'project') {
+                return [
+                    { value: 'all', label: 'All Projects' },
+                    ...getOrderedProjects().map(project => ({ value: project.id, label: project.name }))
+                ];
+            }
+            if (category === 'tag') {
+                return [
+                    { value: 'with_tags', label: 'Any tag' },
+                    { value: 'without_tags', label: 'No tags' },
+                    ...availableTags
+                        .filter(tag => tag && (tag.name || tag.label))
+                        .map(tag => {
+                            const name = String(tag.name || tag.label);
+                            return { value: name, label: name };
+                        })
+                        .sort((a, b) => a.label.localeCompare(b.label))
+                ];
+            }
+            if (category === 'date') {
+                return [
+                    { value: 'nodate', label: 'No date' },
+                    { value: 'overdue', label: 'Overdue' },
+                    { value: 'repeat', label: 'Repeating' },
+                    { value: 'today_allday', label: 'Today' },
+                    { value: 'tomorrow', label: 'Tomorrow' },
+                    { value: 'week', label: 'This week' },
+                    { value: 'next_week', label: 'Next week' },
+                    { value: 'month', label: 'This month' }
+                ];
+            }
+            if (category === 'text') return [];
+            return [
+                { value: '5', label: 'High' },
+                { value: '3', label: 'Medium' },
+                { value: '1', label: 'Low' },
+                { value: '0', label: 'None' }
+            ];
+        }
+
+        function createSavedFilterCondition(condition = {}) {
+            const row = document.createElement('div');
+            row.className = 'saved-filter-condition';
+            const category = condition.category || 'tag';
+            const operator = condition.operator || 'OR';
+            const group = condition.group || 1;
+            const groupLogic = condition.groupLogic || 'OR';
+            row.innerHTML = `
+                <div>
+                    <label>Category</label>
+                    <select class="saved-filter-category" onchange="refreshSavedFilterCondition(this); updateSavedFilterPreview()">
+                        <option value="project">Lists</option>
+                        <option value="tag">Tags</option>
+                        <option value="date">Date</option>
+                        <option value="priority">Priority</option>
+                        <option value="text">Text contains</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Logic</label>
+                    <select class="saved-filter-operator" onchange="updateSavedFilterPreview()">
+                        <option value="OR">OR</option>
+                        <option value="AND">AND</option>
+                        <option value="NOT">NOT</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Group</label>
+                    <select class="saved-filter-group" onchange="updateSavedFilterPreview()">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Within group</label>
+                    <select class="saved-filter-group-logic" onchange="updateSavedFilterPreview()">
+                        <option value="OR">OR</option>
+                        <option value="AND">AND</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Choose values</label>
+                    <div class="saved-filter-value-control"></div>
+                </div>
+                <button type="button" class="saved-filter-remove" onclick="this.parentElement.remove(); updateSavedFilterPreview()">Remove</button>
+            `;
+            row.querySelector('.saved-filter-category').value = category;
+            row.querySelector('.saved-filter-operator').value = operator;
+            row.querySelector('.saved-filter-group').value = String(group);
+            row.querySelector('.saved-filter-group-logic').value = groupLogic;
+            row.dataset.values = JSON.stringify(condition.values || []);
+            refreshSavedFilterCondition(row.querySelector('.saved-filter-category'));
+            updateSavedFilterPreview();
+            return row;
+        }
+
+        function refreshSavedFilterCondition(categorySelect) {
+            const row = categorySelect.closest('.saved-filter-condition');
+            const previousValues = JSON.parse(row.dataset.values || '[]').map(String);
+            const options = getSavedFilterValueOptions(categorySelect.value);
+            const control = row.querySelector('.saved-filter-value-control');
+            control.previousElementSibling.textContent = categorySelect.value === 'text'
+                ? 'Words (comma-separated)'
+                : 'Choose values';
+            if (categorySelect.value === 'text') {
+                control.innerHTML = '<input class="saved-filter-text-values" type="text" placeholder="pay, payment, money" oninput="updateSavedFilterPreview()">';
+                control.querySelector('input').value = previousValues.join(', ');
+            } else {
+                control.innerHTML = `<select class="saved-filter-values" multiple onchange="updateSavedFilterValueSummary(this); updateSavedFilterPreview()">${options.map(option =>
+                    `<option value="${escapeHtml(option.value)}">${escapeHtml(option.label)}</option>`
+                ).join('')}</select>`;
+                const valuesSelect = control.querySelector('.saved-filter-values');
+                previousValues.forEach(value => {
+                    let matchingOption = Array.from(valuesSelect.options).find(item => item.value === value);
+                    if (!matchingOption) {
+                        matchingOption = new Option(value, value);
+                        valuesSelect.add(matchingOption);
+                    }
+                    matchingOption.selected = true;
+                });
+                updateSavedFilterValueSummary(valuesSelect);
+            }
+            row.dataset.values = '[]';
+        }
+
+        function updateSavedFilterValueSummary(valuesSelect) {
+            const values = Array.from(valuesSelect.selectedOptions).map(option => option.textContent.trim());
+            const control = valuesSelect.closest('.saved-filter-value-control');
+            let summary = control.querySelector('.saved-filter-selected-values');
+            if (!summary) {
+                summary = document.createElement('div');
+                summary.className = 'saved-filter-selected-values';
+                control.appendChild(summary);
+            }
+            summary.textContent = values.length ? `Selected: ${values.join(', ')}` : 'Selected: none';
+        }
+
+        function addSavedFilterCondition(condition = {}) {
+            document.getElementById('savedFilterConditions').appendChild(createSavedFilterCondition(condition));
+            updateSavedFilterPreview();
+        }
+
+        function updateSavedFilterPreview() {
+            const preview = document.getElementById('savedFilterPreview');
+            if (!preview) return;
+            const conditions = collectSavedFilterConditions();
+            if (!conditions.length) {
+                preview.textContent = 'Your rule preview will appear here.';
+                return;
+            }
+            const categoryLabels = {
+                project: 'List',
+                tag: 'Tag',
+                date: 'Date',
+                priority: 'Priority',
+                text: 'Text'
+            };
+            const groups = new Map();
+            conditions.forEach(condition => {
+                const labels = getSavedFilterValueOptions(condition.category);
+                const values = condition.category === 'text'
+                    ? condition.values.join(' or ')
+                    : condition.values.map(value =>
+                        labels.find(option => String(option.value) === String(value))?.label || value
+                    ).join(' or ');
+                const phrase = `${categoryLabels[condition.category] || condition.category}: ${values}`;
+                if (!groups.has(condition.group)) {
+                    groups.set(condition.group, { logic: condition.groupLogic, phrases: [] });
+                }
+                groups.get(condition.group).phrases.push(
+                    condition.operator === 'NOT' ? `not (${phrase})` : phrase
+                );
+            });
+            const groupText = Array.from(groups.values()).map(group =>
+                `(${group.phrases.join(` ${group.logic.toLowerCase()} `)})`
+            );
+            const outerLogic = document.getElementById('savedFilterGroupLogic')?.value || 'AND';
+            preview.textContent = `Matches: ${groupText.join(` ${outerLogic.toLowerCase()} `)}`;
+        }
+
+        function openSavedFilterModal(filterId = null) {
+            editingSavedFilterId = filterId;
+            const saved = getSavedFilters().find(filter => filter.id === filterId);
+            document.getElementById('savedFilterDialogTitle').textContent = saved ? 'Edit saved search' : 'Create saved search';
+            document.getElementById('savedFilterName').value = saved?.name || '';
+            document.getElementById('savedFilterGroupLogic').value = saved?.groupLogic || 'AND';
+            const conditions = document.getElementById('savedFilterConditions');
+            conditions.innerHTML = '';
+            (saved?.conditions || [{}]).forEach(condition => addSavedFilterCondition(condition));
+            document.getElementById('savedFilterModal').style.display = 'flex';
+            updateSavedFilterPreview();
+        }
+
+        function closeSavedFilterModal() {
+            document.getElementById('savedFilterModal').style.display = 'none';
+            editingSavedFilterId = null;
+        }
+
+        function collectSavedFilterConditions() {
+            return Array.from(document.querySelectorAll('.saved-filter-condition')).map(row => ({
+                category: row.querySelector('.saved-filter-category').value,
+                operator: row.querySelector('.saved-filter-operator').value,
+                group: Number(row.querySelector('.saved-filter-group').value),
+                groupLogic: row.querySelector('.saved-filter-group-logic').value,
+                values: row.querySelector('.saved-filter-text-values')
+                    ? row.querySelector('.saved-filter-text-values').value.split(',').map(value => value.trim()).filter(Boolean)
+                    : Array.from(row.querySelector('.saved-filter-values').selectedOptions).map(option => option.value)
+            })).filter(condition => condition.values.length > 0);
+        }
+
+        function saveSavedFilter() {
+            const name = document.getElementById('savedFilterName').value.trim();
+            const conditions = collectSavedFilterConditions();
+            if (!name) {
+                showMessage('Enter a name for this saved search', 'error');
+                return;
+            }
+            if (conditions.length === 0) {
+                showMessage('Add at least one condition', 'error');
+                return;
+            }
+            const filters = getSavedFilters();
+            const saved = {
+                id: editingSavedFilterId || `saved-filter-${Date.now()}`,
+                name,
+                groupLogic: document.getElementById('savedFilterGroupLogic').value,
+                conditions
+            };
+            const index = filters.findIndex(filter => filter.id === saved.id);
+            if (index >= 0) filters[index] = saved;
+            else filters.push(saved);
+            saveSavedFilters(filters);
+            window.activeSavedFilter = saved;
+            renderSavedFilters();
+            closeSavedFilterModal();
+            applyPreFiltersInternal();
+        }
+
+        function deleteSavedFilter(filterId) {
+            saveSavedFilters(getSavedFilters().filter(filter => filter.id !== filterId));
+            renderSavedFilters();
+        }
+
+        function duplicateSavedFilter(filterId) {
+            const source = getSavedFilters().find(filter => filter.id === filterId);
+            if (!source) return;
+            const copy = { ...source, id: `saved-filter-${Date.now()}`, name: `${source.name} copy`, conditions: source.conditions.map(condition => ({ ...condition, values: [...condition.values] })) };
+            saveSavedFilters([...getSavedFilters(), copy]);
+            renderSavedFilters();
+        }
+
+        function applySavedFilter(filterId) {
+            const filter = getSavedFilters().find(saved => saved.id === filterId);
+            if (!filter) return;
+            window.activeSavedFilter = filter;
+            applyPreFiltersInternal();
+        }
+
+        function matchesSavedDateCondition(task, value) {
+            if (value === 'repeat') return Boolean(task.repeatFlag || task.repeatType);
+            if (value === 'nodate') return !task.dueDate;
+            if (value === 'today_allday' || value === 'overdue') {
+                const dueDay = getSavedFilterTaskDay(task);
+                if (!dueDay) return false;
+                const now = new Date();
+                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                return value === 'today_allday'
+                    ? dueDay.getTime() === today.getTime()
+                    : dueDay < today;
+            }
+            if (value === 'next_week') {
+                if (!task.dueDate) return false;
+                const now = new Date();
+                const day = now.getDay();
+                const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (day === 0 ? 6 : day - 1) + 7);
+                const nextMonday = new Date(monday);
+                const nextSunday = new Date(monday);
+                nextSunday.setDate(nextSunday.getDate() + 6);
+                const due = new Date(task.dueDate);
+                return due >= nextMonday && due < new Date(nextSunday.getFullYear(), nextSunday.getMonth(), nextSunday.getDate() + 1);
+            }
+            return matchesDateFilter(task, value);
+        }
+
+        function getSavedFilterTaskDay(task) {
+            return getTaskCalendarDay(task);
+        }
+
+        function matchesSavedCondition(task, condition) {
+            const values = condition.values || [];
+            if (condition.category === 'project') {
+                return values.includes('all') || values.includes(task.projectId);
+            }
+            if (condition.category === 'tag') {
+                if (values.includes('with_tags')) return Array.isArray(task.tags) && task.tags.length > 0;
+                if (values.includes('without_tags')) return !Array.isArray(task.tags) || task.tags.length === 0;
+                const taskTags = new Set((task.tags || []).map(tag => String(tag).toLowerCase()));
+                return condition.operator === 'AND'
+                    ? values.every(value => taskTags.has(value.toLowerCase()))
+                    : values.some(value => taskTags.has(value.toLowerCase()));
+            }
+            if (condition.category === 'date') {
+                return condition.operator === 'AND'
+                    ? values.every(value => matchesSavedDateCondition(task, value))
+                    : values.some(value => matchesSavedDateCondition(task, value));
+            }
+            if (condition.category === 'priority') {
+                const priority = String(task.priority || 0);
+                return values.includes(priority);
+            }
+            if (condition.category === 'text') {
+                const searchText = `${task.title || ''} ${task.content || ''}`.toLowerCase();
+                return condition.operator === 'AND'
+                    ? values.every(value => searchText.includes(value.toLowerCase()))
+                    : values.some(value => searchText.includes(value.toLowerCase()));
+            }
+            return true;
+        }
+
+        function matchesSavedFilter(task, filter) {
+            const groups = new Map();
+            filter.conditions.forEach(condition => {
+                const match = matchesSavedCondition(task, condition);
+                const result = condition.operator === 'NOT' ? !match : match;
+                const groupId = Number(condition.group) || 1;
+                if (!groups.has(groupId)) {
+                    groups.set(groupId, {
+                        logic: condition.groupLogic === 'AND' ? 'AND' : 'OR',
+                        results: []
+                    });
+                }
+                groups.get(groupId).results.push(result);
+            });
+            const groupResults = Array.from(groups.values()).map(group =>
+                group.logic === 'AND' ? group.results.every(Boolean) : group.results.some(Boolean)
+            );
+            return filter.groupLogic === 'OR'
+                ? groupResults.some(Boolean)
+                : groupResults.every(Boolean);
+        }
+
+        function renderSavedFilters() {
+            const container = document.getElementById('savedFilterList');
+            if (!container) return;
+            const filters = getSavedFilters();
+            container.innerHTML = filters.length ? filters.map(filter => `
+                <div class="saved-filter-item">
+                    <div class="saved-filter-card-main">
+                        <button class="saved-filter-run" type="button" title="${escapeHtml(filter.name)}" onclick="applySavedFilter('${filter.id}')">${escapeHtml(filter.name)}</button>
+                        <div class="saved-filter-stats">
+                            <span>Tasks <strong>${getSavedFilterTaskSummary(filter).count}</strong></span>
+                            <span>Duration <strong>${getSavedFilterTaskSummary(filter).duration}</strong></span>
+                        </div>
+                    </div>
+                    <button type="button" title="Edit" onclick="openSavedFilterModal('${filter.id}')">✎</button>
+                    <button type="button" title="Delete" onclick="deleteSavedFilter('${filter.id}')">×</button>
+                </div>
+            `).join('') : '<div class="saved-filter-empty">No saved searches</div>';
+        }
+
+        function getSavedFilterTaskSummary(filter) {
+            const excludedProjects = new Set(JSON.parse(localStorage.getItem('excluded_projects') || '[]'));
+            const matchingTasks = allTasks.filter(task =>
+                !excludedProjects.has(task.projectId) && matchesSavedFilter(task, filter)
+            );
+            const totalMinutes = matchingTasks.reduce((total, task) =>
+                total + getOverviewTaskMinutes(task), 0);
+            return {
+                count: matchingTasks.length,
+                duration: formatTodayOverviewMinutes(totalMinutes)
+            };
+        }
+
         function onFilterDropdownChange() {
+            window.activeSavedFilter = null;
             window.customFilterTaskIds = null;
             window.customFilterLabel = null;
             applyPreFiltersInternal();
@@ -11328,15 +14003,20 @@
             saveFilterSelections();
             
             // PERF: Query DOM ONCE before the loop, not inside each iteration
-            const projectCheckboxes = document.querySelectorAll('.project-filter-checkbox:checked');
-            const selectedProjects = Array.from(projectCheckboxes).map(cb => cb.value);
+            const selectedProject = document.getElementById('projectFilter').value;
+            const selectedProjects = selectedProject === 'all' ? [] : [selectedProject];
             const selectedProjectsSet = new Set(selectedProjects);
-            const hasAllSelected = selectedProjectsSet.has('all');
+            const hasAllSelected = selectedProject === 'all';
 
+            const activeSavedFilter = window.activeSavedFilter;
             filteredTasks = allTasks.filter(task => {
                 // Exclude projects filter - O(1) Set lookup
                 if (excludedProjectsSet.has(task.projectId)) {
                     return false;
+                }
+
+                if (activeSavedFilter) {
+                    return matchesSavedFilter(task, activeSavedFilter);
                 }
                 
                 // Date filter
@@ -11425,6 +14105,7 @@
             if (activeAISearch && activeAIResult) {
                 showAIResultBanner(activeAISearch, filteredTasks.length, normalFilteredTaskCount, activeAIResult.summary, true);
             }
+            renderSavedFilters();
             updateFilterInfo();
             updateInboxBadge(); // Update inbox count
             updatePriorityBadge(); // Update priority count
@@ -11469,7 +14150,7 @@
                 const now = new Date();
                 const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
                 const taskDate = new Date(task.dueDate);
-                const taskDay = new Date(taskDate.getFullYear(), taskDate.getMonth(), taskDate.getDate());
+                const taskDay = getTaskCalendarDay(task);
                 const isToday = taskDay.getTime() === today.getTime();
                 const isAllDay = task.isAllDay || (taskDate.getHours() === 0 && taskDate.getMinutes() === 0);
                 return isToday && isAllDay;
@@ -11481,11 +14162,10 @@
                 if (!customDate || !task.dueDate) return false;
                 
                 const selectedDate = new Date(customDate);
-                const taskDate = new Date(task.dueDate);
+                const taskDay = getTaskCalendarDay(task);
                 
                 // Compare only dates (ignore time)
                 const selectedDay = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
-                const taskDay = new Date(taskDate.getFullYear(), taskDate.getMonth(), taskDate.getDate());
                 
                 return taskDay.getTime() === selectedDay.getTime();
             }
@@ -11495,8 +14175,7 @@
                 if (!task.dueDate) return true; // Include tasks with no date
                 const now = new Date();
                 const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                const taskDate = new Date(task.dueDate);
-                const taskDay = new Date(taskDate.getFullYear(), taskDate.getMonth(), taskDate.getDate());
+                const taskDay = getTaskCalendarDay(task);
                 return taskDay <= today;
             }
             
@@ -11509,7 +14188,7 @@
             const tomorrow = new Date(today);
             tomorrow.setDate(tomorrow.getDate() + 1);
             const taskDate = new Date(task.dueDate);
-            const taskDay = new Date(taskDate.getFullYear(), taskDate.getMonth(), taskDate.getDate());
+            const taskDay = getTaskCalendarDay(task);
 
             switch(filter) {
                 case 'today_overdue':
@@ -11669,6 +14348,7 @@
         // Reset all filters to default
         function resetFilters() {
             // Clear custom filter
+            window.activeSavedFilter = null;
             window.customFilterTaskIds = null;
             window.customFilterLabel = null;
             
@@ -11691,11 +14371,7 @@
             document.getElementById('commentFilter').value = 'all';
             document.getElementById('sortFilter').value = 'date';
             
-            // Reset project checkboxes - check "All Projects"
-            const allCheckboxes = document.querySelectorAll('.project-filter-checkbox');
-            allCheckboxes.forEach(cb => {
-                cb.checked = cb.value === 'all';
-            });
+            document.getElementById('projectFilter').value = 'all';
             
             applyPreFiltersInternal();
             showMessage('🔄 Filters reset to default', 'success');
@@ -11703,6 +14379,7 @@
 
         // Clear all filters and show all tasks
         function clearFilters() {
+            window.activeSavedFilter = null;
             document.getElementById('dateFilter').value = 'all';
             document.getElementById('priorityFilter').value = 'all';
             document.getElementById('projectFilter').value = 'all';
@@ -11716,16 +14393,13 @@
             const info = document.getElementById('filterInfo');
             const taskSummary = document.getElementById('taskSummary');
             
-            // Show selected project names from checkboxes
-            const projectCheckboxes = document.querySelectorAll('.project-filter-checkbox:checked');
-            const selectedProjects = Array.from(projectCheckboxes);
+            const projectFilter = document.getElementById('projectFilter');
+            const selectedProject = projectFilter?.value || 'all';
             let projectInfo = '';
             
-            if (selectedProjects.length > 0 && !selectedProjects.some(cb => cb.value === 'all')) {
-                const projectNames = selectedProjects
-                    .map(cb => cb.parentElement.textContent.trim().replace('●', '').trim())
-                    .join(', ');
-                projectInfo = ` from: <strong>${projectNames}</strong>`;
+            if (selectedProject !== 'all') {
+                const projectName = projectFilter.options[projectFilter.selectedIndex]?.textContent || 'Selected project';
+                projectInfo = ` from: <strong>${escapeHtml(projectName)}</strong>`;
             }
             
             // Calculate total time
@@ -11738,10 +14412,12 @@
                 }
             }
             
-            if (filteredTasks.length === allTasks.length) {
-                info.innerHTML = `<strong>${allTasks.length}</strong> tasks${projectInfo}${timeDisplay}`;
-            } else {
-                info.innerHTML = `<strong>${filteredTasks.length}</strong> of ${allTasks.length} tasks${projectInfo}${timeDisplay}`;
+            if (info) {
+                if (filteredTasks.length === allTasks.length) {
+                    info.innerHTML = `<strong>${allTasks.length}</strong> tasks${projectInfo}${timeDisplay}`;
+                } else {
+                    info.innerHTML = `<strong>${filteredTasks.length}</strong> of ${allTasks.length} tasks${projectInfo}${timeDisplay}`;
+                }
             }
             
             // Update header summary
@@ -11809,7 +14485,9 @@
                     tasksByProject[projectName] = [];
                 }
                 
-                const dueDate = t.dueDate ? new Date(t.dueDate) : null;
+                const dueDate = t.dueDate
+                    ? (t.isAllDay ? getTaskCalendarDay(t) : new Date(t.dueDate))
+                    : null;
                 let dateInfo = 'No date';
                 if (dueDate) {
                     const diffTime = dueDate - now;
@@ -11995,6 +14673,11 @@ Answer the question clearly. Only show relevant tasks.`;
                 return;
             }
 
+            const completedTask = taskById[taskId] || allTasks.find(task => task.id === taskId);
+            if (completedTask) {
+                recordTodayCompletedMinutes(getOverviewTaskMinutes(completedTask), projectId);
+            }
+
             // Optimistic UI update - remove immediately
             allTasks = allTasks.filter(t => t.id !== taskId);
             rebuildTaskLookup();
@@ -12035,11 +14718,41 @@ Answer the question clearly. Only show relevant tasks.`;
             for (const taskId of tasksToUpdate) {
                 const task = taskById[taskId]; // PERF: O(1) lookup instead of O(n) .find()
                 if (!task) continue;
+
+                const tagName = duration ? getDurationTagForKey(duration) : null;
+                const newTags = (task.tags || []).filter(tag => !isDurationTag(tag));
+                if (tagName) newTags.push(tagName);
+                task.tags = newTags;
                 
                 // Try to sync to server first if V2 API is configured
                 if (isV2Configured) {
                     const synced = await updateTaskTagsV2(task, duration);
                     if (synced) serverSyncCount++;
+                } else {
+                    const token = document.getElementById('accessToken').value || localStorage.getItem('ticktick_token');
+                    if (token) {
+                        try {
+                            const response = await fetch(`https://api.ticktick.com/open/v1/task/${task.id}`, {
+                                method: 'POST',
+                                headers: {
+                                    'Authorization': `Bearer ${token}`,
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    id: task.id,
+                                    projectId: task.projectId,
+                                    tags: newTags
+                                })
+                            });
+                            if (!response.ok) {
+                                throw new Error(`Tag update failed: ${response.status}`);
+                            }
+                            serverSyncCount++;
+                        } catch (error) {
+                            console.error('Open API tag update failed:', error);
+                            showMessage(`Could not save duration for "${task.title}"`, 'error');
+                        }
+                    }
                 }
                 
                 // Always save locally
@@ -12096,26 +14809,15 @@ Answer the question clearly. Only show relevant tasks.`;
             menu.style.top = `${posY}px`;
             menu.style.left = `${posX}px`;
             
+            const durationOptions = getAvailableDurationOptions();
             menu.innerHTML = `
                 <div style="padding: 5px 10px; color: #9ca3af; font-size: 11px; border-bottom: 1px solid #444;">⏱️ Set Duration</div>
-                <button class="context-menu-item" onclick="setSelectedTasksDuration('5min')">
-                    ⚡ 5 min
-                </button>
-                <button class="context-menu-item" onclick="setSelectedTasksDuration('15min')">
-                    🔹 15 min
-                </button>
-                <button class="context-menu-item" onclick="setSelectedTasksDuration('30min')">
-                    🔸 30 min
-                </button>
-                <button class="context-menu-item" onclick="setSelectedTasksDuration('1hour')">
-                    ⏰ 1 hour
-                </button>
-                <button class="context-menu-item" onclick="setSelectedTasksDuration('2hour')">
-                    🕐 2 hours
-                </button>
-                <button class="context-menu-item" onclick="setSelectedTasksDuration('1day')">
-                    📅 1 day
-                </button>
+                ${durationOptions.map(option => `
+                    <button class="context-menu-item" onclick="setSelectedTasksDuration('${option.durationKey}')">
+                        ${escapeHtml(getDurationInfo(option.durationKey)?.label || option.tagName)}
+                        <span style="margin-left:auto;color:#94a3b8;font-size:10px;">${escapeHtml(option.tagName)}</span>
+                    </button>
+                `).join('')}
                 <div class="context-menu-divider"></div>
                 <button class="context-menu-item" style="color: #f59e0b;" onclick="setSelectedTasksDuration(null)">
                     ✖ Clear
@@ -12244,6 +14946,303 @@ Answer the question clearly. Only show relevant tasks.`;
             }
         }
 
+        function formatTodayOverviewMinutes(minutes) {
+            const safeMinutes = Math.max(0, Math.round(minutes || 0));
+            const hours = Math.floor(safeMinutes / 60);
+            const mins = safeMinutes % 60;
+            if (hours === 0) return `${mins}m`;
+            if (mins === 0) return `${hours}h`;
+            return `${hours}h ${mins}m`;
+        }
+
+        function updateSavedSearchSummary() {
+            const name = document.getElementById('savedSearchSummaryName');
+            const count = document.getElementById('savedSearchSummaryCount');
+            const duration = document.getElementById('savedSearchSummaryDuration');
+            if (!name || !count || !duration) return;
+
+            const activeSavedFilter = window.activeSavedFilter;
+            const totalMinutes = filteredTasks.reduce((total, task) =>
+                total + getOverviewTaskMinutes(task), 0);
+            name.textContent = activeSavedFilter?.name || 'All tasks';
+            name.title = activeSavedFilter?.name || 'All tasks';
+            count.textContent = String(filteredTasks.length);
+            duration.textContent = formatTodayOverviewMinutes(totalMinutes);
+        }
+
+        function parseFlexibleDurationMinutes(tag) {
+            const value = String(tag || '').toLowerCase().trim().split('/').pop()
+                .replace(/[_-]/g, ' ');
+            const match = value.match(/^(\d+(?:\.\d+)?)\s*(m|min|mins|minute|minutes|h|hr|hrs|hour|hours)$/);
+            if (!match) return 0;
+            const amount = Number(match[1]);
+            const unit = match[2];
+            return unit.startsWith('h') ? Math.round(amount * 60) : Math.round(amount);
+        }
+
+        function getGoalDedicatedMinutes() {
+            return Object.values(projects || {}).reduce((total, project) => {
+                const name = String(project?.name || '');
+                const match = name.match(/(?:^|[-–—]\s*)(\d+(?:\.\d+)?)\s*(m|min|mins|minute|minutes|h|hr|hrs|hour|hours)\s*$/i);
+                if (!match) return total;
+                const amount = Number(match[1]);
+                return total + (match[2].toLowerCase().startsWith('h')
+                    ? Math.round(amount * 60)
+                    : Math.round(amount));
+            }, 0);
+        }
+
+        function getOverviewTaskMinutes(task) {
+            const durationKey = getTaskDuration(task.id) || getDurationFromTags(task);
+            const durationInfo = durationKey ? getDurationInfo(durationKey) : null;
+            if (durationInfo) return durationInfo.minutes;
+            if (task.duration) return Math.round(Number(task.duration) / 60);
+            return (task.tags || []).reduce((minutes, tag) =>
+                Math.max(minutes, parseFlexibleDurationMinutes(tag)), 0);
+        }
+
+        function getTodayPlanTasks() {
+            const now = new Date();
+            const endOfToday = new Date(now);
+            endOfToday.setHours(23, 59, 59, 999);
+
+            return allTasks.filter(task => {
+                if (task.status === 2 || !task.dueDate) return false;
+                const dueDate = new Date(task.dueDate);
+                return !Number.isNaN(dueDate.getTime()) && dueDate <= endOfToday;
+            });
+        }
+
+        function getTodayCompletedMinutes() {
+            let saved = {};
+            try {
+                saved = JSON.parse(localStorage.getItem('today_completed_work') || '{}');
+            } catch (error) {
+                console.error('Could not read today completion log:', error);
+            }
+            const today = new Date().toISOString().slice(0, 10);
+            return saved.date === today ? Number(saved.minutes || saved.totalMinutes) || 0 : 0;
+        }
+
+        function getTodayCompletedProjectMinutes(projectId) {
+            let saved = {};
+            try {
+                saved = JSON.parse(localStorage.getItem('today_completed_work') || '{}');
+            } catch (error) {
+                console.error('Could not read project completion log:', error);
+            }
+            const today = new Date().toISOString().slice(0, 10);
+            return saved.date === today ? Number(saved.projects?.[projectId]?.minutes) || 0 : 0;
+        }
+
+        function recordTodayCompletedMinutes(minutes, projectId) {
+            if (!minutes) return;
+            const today = new Date().toISOString().slice(0, 10);
+            let saved = {};
+            try {
+                saved = JSON.parse(localStorage.getItem('today_completed_work') || '{}');
+            } catch (error) {
+                console.error('Could not update today completion log:', error);
+            }
+            const projectsLog = saved.date === today && saved.projects ? saved.projects : {};
+            const projectLog = projectsLog[projectId] || { minutes: 0, tasks: 0 };
+            projectLog.minutes += minutes;
+            projectLog.tasks += 1;
+            localStorage.setItem('today_completed_work', JSON.stringify({
+                date: today,
+                minutes: getTodayCompletedMinutes() + minutes,
+                projects: {
+                    ...projectsLog,
+                    [projectId]: projectLog
+                }
+            }));
+        }
+
+        function updateTodayOverview() {
+            const dateElement = document.getElementById('todayOverviewDate');
+            const timeElement = document.getElementById('todayOverviewTimeLeft');
+            const batteryElement = document.getElementById('todayOverviewBattery');
+            const plannedElement = document.getElementById('todayOverviewPlanned');
+            const remainingElement = document.getElementById('todayOverviewRemaining');
+            const totalElement = document.getElementById('todayOverviewTotal');
+            if (!dateElement || !timeElement || !plannedElement ||
+                !remainingElement || !totalElement) return;
+
+            const now = new Date();
+            const midnight = new Date(now);
+            midnight.setHours(0, 0, 0, 0);
+            const tomorrow = new Date(midnight);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const remainingMs = Math.max(0, tomorrow - now);
+            const remainingPercent = Math.round((remainingMs / 86400000) * 100);
+            const remainingMinutes = Math.ceil(remainingMs / 60000);
+            const plannedMinutes = getTodayPlanTasks()
+                .reduce((sum, task) => sum + getOverviewTaskMinutes(task), 0);
+            const doneMinutes = getTodayCompletedMinutes();
+            const remainingWorkMinutes = Math.max(0, plannedMinutes - doneMinutes);
+            const totalMinutes = getGoalDedicatedMinutes();
+            const scheduledPercent = totalMinutes > 0
+                ? Math.min(100, Math.round((plannedMinutes / totalMinutes) * 100))
+                : 0;
+
+            dateElement.textContent = now.toLocaleDateString('en-US', {
+                weekday: 'long',
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+            timeElement.innerHTML = `${remainingPercent}% left<small>Time left: ${formatTodayOverviewMinutes(remainingMinutes)}</small>`;
+            if (batteryElement) {
+                batteryElement.style.width = `${remainingPercent}%`;
+                batteryElement.style.background = remainingPercent <= 20
+                    ? '#ef4444'
+                    : remainingPercent <= 50 ? '#f59e0b' : '#22c55e';
+            }
+            const circumference = 301.59;
+            const donePercent = plannedMinutes > 0
+                ? Math.min(100, Math.round((doneMinutes / plannedMinutes) * 100))
+                : 0;
+            const doneRing = document.getElementById('todayDoneRing');
+            const timeRing = document.getElementById('todayTimeRing');
+            if (doneRing) doneRing.style.strokeDashoffset = `${circumference - (donePercent / 100) * circumference}`;
+            if (timeRing) timeRing.style.strokeDashoffset = `${circumference - (remainingPercent / 100) * circumference}`;
+            document.getElementById('todayDonePercent').textContent = `${donePercent}%`;
+            document.getElementById('todayTimePercent').textContent = `${remainingPercent}%`;
+            document.getElementById('todayDoneRingSub').textContent =
+                `${formatTodayOverviewMinutes(doneMinutes)} / ${formatTodayOverviewMinutes(plannedMinutes)}`;
+            document.getElementById('todayTimeRingSub').textContent =
+                `${formatTodayOverviewMinutes(remainingMinutes)} left`;
+            totalElement.textContent = formatTodayOverviewMinutes(totalMinutes);
+            plannedElement.textContent =
+                `${formatTodayOverviewMinutes(plannedMinutes)} / ${formatTodayOverviewMinutes(totalMinutes)} (${scheduledPercent}%)`;
+            remainingElement.textContent = formatTodayOverviewMinutes(remainingWorkMinutes);
+            updateProjectWorkloadOverview(plannedMinutes, remainingMinutes);
+        }
+
+        function updateTodayLiveClock() {
+            const clock = document.getElementById('todayLiveClock');
+            if (clock) {
+                clock.textContent = new Date().toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                });
+            }
+        }
+
+        function updateProjectWorkloadOverview(plannedMinutes, remainingDayMinutes) {
+            const container = document.getElementById('projectWorkloadOverview');
+            if (!container) return;
+            const isExpanded = container.classList.contains('expanded');
+
+            const groups = new Map();
+            getTodayPlanTasks().forEach(task => {
+                const minutes = getOverviewTaskMinutes(task);
+                const project = projects[task.projectId];
+                const projectId = task.projectId || 'inbox';
+                const current = groups.get(projectId) || {
+                    id: projectId,
+                    name: project?.name || 'Inbox',
+                    color: project?.color || '#2563eb',
+                    minutes: 0,
+                    tasks: 0,
+                    unassigned: 0
+                };
+                current.tasks++;
+                current.minutes += minutes;
+                if (!minutes) current.unassigned++;
+                groups.set(projectId, current);
+            });
+
+            const projectGroups = Array.from(groups.values())
+                .sort((a, b) => b.minutes - a.minutes || b.tasks - a.tasks);
+            const hasOverBudget = plannedMinutes > remainingDayMinutes;
+            container.classList.toggle('over-budget', hasOverBudget);
+
+            if (projectGroups.length === 0) {
+                container.innerHTML = `
+                    <div class="project-workload-head">
+                        <span class="project-workload-title">Today by goal / project</span>
+                        <span class="project-workload-summary">No dated tasks</span>
+                    </div>
+                    <div class="project-workload-meta">Add a date and duration to see today’s workload.</div>
+                `;
+                return;
+            }
+
+            const budgetMessage = hasOverBudget
+                ? `⚠️ Planned work is ${formatTodayOverviewMinutes(plannedMinutes - remainingDayMinutes)} over remaining day capacity`
+                : `${formatTodayOverviewMinutes(remainingDayMinutes - plannedMinutes)} buffer remains after planned work`;
+
+            container.innerHTML = `
+                <div class="project-workload-head">
+                    <div>
+                        <div class="project-workload-title">Today by goal / project</div>
+                        <div class="project-workload-alert">${budgetMessage}</div>
+                    </div>
+                    <div class="project-workload-actions">
+                        <span class="project-workload-summary">${formatTodayOverviewMinutes(plannedMinutes)} planned</span>
+                        <button class="project-workload-toggle" type="button" aria-expanded="${isExpanded}" onclick="toggleProjectWorkload()">
+                            ${isExpanded ? 'Hide details' : 'Show details'}
+                        </button>
+                    </div>
+                </div>
+                <div class="project-ring-grid">
+                ${projectGroups.map(group => {
+                    const doneMinutes = getTodayCompletedProjectMinutes(group.id);
+                    const donePercent = group.minutes
+                        ? Math.min(100, Math.round((doneMinutes / (doneMinutes + group.minutes)) * 100))
+                        : 100;
+                    const loadPercent = plannedMinutes
+                        ? Math.min(100, Math.round((group.minutes / plannedMinutes) * 100))
+                        : 0;
+                    const innerCircumference = 144.51;
+                    const outerCircumference = 169.65;
+                    const innerOffset = innerCircumference - (donePercent / 100) * innerCircumference;
+                    const outerOffset = outerCircumference - (loadPercent / 100) * outerCircumference;
+                    const duration = group.minutes ? formatTodayOverviewMinutes(group.minutes) : 'No time';
+                    const unassigned = group.unassigned ? ` · ${group.unassigned} without duration` : '';
+                    return `
+                        <div class="project-ring-card">
+                            <div class="project-ring-head">
+                                <span class="project-ring-name">${escapeHtml(group.name)}</span>
+                                <span class="project-ring-status">${loadPercent}% of plan</span>
+                            </div>
+                            <div class="project-ring-body">
+                                <div class="project-ring">
+                                    <svg viewBox="0 0 64 64" aria-label="${donePercent}% complete">
+                                        <circle class="project-ring-load" style="--project-color:${escapeHtml(group.color)}" cx="32" cy="32" r="27" stroke-dashoffset="${outerOffset}"></circle>
+                                        <circle class="project-ring-track" cx="32" cy="32" r="23"></circle>
+                                        <circle class="project-ring-progress" style="--project-color:${escapeHtml(group.color)}" cx="32" cy="32" r="23" stroke-dashoffset="${innerOffset}"></circle>
+                                    </svg>
+                                    <span class="project-ring-center">${donePercent}%</span>
+                                </div>
+                                <div class="project-ring-stats">
+                                    <div class="project-ring-time">${formatTodayOverviewMinutes(doneMinutes)} <span>/ ${duration}</span></div>
+                                    <div class="project-ring-detail">${group.tasks} open task${group.tasks === 1 ? '' : 's'}${unassigned}</div>
+                                    <div class="project-ring-detail">Assigned today</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+                </div>
+            `;
+            container.classList.toggle('expanded', isExpanded);
+        }
+
+        function toggleProjectWorkload() {
+            const container = document.getElementById('projectWorkloadOverview');
+            if (!container) return;
+            const expanded = container.classList.toggle('expanded');
+            const toggle = container.querySelector('.project-workload-toggle');
+            if (toggle) {
+                toggle.textContent = expanded ? 'Hide details' : 'Show details';
+                toggle.setAttribute('aria-expanded', String(expanded));
+            }
+        }
+
         // Load config and cached tasks on page load
         function updateNavDayStatus() {
             const now = new Date();
@@ -12276,13 +15275,17 @@ Answer the question clearly. Only show relevant tasks.`;
                 batteryFill.style.background = elapsedRatio < 0.25 ? '#ef4444' : elapsedRatio < 0.5 ? '#f59e0b' : '#22c55e';
                 if (percentLabel) percentLabel.textContent = `${remainingPercent}% left`;
             }
+            updateTodayOverview();
         }
 
         window.onload = function() {
             updateNavDayStatus();
+            updateTodayLiveClock();
             window.setInterval(updateNavDayStatus, 60000);
+            window.setInterval(updateTodayLiveClock, 1000);
             loadConfig();
             loadAISearches();
+            renderSavedFilters();
             loadAvailableTags();
             
             // Initialize quick task date/time defaults
