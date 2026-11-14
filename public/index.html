@@ -6185,15 +6185,22 @@
             </div>
             
             <div class="filter-item">
+                <label for="projectFilter">📁 Project</label>
+                <select id="projectFilter" onchange="onFilterDropdownChange()" style="width: 100%; padding: 8px 10px; font-size: 12px; background: #1a1a1a; border: 1px solid #444; border-radius: 4px; color: #e0e0e0;">
+                    <option value="all">All Projects</option>
+                </select>
+            </div>
+
+            <div class="filter-item">
                 <label>📅 Date Range</label>
                 <select id="dateFilter" onchange="handleDateFilterChange()">
                     <option value="all">All Dates</option>
-                    <option value="today_overdue" selected>Today and Overdue</option>
+                    <option value="today_overdue">Today and Overdue</option>
                     <option value="today_allday">Today All Day</option>
                     <option value="overdue">Overdue Only</option>
                     <option value="tomorrow">Tomorrow</option>
                     <option value="nodate">No Date Only</option>
-                    <option value="today_overdue_nodate">Today, Overdue & No Date</option>
+                    <option value="today_overdue_nodate" selected>Today, Overdue & No Date</option>
                     <option value="week">Next 7 Days</option>
                     <option value="month">This Month</option>
                     <option value="nextmonth">Next Month</option>
@@ -6206,6 +6213,19 @@
                 <input type="date" id="customDate" onchange="onFilterDropdownChange()" style="width: 100%; padding: 6px 8px; font-size: 12px; background: #1a1a1a; border: 1px solid #444; border-radius: 4px; color: #e0e0e0;">
             </div>
             
+            <div class="filter-item">
+                <label>⭐ Priority</label>
+                <select id="priorityFilter" onchange="onFilterDropdownChange()">
+                    <option value="high_medium_none">🔴🟡⚪ High + Medium + No Priority</option>
+                    <option value="all">All</option>
+                    <option value="high">🔴 High</option>
+                    <option value="medium">🟡 Medium</option>
+                    <option value="low">🔵 Low</option>
+                    <option value="none">⚪ No Priority</option>
+                    <option value="high_medium">High + Medium</option>
+                </select>
+            </div>
+
             <div class="filter-item">
                 <label>🏷️ Tags</label>
                 <select id="tagFilter" onchange="onFilterDropdownChange()">
@@ -6224,26 +6244,6 @@
                     <option value="all" selected>All Tasks</option>
                     <option value="with_comments">💬 Only with comments</option>
                     <option value="without_comments">📝 Without comments</option>
-                </select>
-            </div>
-            
-            <div class="filter-item">
-                <label>⭐ Priority</label>
-                <select id="priorityFilter" onchange="onFilterDropdownChange()">
-                    <option value="high_medium_none">🔴🟡⚪ High + Medium + No Priority</option>
-                    <option value="all">All</option>
-                    <option value="high">🔴 High</option>
-                    <option value="medium">🟡 Medium</option>
-                    <option value="low">🔵 Low</option>
-                    <option value="none">⚪ No Priority</option>
-                    <option value="high_medium">High + Medium</option>
-                </select>
-            </div>
-            
-            <div class="filter-item">
-                <label for="projectFilter">📁 Project</label>
-                <select id="projectFilter" onchange="onFilterDropdownChange()" style="width: 100%; padding: 8px 10px; font-size: 12px; background: #1a1a1a; border: 1px solid #444; border-radius: 4px; color: #e0e0e0;">
-                    <option value="all">All Projects</option>
                 </select>
             </div>
             
@@ -13280,7 +13280,13 @@
             const savedCommentFilter = localStorage.getItem('commentFilter');
             
             if (savedDateFilter) {
-                document.getElementById('dateFilter').value = savedDateFilter;
+                const dateFilter = savedDateFilter === 'today_overdue'
+                    ? 'today_overdue_nodate'
+                    : savedDateFilter;
+                document.getElementById('dateFilter').value = dateFilter;
+                if (dateFilter !== savedDateFilter) localStorage.setItem('dateFilter', dateFilter);
+            } else {
+                document.getElementById('dateFilter').value = 'today_overdue_nodate';
             }
             if (savedPriorityFilter) {
                 document.getElementById('priorityFilter').value = savedPriorityFilter;
@@ -13301,16 +13307,28 @@
                 try {
                     // Restore the previously selected project, keeping older array storage compatible.
                     const selectedProjects = JSON.parse(savedProjectFilter);
-                    const selectedProject = Array.isArray(selectedProjects) && selectedProjects.length === 1
+                    let selectedProject = Array.isArray(selectedProjects) && selectedProjects.length === 1
                         ? selectedProjects[0]
                         : 'all';
+                    if (selectedProject === 'all') {
+                        const inboxProject = getOrderedProjects().find(project =>
+                            project.id?.toLowerCase().startsWith('inbox') ||
+                            project.name?.toLowerCase() === 'inbox'
+                        );
+                        selectedProject = inboxProject?.id || 'all';
+                        if (selectedProject !== 'all') {
+                            localStorage.setItem('projectFilter', JSON.stringify([selectedProject]));
+                        }
+                    }
                     const projectFilter = document.getElementById('projectFilter');
                     projectFilter.value = Array.from(projectFilter.options).some(option => option.value === selectedProject)
                         ? selectedProject
                         : 'all';
                 } catch (e) {
-                    document.getElementById('projectFilter').value = 'all';
+                    document.getElementById('projectFilter').value = getOrderedProjects()[0]?.id || 'all';
                 }
+            } else {
+                document.getElementById('projectFilter').value = getOrderedProjects()[0]?.id || 'all';
             }
             if (savedContextFilter) {
                 document.getElementById('contextFilter').value = savedContextFilter;
