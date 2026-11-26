@@ -6755,7 +6755,9 @@
 
         function getTaskCommentToken() {
             const tokenInput = document.getElementById('accessToken');
-            return (tokenInput ? tokenInput.value : '') || localStorage.getItem('ticktick_token') || '';
+            const token = ((tokenInput ? tokenInput.value : '') || localStorage.getItem('ticktick_token') || '').trim();
+            if (!token) return '';
+            return /^Bearer\s+/i.test(token) ? token : `Bearer ${token}`;
         }
 
         function renderLatestTaskComment(taskId) {
