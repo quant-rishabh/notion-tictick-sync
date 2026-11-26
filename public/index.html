@@ -6498,6 +6498,7 @@
 
         const AI_SEARCH_RESULTS_KEY = 'saved_ai_search_results';
         const AI_SEARCH_EVALUATIONS_KEY = 'saved_ai_search_evaluations';
+        const COMMENTS_ENABLED = false;
 
         function loadAISearches() {
             try {
@@ -6779,6 +6780,7 @@
         }
 
         async function loadTaskComments(taskId, forceRefresh = false) {
+            if (!COMMENTS_ENABLED) return [];
             const task = taskById[taskId] || allTasks.find(item => item.id === taskId);
             const token = getTaskCommentToken();
             if (!task || !token) {
@@ -6828,6 +6830,7 @@
         }
 
         async function queueTaskCommentPreviews(tasks) {
+            if (!COMMENTS_ENABLED) return;
             const taskIds = [...new Set(tasks.map(task => task.id))];
             const token = getTaskCommentToken();
             if (!token || taskIds.length === 0) return;
@@ -6852,6 +6855,7 @@
         }
 
         function ensureCommentsLoadedForFilter() {
+            if (!COMMENTS_ENABLED) return;
             if (commentFilterLoadPromise || !getTaskCommentToken()) return;
 
             const missingTasks = allTasks.filter(task => !Object.prototype.hasOwnProperty.call(taskCommentsCache, task.id));
