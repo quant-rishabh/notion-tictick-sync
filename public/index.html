@@ -6497,6 +6497,7 @@
         let editingAISearchId = null;
 
         const AI_SEARCH_RESULTS_KEY = 'saved_ai_search_results';
+        const AI_SEARCH_EVALUATIONS_KEY = 'saved_ai_search_evaluations';
 
         function loadAISearches() {
             try {
@@ -6617,18 +6618,27 @@
                 return;
             }
             if (editingAISearchId) {
-                const search = aiSearches.find(item => item.id === editingAISearchId);
+                const searchIndex = aiSearches.findIndex(item => item.id === editingAISearchId);
+                const search = searchIndex >= 0 ? aiSearches[searchIndex] : null;
+                const newSearchId = `ai-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
                 if (search) {
-                    search.title = title;
-                    search.instruction = instruction;
-                    search.tags = tags;
-                    search.targetProjectId = targetProjectId;
+                    aiSearches[searchIndex] = {
+                        ...search,
+                        id: newSearchId,
+                        title,
+                        instruction,
+                        tags,
+                        targetProjectId
+                    };
                 }
                 const results = JSON.parse(localStorage.getItem(AI_SEARCH_RESULTS_KEY) || '{}');
                 delete results[editingAISearchId];
                 localStorage.setItem(AI_SEARCH_RESULTS_KEY, JSON.stringify(results));
+                const evaluations = JSON.parse(localStorage.getItem(AI_SEARCH_EVALUATIONS_KEY) || '{}');
+                delete evaluations[editingAISearchId];
+                localStorage.setItem(AI_SEARCH_EVALUATIONS_KEY, JSON.stringify(evaluations));
             } else {
-                aiSearches.push({ id: `ai-${Date.now()}`, title, instruction, tags, targetProjectId });
+                aiSearches.push({ id: `ai-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, title, instruction, tags, targetProjectId });
             }
             saveAISearchOrder();
             renderAISearches();
@@ -6646,6 +6656,9 @@
             const results = JSON.parse(localStorage.getItem(AI_SEARCH_RESULTS_KEY) || '{}');
             delete results[searchId];
             localStorage.setItem(AI_SEARCH_RESULTS_KEY, JSON.stringify(results));
+            const evaluations = JSON.parse(localStorage.getItem(AI_SEARCH_EVALUATIONS_KEY) || '{}');
+            delete evaluations[searchId];
+            localStorage.setItem(AI_SEARCH_EVALUATIONS_KEY, JSON.stringify(evaluations));
 
             if (activeAISearch?.id === searchId) {
                 activeAISearch = null;
@@ -6657,22 +6670,20 @@
             showMessage('AI search deleted', 'success');
         }
 
-        function getCompactTaskForAI(task) {
-            const duration = getDisplayDuration(task.id);
-            const children = getTaskChildren(task.id);
-            return {
-                id: task.id,
-                title: task.title || '',
-                content: task.content || '',
-                dueDate: task.dueDate || null,
-                priority: task.priority || 0,
-                tags: Array.isArray(task.tags) ? task.tags : [],
-                duration: duration.label || null,
-                subtasks: children.map(item => ({
-                    title: item.title || '',
-                    status: item.status || 0
-                }))
-            };
+        const AI_TASK_FIELDS = ['ref', 'title', 'dueDate', 'priority', 'tags'];
+        const AI_RESULT_FIELDS = ['ref', 'score', 'reason'];
+
+        function getCompactTaskForAI(task, ref) {
+            const dueDate = task.dueDate
+                ? String(task.dueDate).split('T')[0]
+                : null;
+            return [
+                ref,
+                task.title || '',
+                dueDate,
+                task.priority || 0,
+                Array.isArray(task.tags) ? task.tags : []
+            ];
         }
 
         function parseGeminiJSON(text) {
@@ -7151,6 +7162,53 @@
             }
         }
 
+        function getAISearchEvaluations(searchId) {
+            try {
+                const allEvaluations = JSON.parse(localStorage.getItem(AI_SEARCH_EVALUATIONS_KEY) || '{}');
+                return allEvaluations[searchId] && typeof allEvaluations[searchId] === 'object'
+                    ? allEvaluations[searchId]
+                    : {};
+            } catch (error) {
+                console.error('Could not load AI search evaluations:', error);
+                return {};
+            }
+        }
+
+        function saveAISearchEvaluations(searchId, evaluations) {
+            let allEvaluations = {};
+            try {
+                allEvaluations = JSON.parse(localStorage.getItem(AI_SEARCH_EVALUATIONS_KEY) || '{}');
+            } catch (error) {
+                console.error('Could not load AI search evaluations:', error);
+            }
+            allEvaluations[searchId] = evaluations;
+            localStorage.setItem(AI_SEARCH_EVALUATIONS_KEY, JSON.stringify(allEvaluations));
+        }
+
+        function resetAISearchEvaluations(searchId) {
+            const allEvaluations = JSON.parse(localStorage.getItem(AI_SEARCH_EVALUATIONS_KEY) || '{}');
+            delete allEvaluations[searchId];
+            localStorage.setItem(AI_SEARCH_EVALUATIONS_KEY, JSON.stringify(allEvaluations));
+        }
+
+        function buildAISearchResult(search, tasks, evaluations, summary = '') {
+            const taskMap = new Map(tasks.map(task => [task.id, task]));
+            return {
+                searchId: search.id,
+                filterKey: getAISearchFilterKey(),
+                generatedAt: new Date().toISOString(),
+                summary,
+                results: Object.entries(evaluations)
+                    .filter(([taskId, evaluation]) => evaluation?.matched && taskMap.has(taskId))
+                    .map(([taskId, evaluation]) => ({
+                        id: taskId,
+                        score: Number(evaluation.score) || 0,
+                        reason: evaluation.reason || ''
+                    }))
+                    .sort((a, b) => b.score - a.score)
+            };
+        }
+
         function saveAIResult(result) {
             let results = {};
             try {
@@ -7160,13 +7218,6 @@
             }
             results[result.searchId] = result;
             localStorage.setItem(AI_SEARCH_RESULTS_KEY, JSON.stringify(results));
-            console.log('Saved Gemini result locally:', {
-                storageKey: AI_SEARCH_RESULTS_KEY,
-                searchId: result.searchId,
-                resultCount: result.results.length,
-                generatedAt: result.generatedAt,
-                origin: window.location.origin
-            });
         }
 
         function applyAIResultToTasks(tasks) {
@@ -7191,6 +7242,7 @@
             const results = JSON.parse(localStorage.getItem(AI_SEARCH_RESULTS_KEY) || '{}');
             delete results[searchId];
             localStorage.setItem(AI_SEARCH_RESULTS_KEY, JSON.stringify(results));
+            resetAISearchEvaluations(searchId);
             activeAISearch = null;
             activeAIResult = null;
             applyPreFiltersInternal();
@@ -7350,40 +7402,42 @@
             activeAIResult = null;
             applyPreFiltersInternal();
             const filterKey = getAISearchFilterKey();
+            if (filteredTasks.length === 0) {
+                showMessage('No tasks match the current filters', 'error');
+                return;
+            }
+            const evaluations = getAISearchEvaluations(searchId);
+            const tasksToEvaluate = filteredTasks.filter(task => !evaluations[task.id]?.completed);
+            const previousResult = getSavedAIResult(searchId, filterKey);
+            const totalFilteredTasks = filteredTasks.length;
+            const processedCount = totalFilteredTasks - tasksToEvaluate.length;
 
-            const savedResult = getSavedAIResult(searchId, filterKey);
-            console.log('AI cache lookup:', {
-                searchId,
-                cacheFound: !!savedResult,
-                origin: window.location.origin,
-                storageKey: AI_SEARCH_RESULTS_KEY
-            });
-            if (savedResult) {
-                activeAISearch = search;
-                activeAIResult = savedResult;
-                localStorage.removeItem('ai_recommendation');
-                let cachedTagSummary = null;
-                let cachedMoveSummary = null;
-                try {
-                    cachedTagSummary = await addAISearchTags(search, savedResult.results, filteredTasks);
-                    cachedMoveSummary = await moveAISearchTasks(search, savedResult.results, filteredTasks);
-                } catch (error) {
-                    showMessage(error.message, 'error');
-                }
-                const totalCount = filteredTasks.length;
+            activeAISearch = search;
+            localStorage.removeItem('ai_recommendation');
+            console.group(`✨ AI Saved Search: ${search.title}`);
+            console.log('Saved search ID:', search.id);
+            console.log('Filtered tasks:', totalFilteredTasks);
+            console.log('Already processed:', processedCount);
+            console.log('New tasks for AI:', tasksToEvaluate.length);
+
+            if (tasksToEvaluate.length === 0) {
+                console.log('Gemini API call: SKIPPED (no new tasks)');
+                console.log('Previous AI matches:', filteredTasks
+                    .filter(task => evaluations[task.id]?.matched)
+                    .map(task => task.title));
+                const cachedResult = buildAISearchResult(
+                    search,
+                    filteredTasks,
+                    evaluations,
+                    previousResult?.summary || 'All filtered tasks have already been evaluated.'
+                );
+                activeAIResult = cachedResult;
                 filteredTasks = applyAIResultToTasks(filteredTasks);
                 displayTasks(filteredTasks);
-                showAIResultBanner(search, filteredTasks.length, totalCount, savedResult.summary, true);
+                showAIResultBanner(search, filteredTasks.length, totalFilteredTasks, cachedResult.summary, true);
                 updateFilterInfo();
-                if (cachedTagSummary) showAISearchTagSummary(search.tags || [], cachedTagSummary);
-                if (cachedMoveSummary) showAISearchMoveSummary(search.targetProjectId, cachedMoveSummary);
-                showMessage(`Loaded ${filteredTasks.length} saved AI result(s)`, 'success');
-                console.log('Loaded saved Gemini result:', {
-                    search: search.title,
-                    generatedAt: savedResult.generatedAt,
-                    cachedResults: savedResult.results.length,
-                    visibleResults: filteredTasks.length
-                });
+                showMessage(`No new tasks to evaluate (${filteredTasks.length} previous match(es))`, 'success');
+                console.groupEnd();
                 return;
             }
 
@@ -7391,41 +7445,29 @@
             if (!geminiKey) {
                 showMessage('Add your Gemini API key in Settings first', 'error');
                 toggleRightPanel();
+                console.log('Gemini API call: SKIPPED (missing API key)');
+                console.groupEnd();
                 return;
             }
-            if (filteredTasks.length === 0) {
-                showMessage('No tasks match the current filters', 'error');
-                return;
-            }
-
-            activeAISearch = search;
-            localStorage.removeItem('ai_recommendation');
             const taskList = document.getElementById('taskList');
             taskList.innerHTML = '<div class="loading">✨ Gemini is reviewing the current tasks...</div>';
-            const compactTasks = filteredTasks.map(getCompactTaskForAI);
-            const prompt = `You are selecting tasks for a personal task manager.\nUser request: ${search.instruction}\nToday: ${new Date().toISOString()}\n\nReview only these tasks. Missing dates, priorities, tags, or duration are unknown, not disqualifying. Use title and content to estimate suitability, but do not invent facts. Return JSON only in this shape: {"results":[{"id":"task id","score":0,"reason":"short reason"}],"summary":"one short sentence"}. Include only relevant tasks, rank best first, and use scores from 0 to 100.\n\nTasks:\n${JSON.stringify(compactTasks)}`;
+            const compactTasks = tasksToEvaluate.map((task, index) => getCompactTaskForAI(task, index + 1));
+            console.log('Gemini API call: STARTING');
+            console.table(tasksToEvaluate.map((task, index) => ({
+                ref: index + 1,
+                title: task.title
+            })));
+            const taskPayload = {
+                fields: AI_TASK_FIELDS,
+                tasks: compactTasks
+            };
+            const prompt = `You are selecting tasks for a personal task manager.\nUser request: ${search.instruction}\nToday: ${new Date().toISOString().split('T')[0]}\n\nEach task is an array whose values correspond to these fields in order: ${JSON.stringify(AI_TASK_FIELDS)}. dueDate values contain only YYYY-MM-DD or null; no time or timezone is provided. Missing dates, priorities, or tags are unknown, not disqualifying. Use only the supplied fields and do not invent facts. Return JSON only in this shape: {"resultFields":${JSON.stringify(AI_RESULT_FIELDS)},"results":[[1,95,"short reason"]],"summary":"one short sentence"}. Each result array must use the resultFields order. The ref must be one of the supplied task refs. Include only relevant tasks, rank best first, and use scores from 0 to 100.\n\nTasks:\n${JSON.stringify(taskPayload)}`;
 
             const promptBytes = new Blob([prompt]).size;
             const approximateTokens = Math.ceil(prompt.length / 4);
-            console.group('✨ Saved Gemini AI Search');
-            console.log('Search:', search.title);
-            console.log('Instruction:', search.instruction);
-            console.log('Filtered tasks sent:', compactTasks.length);
-            console.log('Fields per task: id, title, content, dueDate, priority, tags, duration, subtasks');
             console.log('Prompt size:', `${promptBytes.toLocaleString()} bytes`);
             console.log('Approximate input tokens:', approximateTokens.toLocaleString());
-            console.table(compactTasks.map(task => ({
-                id: task.id,
-                title: task.title,
-                contentCharacters: task.content.length,
-                dueDate: task.dueDate,
-                priority: task.priority,
-                tags: task.tags.join(', '),
-                duration: task.duration,
-                subtaskCount: task.subtasks.length
-            })));
-            console.log('Starting Gemini request...');
-            console.groupEnd();
+            console.log('Full Gemini prompt:\n' + prompt);
 
             try {
                 const requestStartedAt = performance.now();
@@ -7442,33 +7484,53 @@
                 });
                 clearTimeout(timeoutId);
                 const data = await response.json();
-                console.log('Gemini response received:', {
-                    status: response.status,
-                    elapsedMs: Math.round(performance.now() - requestStartedAt),
-                    responseBytes: new Blob([JSON.stringify(data)]).size
-                });
-                console.log('Gemini token usage:', data.usageMetadata || 'Not provided by API');
                 if (!response.ok || data.error) {
                     throw new Error(data.error?.message || `Gemini API error: ${response.status}`);
                 }
                 const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
                 if (!text) throw new Error('Gemini returned no response.');
                 const result = parseGeminiJSON(text);
-                const taskMap = new Map(filteredTasks.map(task => [task.id, task]));
-                const cachedResult = {
-                    searchId: search.id,
-                    filterKey,
-                    generatedAt: new Date().toISOString(),
-                    summary: result.summary || '',
-                    results: (Array.isArray(result.results) ? result.results : [])
-                    .filter(item => taskMap.has(item.id))
-                    .sort((a, b) => (Number(b.score) || 0) - (Number(a.score) || 0))
+                const taskMap = new Map(compactTasks.map((compactTask, index) => [
+                    compactTask[0],
+                    tasksToEvaluate[index]
+                ]));
+                const matchedResults = (Array.isArray(result.results) ? result.results : [])
+                    .map(item => Array.isArray(item)
+                        ? { ref: item[0], score: item[1], reason: item[2] }
+                        : item)
+                    .filter(item => taskMap.has(Number(item.ref)))
                     .map(item => ({
-                        id: item.id,
+                        id: taskMap.get(Number(item.ref)).id,
                         score: Number(item.score) || 0,
                         reason: item.reason || ''
-                    }))
-                };
+                    }));
+                const matchedById = new Map(matchedResults.map(item => [item.id, item]));
+                const taskTitlesById = new Map(tasksToEvaluate.map(task => [task.id, task.title]));
+                const neglectedTasks = tasksToEvaluate
+                    .filter(task => !matchedById.has(task.id))
+                    .map(task => task.title);
+                console.log('Gemini API call: COMPLETED');
+                console.log('AI passed:', matchedResults.length);
+                console.table(matchedResults.map(item => ({
+                    title: taskTitlesById.get(item.id) || item.id,
+                    score: item.score,
+                    reason: item.reason
+                })));
+                console.log('AI neglected:', neglectedTasks.length);
+                console.table(neglectedTasks.map(title => ({ title })));
+                tasksToEvaluate.forEach(task => {
+                    const match = matchedById.get(task.id);
+                    evaluations[task.id] = {
+                        completed: true,
+                        matched: !!match,
+                        score: match?.score || 0,
+                        reason: match?.reason || '',
+                        evaluatedAt: new Date().toISOString()
+                    };
+                });
+                saveAISearchEvaluations(search.id, evaluations);
+
+                const cachedResult = buildAISearchResult(search, filteredTasks, evaluations, result.summary || '');
                 saveAIResult(cachedResult);
                 activeAIResult = cachedResult;
                 const rankedTasks = applyAIResultToTasks(filteredTasks);
@@ -7483,17 +7545,19 @@
                 }
                 filteredTasks = rankedTasks;
                 displayTasks(filteredTasks);
-                showAIResultBanner(search, rankedTasks.length, compactTasks.length, cachedResult.summary);
+                showAIResultBanner(search, rankedTasks.length, totalFilteredTasks, cachedResult.summary);
                 updateFilterInfo();
                 showMessage(`Gemini found ${rankedTasks.length} matching task(s)`, 'success');
                 if (tagSummary) showAISearchTagSummary(search.tags || [], tagSummary);
                 if (moveSummary) showAISearchMoveSummary(search.targetProjectId, moveSummary);
+                console.groupEnd();
             } catch (error) {
                 activeAISearch = null;
                 applyPreFiltersInternal();
                 const errorMessage = error.name === 'AbortError' ? 'Request timed out after 90 seconds' : error.message;
                 console.error('Gemini saved search failed:', errorMessage, error);
                 showMessage(`AI search failed: ${errorMessage}`, 'error');
+                console.groupEnd();
             }
         }
 
@@ -8118,12 +8182,10 @@
         function getInboxTasks() {
             // Debug: Log all unique projectIds and their names
             const uniqueProjectIds = [...new Set(allTasks.map(t => t.projectId))];
-            console.log('📋 All unique projectIds:', uniqueProjectIds);
             
             // Also log project names
             uniqueProjectIds.forEach(pid => {
                 const proj = projects[pid];
-                console.log(`  - ${pid} → "${proj?.name || 'Unknown'}"`);
             });
             
             // Find inbox by ID pattern OR by project name
@@ -8138,12 +8200,10 @@
                 const isInbox = idMatchesInbox || nameMatchesInbox;
                 
                 if (isInbox) {
-                    console.log('✅ Found inbox task:', task.title, '| projectId:', task.projectId);
                 }
                 return isInbox;
             });
             
-            console.log('📥 Total inbox tasks found:', inboxTasks.length);
             return inboxTasks;
         }
         
@@ -9173,7 +9233,6 @@
                 deleteAttachments: []
             };
             
-            console.log('⏱️ Updating duration tag:', task.title, '→', newTags);
             
             const response = await fetch('/api/v2/batch/task', {
                 method: 'POST',
@@ -9187,14 +9246,12 @@
                 body: JSON.stringify(updatePayload)
             });
             
-            console.log('📡 API Response status:', response.status);
             
             if (!response.ok) {
                 throw new Error(`V2 API error: ${response.status}`);
             }
             
             const result = await response.json();
-            console.log('✅ Duration tag updated:', result);
             return result;
         }
         
@@ -9388,7 +9445,6 @@
                 deleteAttachments: []
             };
             
-            console.log('🔄 Updating frequency tag:', task.title, '→', newTags);
             
             const response = await fetch('/api/v2/batch/task', {
                 method: 'POST',
@@ -9402,14 +9458,12 @@
                 body: JSON.stringify(updatePayload)
             });
             
-            console.log('📡 API Response status:', response.status);
             
             if (!response.ok) {
                 throw new Error(`V2 API error: ${response.status}`);
             }
             
             const result = await response.json();
-            console.log('✅ Frequency tag updated:', result);
             return result;
         }
         
@@ -9644,7 +9698,6 @@
                 deleteAttachments: []
             };
             
-            console.log('🔄 Updating recurrence type tag:', task.title, '→', newTags);
             
             const response = await fetch('/api/v2/batch/task', {
                 method: 'POST',
@@ -9658,14 +9711,12 @@
                 body: JSON.stringify(updatePayload)
             });
             
-            console.log('📡 API Response status:', response.status);
             
             if (!response.ok) {
                 throw new Error(`V2 API error: ${response.status}`);
             }
             
             const result = await response.json();
-            console.log('✅ Recurrence type tag updated:', result);
             return result;
         }
         
@@ -9898,7 +9949,6 @@
                 deleteAttachments: []
             };
             
-            console.log('🔄 Updating low priority tag:', task.title, '→', newTags);
             
             const response = await fetch('/api/v2/batch/task', {
                 method: 'POST',
@@ -9912,14 +9962,12 @@
                 body: JSON.stringify(updatePayload)
             });
             
-            console.log('📡 API Response status:', response.status);
             
             if (!response.ok) {
                 throw new Error(`V2 API error: ${response.status}`);
             }
             
             const result = await response.json();
-            console.log('✅ Low priority tag updated:', result);
             return result;
         }
         
@@ -10430,7 +10478,6 @@
             // Format date for TickTick (ISO format with timezone)
             const formattedDate = targetDate.toISOString().replace('Z', '+0000');
             
-            console.log('📅 Updating schedule date:', task.title, '→', formattedDate);
             
             // Try /api/task/update (internal v2 via server proxy) first
             const sessionT = localStorage.getItem('ticktick_session_t');
@@ -10451,7 +10498,6 @@
                     })
                 });
                 if (response.ok) {
-                    console.log('✅ Schedule date updated via /api/task/update');
                     return;
                 }
                 console.warn('⚠️ /api/task/update failed, falling back to Open API');
@@ -10479,7 +10525,6 @@
             if (!response.ok) {
                 throw new Error(`Open API error: ${response.status}`);
             }
-            console.log('✅ Schedule date updated via Open API');
         }
         
         // Inline duration picker for schedule normal processor
@@ -10752,7 +10797,6 @@
         function getV2Credentials() {
             const cookieT = localStorage.getItem('ticktick_cookie_t') || '';
             const csrf = localStorage.getItem('ticktick_csrf') || '';
-            console.log('📋 V2 Credentials check - cookieT length:', cookieT.length, ', csrf length:', csrf.length);
             return { cookieT, csrf };
         }
         
@@ -10760,7 +10804,6 @@
         function isV2ApiConfigured() {
             const creds = getV2Credentials();
             const configured = !!(creds.cookieT && creds.csrf);
-            console.log('🔧 V2 API configured:', configured);
             return configured;
         }
         
@@ -10935,7 +10978,6 @@
         async function updateTaskTagsV2(task, newDuration) {
             const creds = getV2Credentials();
             if (!creds.cookieT || !creds.csrf) {
-                console.log('V2 API not configured, saving locally only');
                 return false;
             }
             
@@ -10962,8 +11004,6 @@
                 deleteAttachments: []
             };
             
-            console.log('🔄 Updating task tags:', task.title, '→', newTags);
-            console.log('📦 Payload:', JSON.stringify(updatePayload, null, 2));
             
             try {
                 // Use Vite proxy at /api/v2 which forwards to api.ticktick.com
@@ -10979,11 +11019,9 @@
                     body: JSON.stringify(updatePayload)
                 });
                 
-                console.log('📡 API Response status:', response.status);
                 
                 if (response.ok) {
                     const result = await response.json();
-                    console.log('✅ API Response:', result);
                     if (result.id2etag || (result.id2error && Object.keys(result.id2error).length === 0)) {
                         // Update local task tags
                         task.tags = newTags;
@@ -11034,11 +11072,9 @@
                     })
                 });
                 
-                console.log('Test API response:', response.status);
                 
                 if (response.ok) {
                     const result = await response.json();
-                    console.log('Test API result:', result);
                     statusDiv.innerHTML = '<span style="color: #4ade80;">✅ Connected! Duration tags will sync to TickTick.</span>';
                 } else {
                     const errorText = await response.text();
@@ -11243,10 +11279,12 @@
             localStorage.setItem('durationFilter', document.getElementById('durationFilter').value);
             localStorage.setItem('tagFilter', document.getElementById('tagFilter').value);
             localStorage.setItem('commentFilter', document.getElementById('commentFilter').value);
+            localStorage.setItem('customDate', document.getElementById('customDate').value);
             
             const selectedProject = document.getElementById('projectFilter').value;
             const selectedProjects = selectedProject === 'all' ? [] : [selectedProject];
             localStorage.setItem('projectFilter', JSON.stringify(selectedProjects));
+            localStorage.setItem('projectFilterPreferenceVersion', '2');
             
             localStorage.setItem('contextFilter', document.getElementById('contextFilter').value);
         }
@@ -11428,7 +11466,6 @@
                 // Try to get userId from localStorage or extract from existing task
                 const userId = TICKTICK_USER_ID;
                 const specialInboxId = `inbox${userId}`;
-                console.log('📥 Fetching special inbox:', specialInboxId);
                 
                 // Always add inbox as a project so it appears in dropdowns
                 projects[specialInboxId] = { id: specialInboxId, name: 'Inbox', color: '#4CAF50' };
@@ -11443,14 +11480,11 @@
                     if (inboxResponse.ok) {
                         const inboxData = await inboxResponse.json();
                         if (inboxData.tasks && inboxData.tasks.length > 0) {
-                            console.log('📥 Found inbox tasks:', inboxData.tasks.length);
                             allTasks = allTasks.concat(inboxData.tasks);
                         }
                     } else {
-                        console.log('📥 Could not fetch special inbox (may need different userId)');
                     }
                 } catch (err) {
-                    console.log('📥 Error fetching special inbox:', err);
                 }
 
                 // Filter out completed tasks and sort by due date
@@ -11481,7 +11515,6 @@
                         }
                     });
                     localStorage.setItem('task_durations', JSON.stringify(durations));
-                    console.log('Durations rebuilt from server tags:', Object.keys(durations).length, 'tasks with durations');
 
                     
                     // Create minimal task list for AI with only essential fields
@@ -13278,6 +13311,7 @@
             const savedDurationFilter = localStorage.getItem('durationFilter');
             const savedTagFilter = localStorage.getItem('tagFilter');
             const savedCommentFilter = localStorage.getItem('commentFilter');
+            const savedCustomDate = localStorage.getItem('customDate');
             
             if (savedDateFilter) {
                 const dateFilter = savedDateFilter === 'today_overdue'
@@ -13303,6 +13337,9 @@
             if (savedCommentFilter) {
                 document.getElementById('commentFilter').value = savedCommentFilter;
             }
+            if (savedCustomDate) {
+                document.getElementById('customDate').value = savedCustomDate;
+            }
             if (savedProjectFilter) {
                 try {
                     // Restore the previously selected project, keeping older array storage compatible.
@@ -13310,25 +13347,25 @@
                     let selectedProject = Array.isArray(selectedProjects) && selectedProjects.length === 1
                         ? selectedProjects[0]
                         : 'all';
-                    if (selectedProject === 'all') {
-                        const inboxProject = getOrderedProjects().find(project =>
-                            project.id?.toLowerCase().startsWith('inbox') ||
-                            project.name?.toLowerCase() === 'inbox'
-                        );
-                        selectedProject = inboxProject?.id || 'all';
-                        if (selectedProject !== 'all') {
-                            localStorage.setItem('projectFilter', JSON.stringify([selectedProject]));
-                        }
+
+                    // Older builds incorrectly converted "All Projects" to Inbox.
+                    // Migrate that stale preference once; later Inbox selections remain persistent.
+                    const preferenceVersion = localStorage.getItem('projectFilterPreferenceVersion');
+                    if (preferenceVersion !== '2' && selectedProject.toLowerCase().startsWith('inbox')) {
+                        selectedProject = 'all';
+                        localStorage.setItem('projectFilter', JSON.stringify([]));
                     }
+
                     const projectFilter = document.getElementById('projectFilter');
                     projectFilter.value = Array.from(projectFilter.options).some(option => option.value === selectedProject)
                         ? selectedProject
                         : 'all';
+                    localStorage.setItem('projectFilterPreferenceVersion', '2');
                 } catch (e) {
-                    document.getElementById('projectFilter').value = getOrderedProjects()[0]?.id || 'all';
+                    document.getElementById('projectFilter').value = 'all';
                 }
             } else {
-                document.getElementById('projectFilter').value = getOrderedProjects()[0]?.id || 'all';
+                document.getElementById('projectFilter').value = 'all';
             }
             if (savedContextFilter) {
                 document.getElementById('contextFilter').value = savedContextFilter;
@@ -14150,9 +14187,11 @@
             
             if (dateFilter === 'custom') {
                 customDateGroup.style.display = 'block';
-                // Set today as default
-                const today = new Date().toISOString().split('T')[0];
-                document.getElementById('customDate').value = today;
+                if (!document.getElementById('customDate').value) {
+                    const savedCustomDate = localStorage.getItem('customDate');
+                    const today = new Date().toISOString().split('T')[0];
+                    document.getElementById('customDate').value = savedCustomDate || today;
+                }
             } else {
                 customDateGroup.style.display = 'none';
             }
@@ -14579,12 +14618,6 @@ Answer the question clearly. Only show relevant tasks.`;
             const requestStr = JSON.stringify(requestBody);
             const estimatedTokens = Math.ceil(requestStr.length / 4);
             
-            console.log('\n=== 🤖 AI REQUEST ===');
-            console.log('1. TOKENS ESTIMATE:', estimatedTokens, 'tokens (~', requestStr.length, 'characters)');
-            console.log('\n2. REQUEST OBJECT:');
-            console.log(JSON.stringify(requestBody, null, 2));
-            console.log('\n3. USER QUERY:', query);
-            console.log('\n4. TASKS SENT:', filteredTasks.length, 'tasks');
 
             try {
                 // Add timeout to fetch request (30 seconds)
@@ -14615,13 +14648,6 @@ Answer the question clearly. Only show relevant tasks.`;
                 const promptTokens = data.usage ? data.usage.prompt_tokens : 'N/A';
                 const completionTokens = data.usage ? data.usage.completion_tokens : 'N/A';
                 
-                console.log('\n=== 📥 AI RESPONSE ===');
-                console.log('3. OUTPUT:');
-                console.log(recommendation);
-                console.log('\n4. TOTAL TOKENS:');
-                console.log('   - Prompt:', promptTokens);
-                console.log('   - Completion:', completionTokens);
-                console.log('   - TOTAL:', totalTokens);
                 
                 // Add AI response to chat panel (truncated)
                 const shortResponse = recommendation.length > 200 
@@ -14727,16 +14753,13 @@ Answer the question clearly. Only show relevant tasks.`;
             hideContextMenu();
             
             const tasksToUpdate = Array.from(selectedTasks);
-            console.log('🎯 setSelectedTasksDuration called:', duration, 'for', tasksToUpdate.length, 'tasks');
             
             if (tasksToUpdate.length === 0) {
-                console.log('⚠️ No tasks selected');
                 return;
             }
             
             const durationInfo = getDurationInfo(duration);
             const isV2Configured = isV2ApiConfigured();
-            console.log('🔧 V2 API configured:', isV2Configured);
             
             let serverSyncCount = 0;
             
@@ -15610,7 +15633,6 @@ Answer the question clearly. Only show relevant tasks.`;
                         body: JSON.stringify([{ fromProjectId: oldProjectId, toProjectId: newList.id, taskId: task.id }])
                     });
                     if (moveResp.ok) {
-                        console.log('✅ Task moved to new list:', newList.name);
                         // Also update priority + tags via task update
                         await fetch(`https://api.ticktick.com/open/v1/task/${task.id}`, {
                             method: 'POST',
@@ -15677,7 +15699,6 @@ Answer the question clearly. Only show relevant tasks.`;
                         body: JSON.stringify([{ fromProjectId: oldProjectId, toProjectId: somedayProject.id, taskId: task.id }])
                     });
                     if (moveResp.ok) {
-                        console.log('✅ Task moved to Someday');
                     } else {
                         console.warn('Move to Someday failed:', await moveResp.text());
                     }
