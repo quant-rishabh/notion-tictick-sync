@@ -5688,11 +5688,11 @@
             <label for="aiSearchTags">Tags to add (optional)</label>
             <input type="text" id="aiSearchTags" placeholder="e.g. focus, review, finance">
             <div style="font-size: 11px; color: #9ca3af; margin-top: -6px; margin-bottom: 12px;">Comma-separated. Existing tags are kept and duplicate tags are skipped.</div>
-            <label for="aiSearchProject">Move matching tasks to list (optional)</label>
+            <label for="aiSearchProject">Move matching Inbox tasks to list (optional)</label>
             <select id="aiSearchProject">
                 <option value="">No list change</option>
             </select>
-            <div style="font-size: 11px; color: #9ca3af; margin-top: -6px; margin-bottom: 12px;">After Gemini returns results, matching tasks will be moved to this list.</div>
+            <div style="font-size: 11px; color: #9ca3af; margin-top: -6px; margin-bottom: 12px;">Tags can apply everywhere, but only matching tasks currently in Inbox will be moved.</div>
             <div class="ai-search-modal-actions">
                 <button class="ai-search-cancel" onclick="closeAISearchModal()">Cancel</button>
                 <button onclick="saveAISearch()">Save Search</button>
@@ -7329,17 +7329,24 @@
             if (!token) throw new Error('Configure your TickTick access token before moving AI search tasks');
 
             const taskMap = new Map(tasks.map(task => [task.id, task]));
-            const moves = [...new Set((resultItems || []).map(item => item.id).filter(Boolean))]
+            const matchingTasks = [...new Set((resultItems || []).map(item => item.id).filter(Boolean))]
                 .map(taskId => taskMap.get(taskId))
-                .filter(task => task && task.projectId !== targetProjectId)
+                .filter(Boolean);
+            const isInboxTask = task => {
+                const project = projects[task.projectId];
+                return String(task.projectId || '').toLowerCase().startsWith('inbox') ||
+                    project?.name?.toLowerCase() === 'inbox';
+            };
+            const moves = matchingTasks
+                .filter(task => isInboxTask(task) && task.projectId !== targetProjectId)
                 .map(task => ({
                     fromProjectId: task.projectId,
                     toProjectId: targetProjectId,
                     taskId: task.id
                 }));
-            const skipped = [...new Set((resultItems || []).map(item => item.id).filter(Boolean))]
-                .map(taskId => taskMap.get(taskId))
-                .filter(task => task && task.projectId === targetProjectId).length;
+            const skipped = matchingTasks.filter(task =>
+                !isInboxTask(task) || task.projectId === targetProjectId
+            ).length;
             if (moves.length === 0) return { updated: 0, skipped, failed: 0 };
 
             try {
