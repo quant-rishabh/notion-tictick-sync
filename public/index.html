@@ -6800,7 +6800,7 @@
             taskCommentsLoading.add(taskId);
             try {
                 const response = await fetch(getTaskCommentsUrl(task), {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    headers: { 'Authorization': token }
                 });
                 if (!response.ok) {
                     throw new Error(`Failed to load comments: ${response.status}`);
@@ -6974,7 +6974,7 @@
                 const response = await fetch(getTaskCommentUrl(task), {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${token}`,
+                        'Authorization': token,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ title })
@@ -7122,7 +7122,7 @@
                 const response = await fetch(`https://api.ticktick.com/open/v1/task/${encodeURIComponent(task.id)}`, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${token}`,
+                        'Authorization': token,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(payload)
@@ -8571,7 +8571,7 @@
                 // Delete from inbox
                 await fetch(`https://api.ticktick.com/open/v1/project/${task.projectId}/task/${task.id}`, {
                     method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    headers: { 'Authorization': token }
                 });
                 
                 showMessage('📝 Moved to Independent', 'success');
