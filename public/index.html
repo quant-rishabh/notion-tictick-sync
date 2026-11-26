@@ -7317,6 +7317,7 @@
                     if (taskById[task.id]) taskById[task.id].tags = mergedTags;
                     const allTask = allTasks.find(item => item.id === task.id);
                     if (allTask) allTask.tags = mergedTags;
+                    localStorage.setItem('ticktick_tasks', JSON.stringify(allTasks));
                     updated++;
                 } catch (error) {
                     failed++;
@@ -7450,6 +7451,16 @@
                 showAIResultBanner(search, filteredTasks.length, totalFilteredTasks, cachedResult.summary, true);
                 updateFilterInfo();
                 showMessage(`No new tasks to evaluate (${filteredTasks.length} previous match(es))`, 'success');
+                let tagSummary = null;
+                let moveSummary = null;
+                try {
+                    tagSummary = await addAISearchTags(search, cachedResult.results, filteredTasks);
+                    moveSummary = await moveAISearchTasks(search, cachedResult.results, filteredTasks);
+                } catch (error) {
+                    showMessage(error.message, 'error');
+                }
+                if (tagSummary) showAISearchTagSummary(search.tags || [], tagSummary);
+                if (moveSummary) showAISearchMoveSummary(search.targetProjectId, moveSummary);
                 console.groupEnd();
                 return;
             }
