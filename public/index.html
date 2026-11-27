@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TickTick Task Manager</title>
+    <script>
+        if (window.innerWidth <= 768 && window.location.pathname === '/') {
+            window.location.replace('/mobile/' + window.location.search + window.location.hash);
+        }
+    </script>
     <style>
         * {
             margin: 0;

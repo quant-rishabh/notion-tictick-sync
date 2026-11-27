@@ -1,4 +1,14 @@
 {
+  "rewrites": [
+    {
+      "source": "/mobile",
+      "destination": "/mobile/index.html"
+    },
+    {
+      "source": "/mobile/",
+      "destination": "/mobile/index.html"
+    }
+  ],
   "crons": [
     {
       "path": "/api/cron/sync",

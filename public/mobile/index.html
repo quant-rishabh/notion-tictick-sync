@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>TickTick Mobile</title>
+    <style>
+        :root {
+            color-scheme: dark;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #101114;
+            color: #f3f4f6;
+        }
+
+        * { box-sizing: border-box; }
+        body { margin: 0; background: #101114; }
+        button, select, input { font: inherit; }
+        button { cursor: pointer; }
+
+        .mobile-shell {
+            width: min(100%, 720px);
+            margin: 0 auto;
+            padding: 14px 12px 28px;
+        }
+
+        .mobile-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 20px;
+            letter-spacing: -0.02em;
+        }
+
+        .header-actions { display: flex; gap: 6px; }
+        .button {
+            border: 1px solid #3b4250;
+            border-radius: 9px;
+            background: #1b1f27;
+            color: #f3f4f6;
+            padding: 8px 10px;
+        }
+
+        .button.primary {
+            background: #2563eb;
+            border-color: #3b82f6;
+        }
+
+        .settings {
+            display: grid;
+            gap: 8px;
+        }
+
+        .settings[hidden] { display: none; }
+
+        .settings label {
+            display: grid;
+            gap: 4px;
+            color: #aeb6c4;
+            font-size: 11px;
+        }
+
+        .settings input {
+            width: 100%;
+            border: 1px solid #3b4250;
+            border-radius: 8px;
+            background: #101114;
+            color: #f3f4f6;
+            padding: 9px;
+        }
+
+        .panel {
+            border: 1px solid #292e39;
+            border-radius: 12px;
+            background: #17191f;
+            padding: 10px;
+            margin-bottom: 12px;
+        }
+
+        .filters {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .filters label {
+            display: grid;
+            gap: 4px;
+            color: #aeb6c4;
+            font-size: 11px;
+        }
+
+        .filters select {
+            width: 100%;
+            min-width: 0;
+            border: 1px solid #3b4250;
+            border-radius: 8px;
+            background: #101114;
+            color: #f3f4f6;
+            padding: 9px 8px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 8px;
+            color: #cbd5e1;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .ai-searches {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .ai-create {
+            display: grid;
+            gap: 8px;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #2d3440;
+        }
+
+        .ai-create[hidden] { display: none; }
+
+        .ai-create input,
+        .ai-create textarea,
+        .ai-create select {
+            width: 100%;
+            border: 1px solid #3b4250;
+            border-radius: 8px;
+            background: #101114;
+            color: #f3f4f6;
+            padding: 9px;
+        }
+
+        .ai-create textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-actions { display: flex; gap: 8px; }
+
+        .ai-search {
+            min-height: 44px;
+            flex: 1;
+            border: 1px solid #334155;
+            border-radius: 9px;
+            background: #202735;
+            color: #e0e7ff;
+            padding: 8px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 650;
+        }
+
+        .ai-search-row {
+            display: flex;
+            align-items: stretch;
+            gap: 5px;
+        }
+
+        .ai-search-actions {
+            display: grid;
+            grid-template-rows: 1fr 1fr;
+            gap: 3px;
+        }
+
+        .ai-search-action {
+            min-width: 32px;
+            border: 1px solid #3b4250;
+            border-radius: 7px;
+            background: #1b1f27;
+            color: #cbd5e1;
+            font-size: 12px;
+        }
+
+        .ai-search:disabled { opacity: 0.55; }
+        .status { min-height: 18px; color: #94a3b8; font-size: 12px; }
+
+        .task-list { display: grid; gap: 8px; }
+
+        .task {
+            border: 1px solid #2d3440;
+            border-left: 4px solid #64748b;
+            border-radius: 10px;
+            background: #181b22;
+            padding: 10px;
+        }
+
+        .task.priority-high { border-left-color: #fb7185; background: #241a1f; }
+        .task.priority-medium { border-left-color: #facc15; background: #242117; }
+        .task.priority-low { border-left-color: #60a5fa; background: #17202d; }
+
+        .task-title {
+            color: #f8fafc;
+            font-size: 14px;
+            font-weight: 650;
+            line-height: 1.35;
+        }
+
+        .task-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px 8px;
+            margin-top: 6px;
+            color: #aeb6c4;
+            font-size: 11px;
+        }
+
+        .task-tags { color: #93c5fd; }
+        .empty { color: #94a3b8; font-size: 13px; padding: 12px 2px; }
+        .desktop-frame { display: none; }
+
+        @media (max-width: 420px) {
+            .filters, .ai-searches { grid-template-columns: 1fr; }
+            .mobile-shell { padding-inline: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <main class="mobile-shell">
+        <header class="mobile-header">
+            <h1>📋 TickTick Mobile</h1>
+            <div class="header-actions">
+                <button class="button" id="syncButton" type="button">Sync</button>
+                <button class="button" id="settingsButton" type="button">⚙</button>
+                <button class="button" id="desktopButton" type="button">Desktop</button>
+            </div>
+        </header>
+
+        <section class="panel settings" id="settingsPanel" hidden>
+            <div class="section-title"><span>Settings</span></div>
+            <label>TickTick Access Token
+                <input id="mobileAccessToken" type="password" autocomplete="off" placeholder="Paste TickTick access token">
+            </label>
+            <label>Gemini API Key
+                <input id="mobileGeminiKey" type="password" autocomplete="off" placeholder="Paste Gemini API key">
+            </label>
+            <label>OpenAI API Key (optional)
+                <input id="mobileOpenAIKey" type="password" autocomplete="off" placeholder="Paste OpenAI API key">
+            </label>
+            <div class="form-actions">
+                <button class="button primary" id="saveSettingsButton" type="button">Save settings</button>
+                <span class="status" id="settingsStatus"></span>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="section-title">
+                <span>Filters</span>
+                <span id="taskCount">0 tasks</span>
+            </div>
+            <div class="filters">
+                <label>Project<select id="mobileProject"></select></label>
+                <label>Date<select id="mobileDate">
+                    <option value="all">All dates</option>
+                    <option value="today-overdue">Today + overdue</option>
+                    <option value="today">Today</option>
+                    <option value="next7">Next 7 days</option>
+                    <option value="nodate">No date</option>
+                </select></label>
+                <label>Priority<select id="mobilePriority">
+                    <option value="all">All priorities</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                    <option value="none">No priority</option>
+                </select></label>
+                <label>Tags<select id="mobileTag">
+                    <option value="all">All tags</option>
+                </select></label>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="section-title">
+                <span>✨ Saved AI searches</span>
+                <span>
+                    <button class="button" id="newSearchButton" type="button">＋ New</button>
+                    <span id="aiStatus"></span>
+                </span>
+            </div>
+            <form class="ai-create" id="createSearchForm" hidden>
+                <input id="newSearchTitle" required maxlength="80" placeholder="Search name">
+                <textarea id="newSearchInstruction" required placeholder="What should Gemini find?"></textarea>
+                <input id="newSearchTags" placeholder="Tags to add, comma-separated (optional)">
+                <select id="newSearchProject">
+                    <option value="">No list change</option>
+                </select>
+                <div class="form-actions">
+                    <button class="button primary" type="submit">Save search</button>
+                    <button class="button" id="cancelSearchButton" type="button">Cancel</button>
+                </div>
+            </form>
+            <div class="ai-searches" id="aiSearches">
+                <div class="empty">Loading saved searches...</div>
+            </div>
+            <div class="status" id="status" aria-live="polite"></div>
+        </section>
+
+        <section class="panel">
+            <div class="section-title"><span>Tasks</span></div>
+            <div class="task-list" id="tasks">
+                <div class="empty">Loading tasks...</div>
+            </div>
+        </section>
+    </main>
+
+    <iframe class="desktop-frame" id="desktopFrame" src="/index.html" title="Shared TickTick data"></iframe>
+
+    <script>
+        (() => {
+            const frame = document.getElementById('desktopFrame');
+            const projectSelect = document.getElementById('mobileProject');
+            const dateSelect = document.getElementById('mobileDate');
+            const prioritySelect = document.getElementById('mobilePriority');
+            const tagSelect = document.getElementById('mobileTag');
+            const tasksElement = document.getElementById('tasks');
+            const searchesElement = document.getElementById('aiSearches');
+            const statusElement = document.getElementById('status');
+            const countElement = document.getElementById('taskCount');
+            const aiStatusElement = document.getElementById('aiStatus');
+            let editingSearchId = null;
+            let filtersInitialized = false;
+            const MOBILE_FILTERS_KEY = 'mobile_filter_state';
+
+            function loadMobileSettings() {
+                document.getElementById('settingsStatus').textContent =
+                    localStorage.getItem('ticktick_token') || localStorage.getItem('gemini_api_key')
+                        ? 'Saved keys are configured.'
+                        : 'Keys required for sync and AI searches.';
+            }
+
+            function saveMobileSettings() {
+                const token = document.getElementById('mobileAccessToken').value.trim();
+                const geminiKey = document.getElementById('mobileGeminiKey').value.trim();
+                const openaiKey = document.getElementById('mobileOpenAIKey').value.trim();
+                if (token) localStorage.setItem('ticktick_token', token);
+                if (geminiKey) {
+                    localStorage.setItem('gemini_api_key', geminiKey);
+                    localStorage.setItem('gemini_key', geminiKey);
+                }
+                if (openaiKey) localStorage.setItem('openai_key', openaiKey);
+                document.getElementById('mobileAccessToken').value = '';
+                document.getElementById('mobileGeminiKey').value = '';
+                document.getElementById('mobileOpenAIKey').value = '';
+                document.getElementById('settingsStatus').textContent = 'Settings saved.';
+                frame.contentWindow.eval('loadConfig()');
+            }
+
+            const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[char]));
+
+            function frameState() {
+                if (!frame.contentWindow) return null;
+                return frame.contentWindow.eval(`({
+                    tasks: allTasks,
+                    projects,
+                    searches: aiSearches,
+                    filtered: filteredTasks,
+                    active: activeAISearch ? activeAISearch.id : null,
+                    resultCount: activeAIResult ? activeAIResult.results.length : 0,
+                    resultReady: Boolean(activeAIResult),
+                    loading: Boolean(document.querySelector('#taskList .loading'))
+                })`);
+            }
+
+            function selectedTasks(state) {
+                const uniqueTasks = [...new Map((state?.tasks || []).map(task => [task.id, task])).values()];
+                return uniqueTasks.filter(task => {
+                    if (projectSelect.value !== 'all' && task.projectId !== projectSelect.value) return false;
+                    if (prioritySelect.value !== 'all') {
+                        const priority = task.priority === 5 ? 'high' : task.priority === 3 ? 'medium' : task.priority === 1 ? 'low' : 'none';
+                        if (priority !== prioritySelect.value) return false;
+                    }
+                    if (tagSelect.value !== 'all' && !(task.tags || []).some(tag => tag.toLowerCase() === tagSelect.value.toLowerCase())) return false;
+                    if (dateSelect.value !== 'all') {
+                        if (!task.dueDate && dateSelect.value !== 'nodate') return false;
+                        if (dateSelect.value === 'nodate') return !task.dueDate;
+                        if (!task.dueDate) return false;
+                        const day = new Date(task.dueDate);
+                        const now = new Date();
+                        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                        const dueDay = new Date(day.getFullYear(), day.getMonth(), day.getDate());
+                        const days = Math.round((dueDay - today) / 86400000);
+                        if (dateSelect.value === 'today' && days !== 0) return false;
+                        if (dateSelect.value === 'today-overdue' && days > 0) return false;
+                        if (dateSelect.value === 'next7' && (days < 0 || days > 7)) return false;
+                    }
+                    return true;
+                });
+            }
+
+            function renderTasks(state) {
+                const tasks = selectedTasks(state);
+                countElement.textContent = `${tasks.length} task${tasks.length === 1 ? '' : 's'}`;
+                if (!tasks.length) {
+                    tasksElement.innerHTML = '<div class="empty">No tasks match these filters.</div>';
+                    return;
+                }
+                tasksElement.innerHTML = tasks.map(task => {
+                    const priority = task.priority === 5 ? 'priority-high' : task.priority === 3 ? 'priority-medium' : task.priority === 1 ? 'priority-low' : '';
+                    const project = state.projects?.[task.projectId]?.name || 'Inbox';
+                    const date = task.dueDate ? new Date(task.dueDate).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : 'No date';
+                    const tags = Array.isArray(task.tags) && task.tags.length ? task.tags.join(', ') : 'No tags';
+                    return `<article class="task ${priority}">
+                        <div class="task-title">${escapeHtml(task.title || 'Untitled task')}</div>
+                        <div class="task-meta"><span>${escapeHtml(date)}</span><span>${escapeHtml(project)}</span></div>
+                        <div class="task-meta task-tags">${escapeHtml(tags)}</div>
+                    </article>`;
+                }).join('');
+            }
+
+            function populateFilters(state) {
+                const previousProject = projectSelect.value;
+                const previousTag = tagSelect.value;
+                const projects = Object.values(state.projects || {}).filter(project => project.name);
+                projectSelect.innerHTML = '<option value="all">All projects</option>' +
+                    projects.map(project => `<option value="${escapeHtml(project.id)}">${escapeHtml(project.name)}</option>`).join('');
+                if ([...projectSelect.options].some(option => option.value === previousProject)) {
+                    projectSelect.value = previousProject;
+                }
+                const tags = [...new Set((state.tasks || []).flatMap(task => Array.isArray(task.tags) ? task.tags : []))].sort();
+                tagSelect.innerHTML = '<option value="all">All tags</option>' +
+                    tags.map(tag => `<option value="${escapeHtml(tag)}">${escapeHtml(tag)}</option>`).join('');
+                if ([...tagSelect.options].some(option => option.value === previousTag)) {
+                    tagSelect.value = previousTag;
+                }
+                if (!filtersInitialized && (state.tasks || []).length > 0) {
+                    try {
+                        const saved = JSON.parse(localStorage.getItem(MOBILE_FILTERS_KEY) || '{}');
+                        [projectSelect, dateSelect, prioritySelect, tagSelect].forEach(select => {
+                            if (typeof saved[select.id] === 'string' &&
+                                [...select.options].some(option => option.value === saved[select.id])) {
+                                select.value = saved[select.id];
+                            }
+                        });
+                    } catch (error) {
+                        statusElement.textContent = 'Could not restore mobile filters.';
+                    }
+                    filtersInitialized = true;
+                }
+            }
+
+            function saveFilterState() {
+                localStorage.setItem(MOBILE_FILTERS_KEY, JSON.stringify({
+                    mobileProject: projectSelect.value,
+                    mobileDate: dateSelect.value,
+                    mobilePriority: prioritySelect.value,
+                    mobileTag: tagSelect.value
+                }));
+            }
+
+            function renderSearches(state) {
+                const searches = state.searches || [];
+                if (!searches.length) {
+                    searchesElement.innerHTML = '<div class="empty">Create saved searches from the desktop page.</div>';
+                    return;
+                }
+                searchesElement.innerHTML = searches.map(search => `
+                    <div class="ai-search-row">
+                        <button class="ai-search" type="button" data-search-id="${escapeHtml(search.id)}">✨ ${escapeHtml(search.title)}</button>
+                        <span class="ai-search-actions">
+                            <button class="ai-search-action" type="button" data-edit-search="${escapeHtml(search.id)}" title="Edit search">✎</button>
+                            <button class="ai-search-action" type="button" data-delete-search="${escapeHtml(search.id)}" title="Delete search">×</button>
+                        </span>
+                    </div>
+                `).join('');
+                searchesElement.querySelectorAll('[data-search-id]').forEach(button => {
+                    button.addEventListener('click', () => runSearch(button.dataset.searchId));
+                });
+                searchesElement.querySelectorAll('[data-edit-search]').forEach(button => {
+                    button.addEventListener('click', () => editSearch(button.dataset.editSearch));
+                });
+                searchesElement.querySelectorAll('[data-delete-search]').forEach(button => {
+                    button.addEventListener('click', () => deleteSearch(button.dataset.deleteSearch));
+                });
+            }
+
+            function populateSearchProjects(state) {
+                const projectSelect = document.getElementById('newSearchProject');
+                const projects = Object.values(state.projects || {}).filter(project => project.name);
+                projectSelect.innerHTML = '<option value="">No list change</option>' +
+                    projects.map(project => `<option value="${escapeHtml(project.id)}">${escapeHtml(project.name)}</option>`).join('');
+            }
+
+            function showCreateSearch(show) {
+                document.getElementById('createSearchForm').hidden = !show;
+                if (!show) editingSearchId = null;
+                if (show) document.getElementById('newSearchTitle').focus();
+            }
+
+            function editSearch(searchId) {
+                const search = (frameState()?.searches || []).find(item => item.id === searchId);
+                if (!search) return;
+                editingSearchId = searchId;
+                document.getElementById('newSearchTitle').value = search.title || '';
+                document.getElementById('newSearchInstruction').value = search.instruction || '';
+                document.getElementById('newSearchTags').value = Array.isArray(search.tags) ? search.tags.join(', ') : '';
+                document.getElementById('newSearchProject').value = search.targetProjectId || '';
+                showCreateSearch(true);
+            }
+
+            function deleteSearch(searchId) {
+                const search = (frameState()?.searches || []).find(item => item.id === searchId);
+                if (!search || !window.confirm(`Delete "${search.title}"?`)) return;
+                const searches = (frameState()?.searches || []).filter(item => item.id !== searchId);
+                localStorage.setItem('saved_ai_searches', JSON.stringify(searches));
+                const results = JSON.parse(localStorage.getItem('saved_ai_search_results') || '{}');
+                delete results[searchId];
+                localStorage.setItem('saved_ai_search_results', JSON.stringify(results));
+                const evaluations = JSON.parse(localStorage.getItem('saved_ai_search_evaluations') || '{}');
+                delete evaluations[searchId];
+                localStorage.setItem('saved_ai_search_evaluations', JSON.stringify(evaluations));
+                if (frameState()?.active === searchId) frame.contentWindow.eval('clearAIResult()');
+                frame.contentWindow.eval('loadAISearches()');
+                statusElement.textContent = 'AI search deleted.';
+                refresh();
+            }
+
+            function saveMobileSearch(event) {
+                event.preventDefault();
+                const title = document.getElementById('newSearchTitle').value.trim();
+                const instruction = document.getElementById('newSearchInstruction').value.trim();
+                const tags = document.getElementById('newSearchTags').value
+                    .split(',')
+                    .map(tag => tag.trim())
+                    .filter(Boolean)
+                    .filter((tag, index, values) => values.findIndex(value => value.toLowerCase() === tag.toLowerCase()) === index);
+                if (!title || !instruction) return;
+
+                const searches = JSON.parse(localStorage.getItem('saved_ai_searches') || '[]');
+                const nextSearch = {
+                    id: `ai-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+                    title,
+                    instruction,
+                    tags,
+                    targetProjectId: document.getElementById('newSearchProject').value
+                };
+                if (editingSearchId) {
+                    const index = searches.findIndex(search => search.id === editingSearchId);
+                    if (index >= 0) {
+                        const results = JSON.parse(localStorage.getItem('saved_ai_search_results') || '{}');
+                        delete results[editingSearchId];
+                        localStorage.setItem('saved_ai_search_results', JSON.stringify(results));
+                        const evaluations = JSON.parse(localStorage.getItem('saved_ai_search_evaluations') || '{}');
+                        delete evaluations[editingSearchId];
+                        localStorage.setItem('saved_ai_search_evaluations', JSON.stringify(evaluations));
+                        searches[index] = nextSearch;
+                    }
+                } else {
+                    searches.push(nextSearch);
+                }
+                localStorage.setItem('saved_ai_searches', JSON.stringify(searches));
+                frame.contentWindow.eval('loadAISearches()');
+                document.getElementById('createSearchForm').reset();
+                const wasEditing = Boolean(editingSearchId);
+                showCreateSearch(false);
+                statusElement.textContent = wasEditing ? 'AI search updated.' : 'AI search saved.';
+                editingSearchId = null;
+                refresh();
+            }
+
+            async function runSearch(searchId) {
+                statusElement.textContent = 'Gemini is reviewing the filtered tasks...';
+                aiStatusElement.textContent = 'Running';
+                searchesElement.querySelectorAll('button').forEach(button => { button.disabled = true; });
+                try {
+                    syncFrameFilters();
+                    frame.contentWindow.eval(`runAISearch(${JSON.stringify(searchId)})`);
+                    await waitForSearch(searchId);
+                    statusElement.textContent = 'AI search complete.';
+                } catch (error) {
+                    statusElement.textContent = error.message || 'AI search failed.';
+                } finally {
+                    aiStatusElement.textContent = '';
+                    refresh();
+                }
+            }
+
+            function waitForSearch(searchId) {
+                return new Promise((resolve, reject) => {
+                    const started = Date.now();
+                    const timer = setInterval(() => {
+                        try {
+                            const state = frameState();
+                            if (state?.active === searchId && state.resultReady && !state.loading) {
+                                clearInterval(timer);
+                                resolve();
+                            } else if (Date.now() - started > 95000) {
+                                clearInterval(timer);
+                                reject(new Error('AI search timed out.'));
+                            }
+                        } catch (error) {
+                            clearInterval(timer);
+                            reject(error);
+                        }
+                    }, 500);
+                });
+            }
+
+            function syncFrameFilters() {
+                const frameDocument = frame.contentDocument;
+                if (!frameDocument) return;
+                const values = {
+                    projectFilter: projectSelect.value,
+                    dateFilter: {
+                        all: 'all',
+                        'today-overdue': 'today_overdue',
+                        today: 'today_allday',
+                        next7: 'week',
+                        nodate: 'nodate'
+                    }[dateSelect.value] || 'all',
+                    priorityFilter: prioritySelect.value
+                };
+                Object.entries(values).forEach(([id, value]) => {
+                    const select = frameDocument.getElementById(id);
+                    if (select && [...select.options].some(option => option.value === value)) {
+                        select.value = value;
+                    }
+                });
+                frame.contentWindow.eval('applyPreFilters()');
+            }
+
+            function refresh() {
+                try {
+                    const state = frameState();
+                    if (!state) return;
+                    populateFilters(state);
+                    populateSearchProjects(state);
+                    renderSearches(state);
+                    renderTasks(state);
+                } catch (error) {
+                    statusElement.textContent = 'Waiting for the desktop app to finish loading...';
+                }
+            }
+
+            [projectSelect, dateSelect, prioritySelect, tagSelect].forEach(select => {
+                select.addEventListener('change', () => {
+                    saveFilterState();
+                    refresh();
+                });
+            });
+
+            document.getElementById('syncButton').addEventListener('click', () => {
+                statusElement.textContent = 'Syncing tasks from TickTick...';
+                frame.contentWindow.eval('refreshFromTickTick()');
+                setTimeout(refresh, 1500);
+            });
+
+            document.getElementById('settingsButton').addEventListener('click', () => {
+                const panel = document.getElementById('settingsPanel');
+                panel.hidden = !panel.hidden;
+                if (!panel.hidden) loadMobileSettings();
+            });
+            document.getElementById('saveSettingsButton').addEventListener('click', saveMobileSettings);
+            document.getElementById('desktopButton').addEventListener('click', () => {
+                window.location.href = '/index.html';
+            });
+
+            document.getElementById('newSearchButton').addEventListener('click', () => showCreateSearch(true));
+            document.getElementById('cancelSearchButton').addEventListener('click', () => showCreateSearch(false));
+            document.getElementById('createSearchForm').addEventListener('submit', saveMobileSearch);
+
+            frame.addEventListener('load', () => {
+                refresh();
+                setInterval(refresh, 1500);
+            });
+        })();
+    </script>
+</body>
+</html>
